@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Perfil - StageLink{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <div class="mb-8">
+    <p class="text-sm text-emerald-400">Conta</p>
+    <h1 class="text-3xl font-semibold">Perfil</h1>
+  </div>
+
+  <div class="rounded border border-zinc-800 bg-zinc-900 p-6">
+    {% if artist %}
+      <div class="flex flex-col gap-5 md:flex-row">
+        {% if artist.photo %}
+          <img src="{{ artist.photo.url }}" alt="{{ artist.name }}" class="h-28 w-28 rounded object-cover">
+        {% else %}
+          <div class="flex h-28 w-28 items-center justify-center rounded bg-zinc-800 text-3xl font-semibold">{{ artist.name|first }}</div>
+        {% endif %}
+        <div class="flex-1">
+          <p class="text-sm text-zinc-400">Musico</p>
+          <h2 class="text-2xl font-semibold">{{ artist.name }}</h2>
+          <p class="mt-2 text-sm text-zinc-400">{{ user.email|default:"Sem email definido" }}</p>
+          <p class="mt-4 whitespace-pre-line text-zinc-300">{{ artist.bio|default:"Ainda nao adicionaste uma bio." }}</p>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <a class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400" href="{% url 'streams:artist_profile_edit' %}">Editar perfil de artista</a>
+            <a class="rounded border border-zinc-700 bg-zinc-900 px-4 py-3 font-semibold text-zinc-100 hover:border-emerald-500" href="{% url 'streams:artist_detail' artist.id %}">Ver pagina publica</a>
+          </div>
+        </div>
+      </div>
+    {% elif fan %}
+      <div class="flex flex-col gap-6 md:flex-row">
+        <div>
+          {% if fan.photo %}
+            <img src="{{ fan.photo.url }}" alt="{{ fan.display_name }}" class="h-32 w-32 rounded-full object-cover ring-2 ring-emerald-500/60">
+          {% elif fan.social_avatar_url %}
+            <img src="{{ fan.social_avatar_url }}" alt="{{ fan.display_name }}" class="h-32 w-32 rounded-full object-cover ring-2 ring-emerald-500/60">
+          {% else %}
+            <img src="{% static 'img/default-fan-avatar.svg' %}" alt="{{ fan.display_name }}" class="h-32 w-32 rounded-full object-cover ring-2 ring-zinc-700">
+          {% endif %}
+        </div>
+        <div class="flex-1">
+          <p class="text-sm text-zinc-400">Fa</p>
+          <h2 class="text-2xl font-semibold">{{ fan.display_name }}</h2>
+          <p class="mt-2 text-sm text-zinc-400">{{ user.email|default:"Sem email definido" }}</p>
+
+          <form method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
+            {% csrf_token %}
+            {{ fan_form.as_p }}
+            <button class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400">Guardar perfil</button>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <h2 class="text-2xl font-semibold">{{ user.username }}</h2>
+      <p class="mt-2 text-zinc-400">Esta conta ainda nao tem perfil associado.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

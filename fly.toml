@@ -1,0 +1,31 @@
+app = "stagelink"
+primary_region = "ams"
+
+[build]
+
+[env]
+  DJANGO_SETTINGS_MODULE = "stagelink.settings"
+  DEBUG = "False"
+  ALLOWED_HOSTS = ".fly.dev"
+  CSRF_TRUSTED_ORIGINS = "https://*.fly.dev"
+  PORT = "8080"
+
+[deploy]
+  release_command = "python manage.py migrate --noinput"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[mounts]
+  source = "stagelink_media"
+  destination = "/app/media"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1

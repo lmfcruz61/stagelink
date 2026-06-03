@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Novo artista gerido - StageLink{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <div class="mb-6">
+    <p class="text-sm text-emerald-400">Equipa / agencia / empresa</p>
+    <h1 class="text-3xl font-semibold">Novo artista gerido</h1>
+    <p class="mt-2 text-zinc-400">Cria uma pagina de artista associada a uma equipa. Depois podes editar a pagina, galeria e agendar streams.</p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4 rounded border border-zinc-800 bg-zinc-900 p-6">
+    {% csrf_token %}
+    <label>
+      <span>Equipa responsavel</span>
+      <select name="organization" required>
+        {% for organization in organizations %}
+          <option value="{{ organization.id }}">{{ organization.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    {{ form.as_p }}
+    <button class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400">Criar artista</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Registo" %} - StageLink{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-md">
+  <h1 class="mb-6 text-3xl font-semibold">{% trans "Criar conta" %}</h1>
+  <div class="mb-5 rounded border border-zinc-800 bg-zinc-900 p-4 text-sm text-zinc-300">
+    <p><strong>Musico:</strong> cria a tua pagina de artista individual.</p>
+    <p class="mt-2"><strong>Manager / equipa:</strong> cria uma empresa, agencia ou equipa para gerir varios artistas.</p>
+    <p class="mt-2"><strong>Fa:</strong> segue artistas, compra acesso e participa nos streams.</p>
+  </div>
+  <form method="post" class="space-y-4 rounded border border-zinc-800 bg-zinc-900 p-6">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="w-full rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400">{% trans "Entrar na StageLink" %}</button>
+  </form>
+</section>
+<script>
+  const roleField = document.querySelector('#id_role');
+  const organizationField = document.querySelector('#id_organization_name');
+  const organizationWrapper = organizationField ? organizationField.closest('p') : null;
+
+  function syncOrganizationField() {
+    if (!roleField || !organizationWrapper) return;
+    const isManager = roleField.value === 'manager';
+    organizationWrapper.classList.toggle('hidden', !isManager);
+    organizationField.required = isManager;
+  }
+
+  roleField?.addEventListener('change', syncOrganizationField);
+  syncOrganizationField();
+</script>
+{% endblock %}

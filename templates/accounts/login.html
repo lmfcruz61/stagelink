@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load i18n socialaccount %}
+{% block title %}{% trans "Login" %} - StageLink{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-md">
+  <h1 class="mb-6 text-3xl font-semibold">{% trans "Login" %}</h1>
+
+  {% if 'google' in social_providers or 'facebook' in social_providers %}
+    <div class="mb-4 grid gap-3">
+      {% if 'google' in social_providers %}
+        <a class="rounded border border-zinc-700 bg-zinc-900 px-4 py-3 text-center font-semibold text-zinc-100 hover:border-emerald-500" href="{% provider_login_url 'google' %}">
+          {% trans "Entrar com Google" %}
+        </a>
+      {% endif %}
+      {% if 'facebook' in social_providers %}
+        <a class="rounded border border-zinc-700 bg-zinc-900 px-4 py-3 text-center font-semibold text-zinc-100 hover:border-emerald-500" href="{% provider_login_url 'facebook' %}">
+          {% trans "Entrar com Facebook" %}
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <form method="post" class="space-y-4 rounded border border-zinc-800 bg-zinc-900 p-6">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="w-full rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400">{% trans "Entrar" %}</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Stream - StageLink{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-xl">
+  <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar stream{% else %}Novo stream{% endif %}</h1>
+  <div class="mb-5 rounded border border-emerald-700 bg-emerald-950/30 p-4 text-sm text-zinc-200">
+    Para tocar dentro da StageLink, a live do YouTube tem de permitir incorporacao. No YouTube Studio, usa uma live publica ou nao listada e confirma que a opcao de incorporar esta ativa. Videos privados, com restricao de idade, copyright ou embed bloqueado vao mostrar "ver no YouTube".
+  </div>
+  <form method="post" enctype="multipart/form-data" class="space-y-4 rounded border border-zinc-800 bg-zinc-900 p-6">
+    {% csrf_token %}
+    {% if not stream %}
+      <label>
+        <span>Artista</span>
+        <select name="artist" required>
+          {% for artist in artists %}
+            <option value="{{ artist.id }}">{{ artist.name }}{% if artist.organization %} - {{ artist.organization.name }}{% endif %}</option>
+          {% endfor %}
+        </select>
+      </label>
+    {% else %}
+      <div class="rounded border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-300">
+        Artista: <span class="font-semibold text-zinc-100">{{ stream.artist.name }}</span>
+      </div>
+    {% endif %}
+    {{ form.as_p }}
+    {% if stream and stream.cover_image %}
+      <div>
+        <p class="mb-2 text-sm text-zinc-400">Capa atual</p>
+        <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full rounded border border-zinc-800 object-cover">
+      </div>
+    {% endif %}
+    <button class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400">Guardar</button>
+  </form>
+</section>
+{% endblock %}

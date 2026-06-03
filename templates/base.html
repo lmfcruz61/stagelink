@@ -1,0 +1,113 @@
+<!doctype html>
+{% load static %}
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
+<html lang="{{ CURRENT_LANGUAGE }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}StageLink{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid rgb(63 63 70);
+      border-radius: 0.375rem;
+      background: rgb(9 9 11);
+      color: rgb(244 244 245);
+      padding: 0.625rem 0.75rem;
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: rgb(212 212 216);
+      font-size: 0.875rem;
+    }
+
+    .helptext, form ul {
+      display: block;
+      margin-top: 0.35rem;
+      color: rgb(161 161 170);
+      font-size: 0.75rem;
+    }
+
+    .errorlist {
+      color: rgb(248 113 113);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-zinc-950 text-zinc-100">
+  {% if site_appearance.background_image %}
+    <div class="fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat" style="background-image: url('{{ site_appearance.background_image.url }}');"></div>
+    <div class="fixed inset-0 -z-10 bg-zinc-950" style="opacity: {{ site_appearance.background_overlay|default:75 }}%;"></div>
+  {% endif %}
+  <header class="border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+      <a href="{% url 'streams:home' %}" class="flex items-center gap-3 text-xl font-semibold tracking-tight">
+        {% if site_appearance.logo %}
+          <img src="{{ site_appearance.logo.url }}" alt="{{ site_appearance.name|default:'StageLink' }}" class="h-16 w-auto max-w-64 object-contain md:h-20 md:max-w-80">
+        {% else %}
+          <span>{{ site_appearance.name|default:'StageLink' }}</span>
+        {% endif %}
+      </a>
+      <div class="flex items-center gap-3 text-sm">
+        <form action="{% url 'set_language' %}" method="post" class="hidden sm:block">
+          {% csrf_token %}
+          <input name="next" type="hidden" value="{{ request.get_full_path }}">
+          <select name="language" onchange="this.form.submit()" class="w-auto rounded border border-zinc-700 bg-zinc-900 px-2 py-2 text-xs text-zinc-100">
+            {% get_current_language as LANGUAGE_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            {% for language_code, language_name in LANGUAGES %}
+              <option value="{{ language_code }}"{% if language_code == LANGUAGE_CODE %} selected{% endif %}>{{ language_code|upper }}</option>
+            {% endfor %}
+          </select>
+        </form>
+        {% if user.is_authenticated %}
+          <a class="hidden items-center gap-2 text-zinc-300 hover:text-white sm:flex" href="{% url 'accounts:profile' %}">
+            {% if user.fan_profile %}
+              {% if user.fan_profile.photo %}
+                <img src="{{ user.fan_profile.photo.url }}" alt="{{ user.fan_profile.display_name }}" class="h-8 w-8 rounded-full object-cover ring-1 ring-zinc-700">
+              {% elif user.fan_profile.social_avatar_url %}
+                <img src="{{ user.fan_profile.social_avatar_url }}" alt="{{ user.fan_profile.display_name }}" class="h-8 w-8 rounded-full object-cover ring-1 ring-zinc-700">
+              {% else %}
+                <img src="{% static 'img/default-fan-avatar.svg' %}" alt="{{ user.fan_profile.display_name }}" class="h-8 w-8 rounded-full object-cover ring-1 ring-zinc-700">
+              {% endif %}
+              <span>{{ user.fan_profile.display_name }}</span>
+            {% elif user.artist_profile %}
+              <span>{{ user.artist_profile.name }}</span>
+            {% else %}
+              <span>{{ user.username }}</span>
+            {% endif %}
+          </a>
+          <a class="text-zinc-300 hover:text-white" href="{% url 'streams:dashboard' %}">Dashboard</a>
+          <a class="rounded border border-zinc-700 px-3 py-2 text-zinc-300 hover:border-emerald-500 hover:text-white" href="{% url 'accounts:profile' %}">{% trans "Perfil" %}</a>
+          <form method="post" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button class="rounded bg-zinc-800 px-3 py-2 hover:bg-zinc-700">{% trans "Sair" %}</button>
+          </form>
+        {% else %}
+          <a class="text-zinc-300 hover:text-white" href="{% url 'accounts:login' %}">{% trans "Login" %}</a>
+          <a class="rounded bg-emerald-500 px-3 py-2 font-medium text-zinc-950 hover:bg-emerald-400" href="{% url 'accounts:register' %}">{% trans "Registo" %}</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 py-8">
+    {% if messages %}
+      <div class="mb-6 space-y-2">
+        {% for message in messages %}
+          <div class="rounded border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

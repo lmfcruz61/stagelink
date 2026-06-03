@@ -1,0 +1,220 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-02 15:00+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\templates\accounts\login.html:3 .\templates\accounts\login.html:6
+#: .\templates\base.html:97
+msgid "Login"
+msgstr "Anmelden"
+
+#: .\templates\accounts\login.html:12
+msgid "Entrar com Google"
+msgstr "Mit Google anmelden"
+
+#: .\templates\accounts\login.html:17
+msgid "Entrar com Facebook"
+msgstr "Mit Facebook anmelden"
+
+#: .\templates\accounts\login.html:26
+msgid "Entrar"
+msgstr "Anmelden"
+
+#: .\templates\accounts\register.html:3 .\templates\base.html:98
+msgid "Registo"
+msgstr "Registrieren"
+
+#: .\templates\accounts\register.html:6
+msgid "Criar conta"
+msgstr "Konto erstellen"
+
+#: .\templates\accounts\register.html:10
+msgid "Entrar na StageLink"
+msgstr "StageLink beitreten"
+
+#: .\templates\base.html:91
+msgid "Perfil"
+msgstr "Profil"
+
+#: .\templates\base.html:94
+msgid "Sair"
+msgstr "Abmelden"
+
+#: .\templates\streams\access_required.html:3
+msgid "Acesso"
+msgstr "Zugang"
+
+#: .\templates\streams\access_required.html:11
+msgid ""
+"Esta sala está reservada a fãs com subscrição ativa ou bilhete comprado."
+msgstr ""
+
+#: .\templates\streams\access_required.html:13
+msgid "Comprar bilhete"
+msgstr "Ticket kaufen"
+
+#: .\templates\streams\access_required.html:14
+msgid "Subscrever artista"
+msgstr "Künstler abonnieren"
+
+#: .\templates\streams\home.html:9
+msgid "Prepara e monetiza os teus concertos ao vivo."
+msgstr "Bereite deine Live-Konzerte vor und monetarisiere sie."
+
+#: .\templates\streams\home.html:10
+msgid ""
+"Cria streams, acompanha subscritores e recebe gorjetas dos teus fãs durante "
+"a sala ao vivo."
+msgstr ""
+
+#: .\templates\streams\home.html:14
+msgid "Novo stream"
+msgstr "Neuer Stream"
+
+#: .\templates\streams\home.html:20
+msgid "Streams ao vivo para fãs que querem apoiar de perto."
+msgstr "Live-Konzerte für Fans, die ihre Lieblingskünstler ganz nah unterstützen möchten."
+
+#: .\templates\streams\home.html:21
+msgid ""
+"Subscreve artistas, compra bilhetes para salas privadas e envia gorjetas "
+"durante o concerto."
+msgstr "Abonniere Künstler, kaufe Tickets für private Sessions und sende während des Konzerts Trinkgeld."
+
+#: .\templates\streams\home.html:25
+msgid "Guia rápido"
+msgstr ""
+
+#: .\templates\streams\home.html:35
+msgid "Guia rápido para fãs"
+msgstr ""
+
+#: .\templates\streams\home.html:36
+msgid "Segue estes passos para entrar nos concertos e apoiar os teus artistas."
+msgstr "Folge diesen Schritten, um Konzerte zu betreten und deine KÃ¼nstler zu unterstÃ¼tzen."
+
+#: .\templates\streams\home.html:38
+msgid "Fechar"
+msgstr ""
+
+#: .\templates\streams\home.html:41
+msgid "1. Escolhe um artista."
+msgstr "1. WÃ¤hle einen KÃ¼nstler."
+
+#: .\templates\streams\home.html:41
+msgid ""
+"Abre a página de um músico para veres streams futuros, streams passados e "
+"opções de acesso."
+msgstr ""
+
+#: .\templates\streams\home.html:42
+msgid "2. Garante o acesso."
+msgstr "2. Sichere dir Zugang."
+
+#: .\templates\streams\home.html:42
+msgid ""
+"Podes subscrever mensalmente o artista ou comprar bilhete para um stream "
+"específico."
+msgstr ""
+
+#: .\templates\streams\home.html:43
+msgid "3. Entra na sala."
+msgstr "3. Betritt den Raum."
+
+#: .\templates\streams\home.html:43
+msgid ""
+"Quando tiveres acesso, abre o stream para ver o player YouTube e participar "
+"no chat ao vivo."
+msgstr "Wenn du Zugang hast, Ã¶ffne den Stream, um den YouTube-Player zu sehen und am Live-Chat teilzunehmen."
+
+#: .\templates\streams\home.html:44
+msgid "4. Apoia em direto."
+msgstr "4. UnterstÃ¼tze live."
+
+#: .\templates\streams\home.html:44
+msgid ""
+"Durante o concerto, envia gorjetas com valor personalizado e uma mensagem "
+"para o artista."
+msgstr "Sende wÃ¤hrend des Konzerts individuelles Trinkgeld mit einer Nachricht an den KÃ¼nstler."
+
+#: .\templates\streams\home.html:51
+msgid "Ao vivo"
+msgstr "Live"
+
+#: .\templates\streams\home.html:68
+msgid "Ainda não há streams ativos."
+msgstr ""
+
+#: .\templates\streams\home.html:74
+msgid "Artistas"
+msgstr "Künstler"
+
+#: .\templates\streams\home.html:89
+msgid "Ainda não há artistas registados."
+msgstr ""
+
+#: .\templates\streams\room.html:16
+msgid "Mensagem"
+msgstr "Nachricht"
+
+#: .\templates\streams\room.html:17
+msgid "Gorjeta"
+msgstr "Trinkgeld"
+
+#: .\templates\streams\room.html:33
+msgid "Escreve no chat"
+msgstr "Im Chat schreiben"
+
+#: .\templates\streams\room.html:34
+msgid "Enviar"
+msgstr "Senden"
+
+#: .\templates\streams\room.html:41
+msgid ""
+"Não foi possível carregar este vídeo. Confirma o ID ou link do YouTube no "
+"dashboard do músico."
+msgstr ""
+
+#: .\templates\streams\room.html:42
+msgid ""
+"Este vídeo bloqueia incorporação fora do YouTube. No YouTube Studio, ativa a "
+"incorporação ou usa uma live pública/não listada que permita embed."
+msgstr ""
+
+#: .\templates\streams\room.html:43
+msgid ""
+"O ID/link do YouTube não parece válido ou o vídeo não está público/"
+"disponível."
+msgstr ""
+
+#: .\templates\streams\room.html:44
+msgid "Chat ligado."
+msgstr "Chat verbunden."
+
+#: .\templates\streams\room.html:45
+msgid "Erro ao ligar o chat."
+msgstr "Fehler beim Verbinden des Chats."
+
+#: .\templates\streams\room.html:46
+msgid "Chat desligado."
+msgstr "Chat getrennt."
+
+#: .\templates\streams\room.html:47
+msgid "O chat ainda não está ligado. Recarrega a página."
+msgstr ""
+
+

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{{ stream.title }} - StageLink{% endblock %}
+{% block content %}
+<section class="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+  <div>
+    {% if stream.cover_image %}
+      <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="mb-5 max-h-80 w-full rounded border border-zinc-800 object-cover md:hidden">
+    {% endif %}
+    <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
+    <h1 class="text-3xl font-semibold">{{ stream.title }}</h1>
+  </div>
+  <form method="post" action="{% url 'payments:create_tip' stream.id %}" class="flex flex-wrap gap-2">
+    {% csrf_token %}
+    <input name="amount" type="number" min="1" step="0.50" value="5" class="w-24 rounded border border-zinc-700 bg-zinc-900 px-3 py-2">
+    <input name="message" placeholder="{% trans 'Mensagem' %}" class="min-w-0 flex-1 rounded border border-zinc-700 bg-zinc-900 px-3 py-2">
+    <button class="rounded bg-emerald-500 px-4 py-2 font-semibold text-zinc-950 hover:bg-emerald-400">{% trans "Gorjeta" %}</button>
+  </form>
+</section>
+
+<section class="grid gap-6 lg:grid-cols-[1fr_360px]">
+  {% if stream.cover_image %}
+    <div class="hidden lg:col-span-2 md:block">
+      <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="max-h-96 w-full rounded border border-zinc-800 object-cover">
+    </div>
+  {% endif %}
+  <div class="aspect-video overflow-hidden rounded border border-zinc-800 bg-black">
+    <div id="player" class="h-full w-full"></div>
+  </div>
+  <aside class="rounded border border-zinc-800 bg-zinc-900">
+    <div id="chat-log" class="h-96 space-y-3 overflow-y-auto p-4 text-sm"></div>
+    <form id="chat-form" class="flex border-t border-zinc-800 p-3">
+      <input id="chat-message-input" autocomplete="off" class="min-w-0 flex-1 rounded-l border border-zinc-700 bg-zinc-950 px-3 py-2" placeholder="{% trans 'Escreve no chat' %}">
+      <button class="rounded-r bg-emerald-500 px-4 py-2 font-semibold text-zinc-950">{% trans "Enviar" %}</button>
+    </form>
+  </aside>
+</section>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+  const videoErrorDefault = "{% trans 'Não foi possível carregar este vídeo. Confirma o ID ou link do YouTube no dashboard do músico.' %}";
+  const videoErrorEmbed = "{% trans 'Este vídeo bloqueia incorporação fora do YouTube. No YouTube Studio, ativa a incorporação ou usa uma live pública/não listada que permita embed.' %}";
+  const videoErrorInvalid = "{% trans 'O ID/link do YouTube não parece válido ou o vídeo não está público/disponível.' %}";
+  const chatConnected = "{% trans 'Chat ligado.' %}";
+  const chatError = "{% trans 'Erro ao ligar o chat.' %}";
+  const chatDisconnected = "{% trans 'Chat desligado.' %}";
+  const chatReload = "{% trans 'O chat ainda não está ligado. Recarrega a página.' %}";
+
+  function onYouTubeIframeAPIReady() {
+    new YT.Player('player', {
+      videoId: '{{ stream.youtube_embed_id }}',
+      playerVars: {
+        autoplay: 0,
+        modestbranding: 1,
+        playsinline: 1,
+        rel: 0,
+        origin: window.location.origin
+      },
+      events: {
+        onError: function(event) {
+          const player = document.querySelector('#player');
+          let message = videoErrorDefault;
+          if (event.data === 101 || event.data === 150) {
+            message = videoErrorEmbed;
+          }
+          if (event.data === 2 || event.data === 100) {
+            message = videoErrorInvalid;
+          }
+          player.innerHTML = `<div class="flex h-full items-center justify-center p-6 text-center text-sm text-zinc-300">${message}</div>`;
+        }
+      }
+    });
+  }
+
+  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  const chatSocket = new WebSocket(`${protocol}://${window.location.host}/ws/streams/{{ stream.id }}/chat/`);
+  const chatLog = document.querySelector('#chat-log');
+  const chatForm = document.querySelector('#chat-form');
+  const chatInput = document.querySelector('#chat-message-input');
+
+  function appendChatLine(username, message) {
+    const row = document.createElement('div');
+    row.innerHTML = `<strong class="text-emerald-400"></strong> <span></span>`;
+    row.querySelector('strong').textContent = username;
+    row.querySelector('span').textContent = message;
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  chatSocket.onopen = function() {
+    appendChatLine('StageLink', chatConnected);
+  };
+
+  chatSocket.onerror = function() {
+    appendChatLine('StageLink', chatError);
+  };
+
+  chatSocket.onclose = function() {
+    appendChatLine('StageLink', chatDisconnected);
+  };
+
+  chatSocket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    appendChatLine(data.username, data.message);
+  };
+
+  chatForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    const message = chatInput.value.trim();
+    if (!message) return;
+    if (chatSocket.readyState !== WebSocket.OPEN) {
+      appendChatLine('StageLink', chatReload);
+      return;
+    }
+    chatSocket.send(JSON.stringify({ message }));
+    chatInput.value = '';
+  });
+</script>
+{% endblock %}
