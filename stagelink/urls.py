@@ -28,5 +28,6 @@ urlpatterns = [
     path('', include('streams.urls')),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# No piloto em Fly.io, os uploads do admin ficam no volume montado em MEDIA_ROOT.
+# Em escala maior, isto deve passar para S3/R2 ou outro object storage.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
