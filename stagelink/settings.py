@@ -121,10 +121,6 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'pt'
 LANGUAGES = [
     ('pt', 'Português'),
-    ('en', 'English'),
-    ('fr', 'Français'),
-    ('de', 'Deutsch'),
-    ('es', 'Español'),
 ]
 LOCALE_PATHS = [BASE_DIR / 'locale']
 TIME_ZONE = config('TIME_ZONE', default='Europe/Lisbon')

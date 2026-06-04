@@ -1,8 +1,7 @@
 <!doctype html>
 {% load static %}
 {% load i18n %}
-{% get_current_language as CURRENT_LANGUAGE %}
-<html lang="{{ CURRENT_LANGUAGE }}">
+<html lang="pt">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -57,17 +56,6 @@
         {% endif %}
       </a>
       <div class="flex items-center gap-3 text-sm">
-        <form action="{% url 'set_language' %}" method="post" class="hidden sm:block">
-          {% csrf_token %}
-          <input name="next" type="hidden" value="{{ request.get_full_path }}">
-          <select name="language" onchange="this.form.submit()" class="w-auto rounded border border-zinc-700 bg-zinc-900 px-2 py-2 text-xs text-zinc-100">
-            {% get_current_language as LANGUAGE_CODE %}
-            {% get_available_languages as LANGUAGES %}
-            {% for language_code, language_name in LANGUAGES %}
-              <option value="{{ language_code }}"{% if language_code == LANGUAGE_CODE %} selected{% endif %}>{{ language_code|upper }}</option>
-            {% endfor %}
-          </select>
-        </form>
         {% if user.is_authenticated %}
           <a class="hidden items-center gap-2 text-zinc-300 hover:text-white sm:flex" href="{% url 'accounts:profile' %}">
             {% if user.fan_profile %}
