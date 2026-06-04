@@ -43,14 +43,14 @@
 </head>
 <body class="min-h-screen bg-zinc-950 text-zinc-100">
   {% if site_appearance.background_image %}
-    <div class="fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat" style="background-image: url('{{ site_appearance.background_image.url }}');"></div>
+    <div class="fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat" style="background-image: url('{{ site_appearance.background_image.url }}?v={{ site_appearance_version }}');"></div>
     <div class="fixed inset-0 -z-10 bg-zinc-950" style="opacity: {{ site_appearance.background_overlay|default:75 }}%;"></div>
   {% endif %}
   <header class="border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
     <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
       <a href="{% url 'streams:home' %}" class="flex items-center gap-3 text-xl font-semibold tracking-tight">
         {% if site_appearance.logo %}
-          <img src="{{ site_appearance.logo.url }}" alt="{{ site_appearance.name|default:'StageLink' }}" class="h-16 w-auto max-w-64 object-contain md:h-20 md:max-w-80">
+          <img src="{{ site_appearance.logo.url }}?v={{ site_appearance_version }}" alt="{{ site_appearance.name|default:'StageLink' }}" class="h-16 w-auto max-w-64 object-contain md:h-20 md:max-w-80">
         {% else %}
           <span>{{ site_appearance.name|default:'StageLink' }}</span>
         {% endif %}
