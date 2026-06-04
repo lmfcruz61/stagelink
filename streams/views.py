@@ -69,6 +69,14 @@ def can_manage_artist(user, artist):
     return False
 
 
+def can_access_dashboard(user):
+    if user.is_staff or user.is_superuser:
+        return True
+    if Artist.objects.filter(user=user).exists():
+        return True
+    return OrganizationMember.objects.filter(user=user).exists()
+
+
 @login_required
 def stream_room(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
@@ -80,6 +88,10 @@ def stream_room(request, stream_id):
 
 @login_required
 def dashboard(request):
+    if not can_access_dashboard(request.user):
+        messages.info(request, 'A tua conta de fa nao tem dashboard de gestao. Usa a homepage para seguir artistas, entrar em streams e gerir o teu perfil.')
+        return redirect('streams:home')
+
     artists = editable_artists_for(request.user).order_by('name')
     artist_id = request.GET.get('artist')
     artist = get_object_or_404(artists, pk=artist_id) if artist_id else artists.first()
@@ -111,6 +123,10 @@ def dashboard(request):
 
 @login_required
 def organization_create(request):
+    if not request.user.is_staff and getattr(getattr(request.user, 'profile', None), 'role', '') == 'fan':
+        messages.error(request, 'Contas de fa nao podem criar equipas. Cria uma conta Manager / equipa para gerir artistas.')
+        return redirect('streams:home')
+
     if request.method == 'POST':
         form = OrganizationForm(request.POST, request.FILES)
         if form.is_valid():
