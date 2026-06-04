@@ -100,6 +100,7 @@ class Fan(models.Model):
     display_name = models.CharField(max_length=120)
     photo = models.ImageField(upload_to='fans/', blank=True, null=True)
     social_avatar_url = models.URLField(blank=True)
+    favorite_artists = models.ManyToManyField(Artist, blank=True, related_name='fans_who_favorited')
 
     def __str__(self):
         return self.display_name

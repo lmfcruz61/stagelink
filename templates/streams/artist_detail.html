@@ -29,6 +29,15 @@
       </div>
       <div class="flex flex-wrap gap-3">
         {% if user.is_authenticated and user.fan_profile %}
+          <form method="post" action="{% url 'streams:favorite_artist_toggle' artist.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            {% if is_favorite %}
+              <button class="rounded border border-emerald-500 bg-emerald-950/70 px-4 py-3 font-semibold text-emerald-200 hover:bg-emerald-900/70">Favorito</button>
+            {% else %}
+              <button class="rounded border border-zinc-600 bg-zinc-950/80 px-4 py-3 font-semibold text-zinc-100 hover:border-emerald-500">Adicionar aos favoritos</button>
+            {% endif %}
+          </form>
           <a class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400" href="{% url 'payments:subscribe_artist' artist.id %}">Subscrever</a>
         {% endif %}
         {% if featured_stream %}

@@ -7,6 +7,7 @@ app_name = 'streams'
 urlpatterns = [
     path('', views.home, name='home'),
     path('artistas/<int:artist_id>/', views.artist_detail, name='artist_detail'),
+    path('artistas/<int:artist_id>/favorito/', views.favorite_artist_toggle, name='favorite_artist_toggle'),
     path('streams/<int:stream_id>/', views.stream_room, name='room'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('dashboard/equipas/nova/', views.organization_create, name='organization_create'),

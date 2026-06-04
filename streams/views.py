@@ -23,7 +23,19 @@ from .models import LiveStream
 def home(request):
     artists = Artist.objects.all().order_by('name')
     live_streams = LiveStream.objects.filter(is_active=True).select_related('artist')[:8]
-    return render(request, 'streams/home.html', {'artists': artists, 'live_streams': live_streams})
+    favorite_artist_ids = set()
+    favorite_artists = Artist.objects.none()
+
+    if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
+        favorite_artists = request.user.fan_profile.favorite_artists.all().order_by('name')
+        favorite_artist_ids = set(favorite_artists.values_list('id', flat=True))
+
+    return render(request, 'streams/home.html', {
+        'artists': artists,
+        'favorite_artists': favorite_artists,
+        'favorite_artist_ids': favorite_artist_ids,
+        'live_streams': live_streams,
+    })
 
 
 def artist_detail(request, artist_id):
@@ -32,13 +44,42 @@ def artist_detail(request, artist_id):
     now = timezone.now()
     upcoming_streams = streams.filter(scheduled_at__gte=now).order_by('scheduled_at')
     past_streams = streams.filter(scheduled_at__lt=now).order_by('-scheduled_at')
+    is_favorite = False
+    if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
+        is_favorite = request.user.fan_profile.favorite_artists.filter(pk=artist.pk).exists()
+
     return render(request, 'streams/artist_detail.html', {
         'artist': artist,
         'gallery_photos': artist.gallery_photos.all(),
         'featured_stream': upcoming_streams.first(),
+        'is_favorite': is_favorite,
         'upcoming_streams': upcoming_streams,
         'past_streams': past_streams,
     })
+
+
+@login_required
+def favorite_artist_toggle(request, artist_id):
+    if request.method != 'POST':
+        return redirect('streams:artist_detail', artist_id=artist_id)
+
+    fan = getattr(request.user, 'fan_profile', None)
+    if not fan:
+        messages.error(request, 'Apenas fas podem guardar artistas favoritos.')
+        return redirect('streams:artist_detail', artist_id=artist_id)
+
+    artist = get_object_or_404(Artist, pk=artist_id)
+    if fan.favorite_artists.filter(pk=artist.pk).exists():
+        fan.favorite_artists.remove(artist)
+        messages.success(request, f'{artist.name} removido dos favoritos.')
+    else:
+        fan.favorite_artists.add(artist)
+        messages.success(request, f'{artist.name} adicionado aos favoritos.')
+
+    next_url = request.POST.get('next')
+    if next_url:
+        return redirect(next_url)
+    return redirect('streams:artist_detail', artist_id=artist_id)
 
 
 def editable_artists_for(user):
