@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load i18n %}
 {% block title %}StageLink{% endblock %}
 {% block content %}
 {% if user.is_authenticated and user.artist_profile or user.is_authenticated and user.organization_memberships.exists %}
@@ -30,7 +29,7 @@
     <div class="mt-6 grid gap-3 sm:grid-cols-3">
       <button type="button" data-public-tab="concerts" class="public-tab rounded border border-emerald-600 bg-emerald-500 px-4 py-3 text-left font-semibold text-zinc-950">
         Concertos
-        <span class="mt-1 block text-sm font-normal">{{ live_streams|length }} ao vivo · {{ upcoming_streams|length }} proximos</span>
+        <span class="mt-1 block text-sm font-normal">{{ concert_streams|length }} disponiveis</span>
       </button>
       <button type="button" data-public-tab="artists" class="public-tab rounded border border-zinc-700 bg-zinc-950 px-4 py-3 text-left font-semibold text-zinc-100 hover:border-emerald-500">
         Artistas
@@ -109,61 +108,56 @@
 {% endif %}
 
 <section data-public-panel="concerts" class="{% if user.is_authenticated and user.fan_profile %}public-panel hidden{% endif %} mb-10">
-  <div class="mb-4 flex items-center justify-between">
-    <h2 class="text-2xl font-semibold">Concertos</h2>
-  </div>
-  {% if live_streams %}
-    <div class="mb-8">
-      <h3 class="mb-3 text-lg font-semibold text-emerald-300">Ao vivo agora</h3>
-      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {% for stream in live_streams %}
-          <a href="{% url 'streams:room' stream.id %}" class="overflow-hidden rounded border border-zinc-800 bg-zinc-900 hover:border-emerald-500">
-            {% if stream.cover_image %}
-              <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full object-cover">
-            {% else %}
-              <div class="flex aspect-video w-full items-center justify-center bg-zinc-800 px-4 text-center text-sm font-semibold text-zinc-300">{{ stream.title }}</div>
-            {% endif %}
-            <div class="p-4">
-              <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
-              <h3 class="mt-2 font-semibold">{{ stream.title }}</h3>
-              <p class="mt-2 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
-            </div>
-          </a>
-        {% endfor %}
-      </div>
+  <div class="mb-4 flex flex-col gap-1 md:flex-row md:items-end md:justify-between">
+    <div>
+      <h2 class="text-2xl font-semibold">Concertos</h2>
+      {% if user.is_authenticated and user.fan_profile %}
+        <p class="text-sm text-zinc-400">Os concertos dos teus artistas favoritos aparecem primeiro e ficam marcados com estrela.</p>
+      {% else %}
+        <p class="text-sm text-zinc-400">Shows ao vivo e agendados na StageLink.</p>
+      {% endif %}
     </div>
-  {% endif %}
-
-  <div>
-    <h3 class="mb-3 text-lg font-semibold">Proximos concertos</h3>
-    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {% for stream in upcoming_streams %}
-        <a href="{% url 'streams:room' stream.id %}" class="overflow-hidden rounded border border-zinc-800 bg-zinc-900 hover:border-emerald-500">
+  </div>
+  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    {% for stream in concert_streams %}
+      <a href="{% url 'streams:room' stream.id %}" class="group overflow-hidden rounded border {% if stream.artist_id in favorite_artist_ids %}border-emerald-600 bg-emerald-950/20{% else %}border-zinc-800 bg-zinc-900{% endif %} hover:border-emerald-500">
+        <div class="relative">
           {% if stream.cover_image %}
             <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full object-cover">
           {% else %}
             <div class="flex aspect-video w-full items-center justify-center bg-zinc-800 px-4 text-center text-sm font-semibold text-zinc-300">{{ stream.title }}</div>
           {% endif %}
-          <div class="p-4">
-            <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
-            <h3 class="mt-2 font-semibold">{{ stream.title }}</h3>
-            <p class="mt-2 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }} · {{ stream.access_price }} EUR</p>
+          <div class="absolute left-3 top-3 flex flex-wrap gap-2">
+            {% if stream.is_active %}
+              <span class="rounded bg-emerald-500 px-2 py-1 text-xs font-semibold text-zinc-950">Ao vivo</span>
+            {% endif %}
+            {% if stream.artist_id in favorite_artist_ids %}
+              <span class="rounded border border-emerald-400 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-emerald-200">&#9733; Favorito</span>
+            {% endif %}
           </div>
-        </a>
-      {% empty %}
-        <p class="text-zinc-400">Ainda nao ha concertos agendados.</p>
-      {% endfor %}
-    </div>
+        </div>
+        <div class="p-4">
+          <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
+          <h3 class="mt-2 font-semibold group-hover:text-emerald-200">{{ stream.title }}</h3>
+          <p class="mt-2 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ stream.access_price }} EUR</p>
+        </div>
+      </a>
+    {% empty %}
+      <p class="text-zinc-400">Ainda nao ha concertos agendados.</p>
+    {% endfor %}
   </div>
 </section>
 
 <section data-public-panel="artists" class="{% if user.is_authenticated and user.fan_profile %}public-panel hidden{% endif %}">
-  <div class="mb-4 flex items-center justify-between">
+  <div class="mb-4">
     <h2 class="text-2xl font-semibold">Artistas</h2>
+    {% if user.is_authenticated and user.fan_profile %}
+      <p class="mt-1 text-sm text-zinc-400">Os teus favoritos aparecem primeiro. Nos favoritos mostramos tambem os concertos associados.</p>
+    {% endif %}
   </div>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for artist in artists %}
-      <article class="rounded border border-zinc-800 bg-zinc-900 p-4 hover:border-emerald-500">
+      <article class="rounded border {% if artist.id in favorite_artist_ids %}border-emerald-700 bg-emerald-950/20{% else %}border-zinc-800 bg-zinc-900{% endif %} p-4 hover:border-emerald-500">
         <a href="{% url 'streams:artist_detail' artist.id %}" class="flex gap-4">
           {% if artist.photo %}
             <img src="{{ artist.photo.url }}" alt="{{ artist.name }}" class="h-16 w-16 rounded object-cover">
@@ -171,10 +165,25 @@
             <div class="flex h-16 w-16 items-center justify-center rounded bg-zinc-800 text-xl font-semibold">{{ artist.name|first }}</div>
           {% endif %}
           <div>
-            <h3 class="font-semibold">{{ artist.name }}</h3>
+            <h3 class="font-semibold">
+              {% if artist.id in favorite_artist_ids %}<span class="mr-1 text-emerald-300">&#9733;</span>{% endif %}{{ artist.name }}
+            </h3>
             <p class="mt-1 line-clamp-2 text-sm text-zinc-400">{{ artist.bio|default:"Perfil de musico StageLink" }}</p>
           </div>
         </a>
+        {% if artist.id in favorite_artist_ids and artist.homepage_streams %}
+          <div class="mt-4 rounded border border-zinc-800 bg-zinc-950 p-3">
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Concertos deste favorito</p>
+            <div class="space-y-2">
+              {% for stream in artist.homepage_streams|slice:":3" %}
+                <a href="{% url 'streams:room' stream.id %}" class="block rounded border border-zinc-800 px-3 py-2 text-sm hover:border-emerald-500">
+                  <span class="font-semibold text-zinc-100">{{ stream.title }}</span>
+                  <span class="mt-1 block text-xs text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</span>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
         {% if user.is_authenticated and user.fan_profile %}
           <form method="post" action="{% url 'streams:favorite_artist_toggle' artist.id %}" class="mt-4">
             {% csrf_token %}

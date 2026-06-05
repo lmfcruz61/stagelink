@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.db.models import Sum
+from django.db.models import Case, IntegerField, Prefetch, Q, Sum, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -21,26 +21,59 @@ from .models import LiveStream
 
 
 def home(request):
-    artists = Artist.objects.all().order_by('name')
     now = timezone.now()
-    live_streams = LiveStream.objects.filter(is_active=True).select_related('artist').order_by('scheduled_at')[:8]
-    upcoming_streams = LiveStream.objects.filter(
-        is_active=False,
-        scheduled_at__gte=now,
-    ).select_related('artist').order_by('scheduled_at')[:12]
+    visible_streams_filter = Q(is_active=True) | Q(scheduled_at__gte=now)
+    visible_artist_streams = Prefetch(
+        'streams',
+        queryset=LiveStream.objects.filter(visible_streams_filter).order_by('-is_active', 'scheduled_at'),
+        to_attr='homepage_streams',
+    )
     favorite_artist_ids = set()
-    favorite_artists = Artist.objects.none()
+    favorite_artists = Artist.objects.none().prefetch_related(visible_artist_streams)
 
     if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
-        favorite_artists = request.user.fan_profile.favorite_artists.all().order_by('name')
+        favorite_artists = request.user.fan_profile.favorite_artists.prefetch_related(
+            visible_artist_streams,
+        ).order_by('name')
         favorite_artist_ids = set(favorite_artists.values_list('id', flat=True))
+
+    artists = Artist.objects.prefetch_related(visible_artist_streams)
+    concert_streams = LiveStream.objects.filter(visible_streams_filter).select_related('artist')
+
+    if favorite_artist_ids:
+        artists = artists.annotate(
+            favorite_rank=Case(
+                When(id__in=favorite_artist_ids, then=Value(0)),
+                default=Value(1),
+                output_field=IntegerField(),
+            ),
+        ).order_by('favorite_rank', 'name')
+        concert_streams = concert_streams.annotate(
+            favorite_rank=Case(
+                When(artist_id__in=favorite_artist_ids, then=Value(0)),
+                default=Value(1),
+                output_field=IntegerField(),
+            ),
+        )
+    else:
+        artists = artists.order_by('name')
+        concert_streams = concert_streams.annotate(
+            favorite_rank=Value(1, output_field=IntegerField()),
+        )
+
+    concert_streams = concert_streams.annotate(
+        active_rank=Case(
+            When(is_active=True, then=Value(0)),
+            default=Value(1),
+            output_field=IntegerField(),
+        ),
+    ).order_by('favorite_rank', 'active_rank', 'scheduled_at')
 
     return render(request, 'streams/home.html', {
         'artists': artists,
+        'concert_streams': concert_streams,
         'favorite_artists': favorite_artists,
         'favorite_artist_ids': favorite_artist_ids,
-        'live_streams': live_streams,
-        'upcoming_streams': upcoming_streams,
     })
 
 
