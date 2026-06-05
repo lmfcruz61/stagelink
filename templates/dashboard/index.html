@@ -115,13 +115,23 @@
     <h2 class="mb-4 text-xl font-semibold">Streams</h2>
     <div class="space-y-3">
       {% for stream in streams %}
-        <a class="sl-card block p-4" href="{% url 'streams:stream_update' stream.id %}">
-          <div class="flex justify-between gap-4">
-            <span class="font-semibold">{{ stream.title }}</span>
-            <span class="text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</span>
+        <article class="sl-card p-4">
+          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <a class="font-semibold hover:text-emerald-300" href="{% url 'streams:stream_update' stream.id %}">{{ stream.title }}</a>
+              <p class="mt-1 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
+              <p class="mt-1 text-sm text-zinc-400">{{ stream.access_price }} EUR &middot; {% if stream.is_active %}ativo{% else %}inativo{% endif %}</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:stream_update' stream.id %}">Editar</a>
+              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:room' stream.id %}">Ver sala</a>
+              <form method="post" action="{% url 'streams:stream_delete' stream.id %}" onsubmit="return confirm('Apagar este concerto? Esta acao nao pode ser desfeita.');">
+                {% csrf_token %}
+                <button class="rounded-full border border-red-700 bg-red-950/40 px-3 py-2 text-sm font-semibold text-red-200 hover:border-red-500">Apagar</button>
+              </form>
+            </div>
           </div>
-          <p class="mt-1 text-sm text-zinc-400">{{ stream.access_price }} EUR &middot; {% if stream.is_active %}ativo{% else %}inativo{% endif %}</p>
-        </a>
+        </article>
       {% empty %}
         <p class="text-zinc-400">Cria o teu primeiro stream.</p>
       {% endfor %}

@@ -29,7 +29,20 @@
         <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full rounded border border-zinc-800 object-cover">
       </div>
     {% endif %}
-    <button class="sl-primary">Guardar</button>
+    <div class="flex flex-wrap gap-3">
+      <button class="sl-primary">Guardar</button>
+      {% if stream %}
+        <a class="sl-secondary" href="{% url 'streams:dashboard' %}?artist={{ stream.artist_id }}">Voltar ao dashboard</a>
+      {% endif %}
+    </div>
   </form>
+  {% if stream %}
+    <form method="post" action="{% url 'streams:stream_delete' stream.id %}" class="mt-6 rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('Apagar este concerto? Esta acao nao pode ser desfeita.');">
+      {% csrf_token %}
+      <h2 class="text-lg font-semibold text-red-200">Apagar concerto</h2>
+      <p class="mt-2 text-sm text-red-100/80">Remove este concerto, incluindo mensagens de chat associadas a ele.</p>
+      <button class="mt-4 rounded-full border border-red-700 bg-red-950/60 px-4 py-3 font-semibold text-red-100 hover:border-red-500">Apagar definitivamente</button>
+    </form>
+  {% endif %}
 </section>
 {% endblock %}

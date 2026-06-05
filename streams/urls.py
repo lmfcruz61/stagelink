@@ -17,4 +17,5 @@ urlpatterns = [
     path('dashboard/galeria/<int:photo_id>/remover/', views.artist_photo_delete, name='artist_photo_delete'),
     path('dashboard/streams/novo/', views.stream_create, name='stream_create'),
     path('dashboard/streams/<int:stream_id>/editar/', views.stream_update, name='stream_update'),
+    path('dashboard/streams/<int:stream_id>/apagar/', views.stream_delete, name='stream_delete'),
 ]

@@ -398,3 +398,19 @@ def stream_update(request, stream_id):
     else:
         form = LiveStreamForm(instance=stream)
     return render(request, 'dashboard/stream_form.html', {'form': form, 'stream': stream})
+
+
+@login_required
+def stream_delete(request, stream_id):
+    stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
+    if not can_manage_artist(request.user, stream.artist):
+        messages.error(request, 'Nao tens permissao para apagar este stream.')
+        return redirect('streams:dashboard')
+
+    artist_id = stream.artist_id
+    if request.method == 'POST':
+        stream.delete()
+        messages.success(request, 'Concerto apagado.')
+        return redirect(f"{reverse('streams:dashboard')}?artist={artist_id}")
+
+    return redirect(f"{reverse('streams:stream_update', args=[stream.id])}")
