@@ -176,7 +176,6 @@
           {% if user.is_staff or user.is_superuser or user.artist_profile or user.organization_memberships.exists %}
             <a class="text-zinc-300 hover:text-white" href="{% url 'streams:dashboard' %}">Dashboard</a>
           {% endif %}
-          <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'accounts:profile' %}">{% trans "Perfil" %}</a>
           <form method="post" action="{% url 'accounts:logout' %}">
             {% csrf_token %}
             <button class="rounded-full bg-zinc-800 px-3 py-2 hover:bg-zinc-700">{% trans "Sair" %}</button>
