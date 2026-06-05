@@ -3,101 +3,112 @@
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 2 0 obj
-<< /Length 2081 >>
+<< /Length 2854 >>
 stream
 BT
 /F1 10 Tf
-50 800 Td
-14 TL
-(StageLink - Guia de Testes Passo a Passo) Tj
-T*
-() Tj
-T*
-(Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Stripe em) Tj
-T*
-(modo teste e YouTube com video publico ou nao listado com incorporacao ativa.) Tj
-T*
-() Tj
-T*
-(#1. Preparacao) Tj
-T*
-() Tj
-T*
-(1. Abrir `https://stagelink.fly.dev/`.) Tj
-T*
-(2. Entrar no admin em `/admin/`.) Tj
-T*
+50 790 Td
+/F1 14 Tf
+(STAGELINK - GUIA DE TESTES PASSO A PASSO) Tj
+/F1 10 Tf
+0 -13 Td
+0 -13 Td
+0 -13 Td
+(Ambiente sugerido para este ciclo: Fly.io em https://stagelink.fly.dev/, Stripe em modo) Tj
+0 -13 Td
+(teste e YouTube com video publico ou nao listado com incorporacao ativa.) Tj
+0 -13 Td
+0 -13 Td
+(1. Preparacao) Tj
+0 -13 Td
+0 -13 Td
+0 -13 Td
+(1. Abrir https://stagelink.fly.dev/.) Tj
+0 -13 Td
+(2. Entrar no admin em /admin/.) Tj
+0 -13 Td
 (3. Confirmar que existe pelo menos um utilizador admin ativo.) Tj
-T*
-(4. No admin, configurar `Aparencia do site`: nome, logotipo, imagem de fundo e overlay.) Tj
-T*
-(5. Confirmar variaveis do Fly.io: `SECRET_KEY`, `DATABASE_URL`, chaves Stripe,) Tj
-T*
-(Redis/Upstash quando for usado chat multi-instancia.) Tj
-T*
-(6. Confirmar que o YouTube usado no teste permite embed.) Tj
-T*
-() Tj
-T*
-(#2. Teste como admin) Tj
-T*
-() Tj
-T*
+0 -13 Td
+(4. No admin, confirmar que o topo diz Administracao do site, mostra o nome do site e usa o) Tj
+0 -13 Td
+(logotipo configurado em Aparencia do site.) Tj
+0 -13 Td
+(5. No admin, configurar Aparencia do site: nome, logotipo, imagem de fundo e overlay.) Tj
+0 -13 Td
+(6. Confirmar variaveis do Fly.io: SECRET_KEY, DATABASE_URL, chaves Stripe, Redis/Upstash) Tj
+0 -13 Td
+(quando for usado chat multi-instancia.) Tj
+0 -13 Td
+(7. Confirmar que o YouTube usado no teste permite embed.) Tj
+0 -13 Td
+0 -13 Td
+(2. Teste como admin) Tj
+0 -13 Td
+0 -13 Td
+0 -13 Td
 (1. Entrar como admin.) Tj
-T*
-(2. Abrir a homepage e confirmar header, logo, idioma e fundo.) Tj
-T*
-(3. Abrir `/admin/` e verificar Users, Artists, Organizations, Organization Members,) Tj
-T*
-(Streams, Subscriptions, Tips e Site Appearance.) Tj
-T*
-(4. Criar ou rever uma equipa/empresa.) Tj
-T*
-(5. Criar ou rever artistas associados a essa equipa.) Tj
-T*
-(6. Abrir uma sala de stream como admin. O admin deve entrar sem bilhete nem subscricao.) Tj
-T*
-(7. Confirmar que uploads de imagens aparecem no site publico.) Tj
-T*
-() Tj
-T*
-(#3. Teste como artista individual) Tj
-T*
-() Tj
-T*
+0 -13 Td
+(2. Abrir a homepage e confirmar header, logo, fundo e imagem de perfil.) Tj
+0 -13 Td
+(3. Abrir /admin/ e verificar Users, Artists, Organizations, Organization Members, Streams,) Tj
+0 -13 Td
+(Subscriptions, Tips e Site Appearance.) Tj
+0 -13 Td
+(4. Confirmar que o admin ve o nome/logo do site no cabecalho da administracao.) Tj
+0 -13 Td
+(5. Criar ou rever uma equipa/empresa.) Tj
+0 -13 Td
+(6. Criar ou rever artistas associados a essa equipa.) Tj
+0 -13 Td
+(7. Abrir uma sala de stream como admin. O admin deve entrar sem bilhete nem subscricao.) Tj
+0 -13 Td
+(8. Confirmar que uploads de imagens aparecem no site publico.) Tj
+0 -13 Td
+0 -13 Td
+(3. Teste como artista individual) Tj
+0 -13 Td
+0 -13 Td
+0 -13 Td
 (1. Criar conta nova como musico.) Tj
-T*
+0 -13 Td
 (2. Entrar no dashboard.) Tj
-T*
-(3. Abrir o `Guia rapido`.) Tj
-T*
-(4. Editar pagina publica: nome artistico, frase, cidade, bio, foto principal, capa e) Tj
-T*
-(links.) Tj
-T*
-(5. Adicionar varias fotos a galeria.) Tj
-T*
-(6. Criar stream com titulo, capa 16:9, data futura, preco e ID/link YouTube.) Tj
-T*
-(7. Ativar o stream.) Tj
-T*
-(8. Abrir a pagina publica do artista e confirmar:) Tj
-T*
-(- capa visivel;) Tj
-T*
-(- foto principal visivel;) Tj
-T*
-(- bio e links;) Tj
-T*
-(- galeria;) Tj
-T*
-(- concerto agendado;) Tj
-T*
-(- stream ativo.) Tj
-T*
-(9. Entrar na sala como artista e confirmar player, chat e botoes.) Tj
-T*
-(Pagina 1 de 3) Tj
+0 -13 Td
+(3. Confirmar que nao aparecem botoes de equipa como Nova equipa ou Novo artista gerido.) Tj
+0 -13 Td
+(4. Abrir o Guia rapido.) Tj
+0 -13 Td
+(5. Editar pagina publica: nome artistico, frase, cidade, bio, foto principal, capa e links.) Tj
+0 -13 Td
+(6. Adicionar varias fotos a galeria.) Tj
+0 -13 Td
+(7. Criar stream com titulo, capa 16:9, data futura, preco e ID/link YouTube.) Tj
+0 -13 Td
+(8. Ativar o stream.) Tj
+0 -13 Td
+(9. Abrir a pagina publica do artista e confirmar:) Tj
+0 -13 Td
+(   - capa visivel;) Tj
+0 -13 Td
+(   - foto principal visivel;) Tj
+0 -13 Td
+(   - bio e links;) Tj
+0 -13 Td
+(   - galeria;) Tj
+0 -13 Td
+(   - concerto agendado;) Tj
+0 -13 Td
+(   - stream ativo.) Tj
+0 -13 Td
+(10. Entrar na sala como artista e confirmar player, chat, contador a ver e botoes de apoio.) Tj
+0 -13 Td
+0 -13 Td
+(4. Teste como manager / equipa) Tj
+0 -13 Td
+0 -13 Td
+0 -13 Td
+(1. Criar conta de manager.) Tj
+0 -13 Td
+(2. Entrar no dashboard.) Tj
 ET
 endstream
 endobj
@@ -105,101 +116,114 @@ endobj
 << /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
 endobj
 4 0 obj
-<< /Length 1949 >>
+<< /Length 2901 >>
 stream
 BT
 /F1 10 Tf
-50 800 Td
-14 TL
-() Tj
-T*
-(#4. Teste como manager / equipa) Tj
-T*
-() Tj
-T*
-(1. Criar conta de manager.) Tj
-T*
-(2. Entrar no dashboard.) Tj
-T*
-(3. Criar `Nova equipa`.) Tj
-T*
-(4. Abrir a equipa e adicionar membros por username:) Tj
-T*
-(- Dono;) Tj
-T*
-(- Manager;) Tj
-T*
-(- Editor;) Tj
-T*
-(- Leitor.) Tj
-T*
-(5. Criar `Novo artista gerido` associado a equipa.) Tj
-T*
-(6. Selecionar o artista no dashboard.) Tj
-T*
-(7. Editar pagina publica desse artista.) Tj
-T*
-(8. Criar stream para esse artista.) Tj
-T*
-(9. Entrar com outro membro da equipa e confirmar permissoes:) Tj
-T*
-(- Dono/Manager/Editor conseguem gerir;) Tj
-T*
-(- Leitor deve ficar limitado.) Tj
-T*
-(10. Confirmar que o manager consegue entrar na sala do stream para operar/testar.) Tj
-T*
-() Tj
-T*
-(#5. Teste como público) Tj
-T*
-() Tj
-T*
-(1. Criar conta nova como público.) Tj
-T*
+50 790 Td
+(3. Confirmar que aparecem Nova equipa e Novo artista gerido.) Tj
+0 -13 Td
+(4. Criar Nova equipa.) Tj
+0 -13 Td
+(5. Abrir a equipa e adicionar membros por username:) Tj
+0 -13 Td
+(   - Dono;) Tj
+0 -13 Td
+(   - Manager;) Tj
+0 -13 Td
+(   - Editor;) Tj
+0 -13 Td
+(   - Leitor.) Tj
+0 -13 Td
+(6. Criar Novo artista gerido associado a equipa.) Tj
+0 -13 Td
+(7. Selecionar o artista no dashboard.) Tj
+0 -13 Td
+(8. Editar pagina publica desse artista.) Tj
+0 -13 Td
+(9. Criar stream para esse artista.) Tj
+0 -13 Td
+(10. Entrar com outro membro da equipa e confirmar permissoes:) Tj
+0 -13 Td
+(   - Dono/Manager/Editor conseguem gerir;) Tj
+0 -13 Td
+(   - Leitor deve ficar limitado.) Tj
+0 -13 Td
+(11. Confirmar que o manager consegue entrar na sala do stream para operar/testar.) Tj
+0 -13 Td
+0 -13 Td
+(5. Teste como publico) Tj
+0 -13 Td
+0 -13 Td
+0 -13 Td
+(1. Criar conta nova como publico.) Tj
+0 -13 Td
 (2. Confirmar avatar circular por defeito no header/perfil.) Tj
-T*
+0 -13 Td
 (3. Atualizar nome publico e foto do perfil.) Tj
-T*
-(4. Abrir a homepage e o `Guia rápido para o público`.) Tj
-T*
+0 -13 Td
+(4. Abrir a homepage e o Guia rapido para o publico.) Tj
+0 -13 Td
 (5. Abrir pagina de um artista.) Tj
-T*
-(6. Tentar entrar num stream pago sem acesso. Deve aparecer bloqueio.) Tj
-T*
-(7. Comprar bilhete em modo teste ou criar acesso/subscricao de teste.) Tj
-T*
-(8. Entrar na sala.) Tj
-T*
-(9. Enviar mensagem no chat e confirmar que aparece imediatamente.) Tj
-T*
-(10. Abrir outra janela/navegador com outro utilizador e confirmar chat em tempo real.) Tj
-T*
-(11. Enviar gorjeta em modo teste.) Tj
-T*
-(12. Confirmar que a gorjeta aparece no dashboard do artista/manager.) Tj
-T*
-() Tj
-T*
-(#6. Teste de pagamentos Stripe) Tj
-T*
-() Tj
-T*
+0 -13 Td
+(6. Marcar e remover artista favorito; confirmar estrela dourada na homepage.) Tj
+0 -13 Td
+(7. Tentar entrar num stream pago sem acesso. Deve aparecer bloqueio.) Tj
+0 -13 Td
+(8. Comprar bilhete em modo teste ou criar acesso/subscricao de teste.) Tj
+0 -13 Td
+(9. Entrar na sala.) Tj
+0 -13 Td
+(10. Enviar mensagem no chat e confirmar que aparece imediatamente.) Tj
+0 -13 Td
+(11. Enviar mensagem com emojis escritos manualmente, por exemplo ????.) Tj
+0 -13 Td
+(12. Usar os botoes rapidos de emoji do chat: palmas, fogo, coracao, guitarra e musica.) Tj
+0 -13 Td
+(13. Abrir outra janela/navegador com outro utilizador e confirmar chat em tempo real.) Tj
+0 -13 Td
+(14. Confirmar que o contador a ver aumenta quando entra outro utilizador na sala e diminui) Tj
+0 -13 Td
+(quando fecha a janela.) Tj
+0 -13 Td
+(15. Enviar gorjeta em modo teste.) Tj
+0 -13 Td
+(16. Confirmar que a gorjeta aparece no dashboard do artista/manager.) Tj
+0 -13 Td
+0 -13 Td
+(6. Teste de pagamentos Stripe) Tj
+0 -13 Td
+0 -13 Td
+0 -13 Td
 (1. Usar Stripe em modo teste.) Tj
-T*
+0 -13 Td
 (2. Testar compra de bilhete one-time.) Tj
-T*
+0 -13 Td
 (3. Testar subscricao mensal.) Tj
-T*
+0 -13 Td
 (4. Testar gorjeta one-time.) Tj
-T*
+0 -13 Td
 (5. Confirmar estados no dashboard e no admin.) Tj
-T*
+0 -13 Td
 (6. Confirmar comportamento se o pagamento for cancelado.) Tj
-T*
+0 -13 Td
 (7. Confirmar comportamento se o pagamento falhar.) Tj
-T*
-(Pagina 2 de 3) Tj
+0 -13 Td
+0 -13 Td
+(7. Teste de YouTube) Tj
+0 -13 Td
+0 -13 Td
+0 -13 Td
+(1. Usar video publico ou nao listado.) Tj
+0 -13 Td
+(2. Confirmar que a incorporacao esta permitida no YouTube Studio.) Tj
+0 -13 Td
+(3. Testar video valido.) Tj
+0 -13 Td
+(4. Testar video privado ou bloqueado para confirmar mensagem/limite esperado.) Tj
+0 -13 Td
+(5. Testar em desktop e mobile.) Tj
+0 -13 Td
 ET
 endstream
 endobj
@@ -207,95 +231,90 @@ endobj
 << /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
 endobj
 6 0 obj
-<< /Length 1786 >>
+<< /Length 2461 >>
 stream
 BT
 /F1 10 Tf
-50 800 Td
-14 TL
-() Tj
-T*
-(#7. Teste de YouTube) Tj
-T*
-() Tj
-T*
-(1. Usar video publico ou nao listado.) Tj
-T*
-(2. Confirmar que a incorporacao esta permitida no YouTube Studio.) Tj
-T*
-(3. Testar video valido.) Tj
-T*
-(4. Testar video privado ou bloqueado para confirmar mensagem/limite esperado.) Tj
-T*
-(5. Testar em desktop e mobile.) Tj
-T*
-() Tj
-T*
-(#8. Teste de idiomas) Tj
-T*
-() Tj
-T*
-(1. Alternar PT, EN, ES, FR e DE no header.) Tj
-T*
-(2. Confirmar que textos principais mudam.) Tj
-T*
-(3. Confirmar que nao aparecem caracteres estranhos.) Tj
-T*
-(4. Confirmar frases comerciais da homepage em cada idioma.) Tj
-T*
-() Tj
-T*
-(#9. Teste mobile e navegadores) Tj
-T*
-() Tj
-T*
+50 790 Td
+(8. Teste de sala ao vivo, chat e presenca) Tj
+0 -13 Td
+0 -13 Td
+0 -13 Td
+(1. Entrar na mesma sala com dois utilizadores diferentes.) Tj
+0 -13 Td
+(2. Confirmar que ambos veem o player e o chat.) Tj
+0 -13 Td
+(3. Confirmar que o contador a ver aparece junto ao titulo do concerto e no cabecalho do) Tj
+0 -13 Td
+(chat.) Tj
+0 -13 Td
+(4. Confirmar que o contador mostra pelo menos 2 a ver quando existem dois browsers ligados.) Tj
+0 -13 Td
+(5. Enviar texto normal, texto com acentos e texto com emojis.) Tj
+0 -13 Td
+(6. Confirmar que emojis aparecem corretamente para todos os utilizadores ligados.) Tj
+0 -13 Td
+(7. Fechar uma das janelas e confirmar que a contagem reduz.) Tj
+0 -13 Td
+(8. Recarregar a pagina e confirmar que o WebSocket volta a ligar ao chat.) Tj
+0 -13 Td
+0 -13 Td
+(Nota: nesta fase piloto, o contador mede ligacoes WebSocket ativas na sala. Em escala com) Tj
+0 -13 Td
+(varias maquinas Fly.io, deve passar para presenca partilhada via Redis/Upstash.) Tj
+0 -13 Td
+0 -13 Td
+(9. Teste mobile e navegadores) Tj
+0 -13 Td
+0 -13 Td
+0 -13 Td
 (1. Testar Chrome desktop.) Tj
-T*
+0 -13 Td
 (2. Testar Edge desktop.) Tj
-T*
+0 -13 Td
 (3. Testar mobile estreito.) Tj
-T*
-(4. Confirmar que header, botoes, cards, player, chat e formularios nao se sobrepoem.) Tj
-T*
+0 -13 Td
+(4. Confirmar que header, avatar, botoes, cards, player, chat e formularios nao se sobrepoem.) Tj
+0 -13 Td
 (5. Confirmar uploads e imagens em paginas publicas.) Tj
-T*
-() Tj
-T*
-(#10. Criterios para falar com artista piloto) Tj
-T*
-() Tj
-T*
+0 -13 Td
+0 -13 Td
+(10. Criterios para falar com artista piloto) Tj
+0 -13 Td
+0 -13 Td
+0 -13 Td
 (Avancar para um artista piloto quando:) Tj
-T*
-() Tj
-T*
-(1. Registo de musico, manager e público nao tiver erros 500.) Tj
-T*
+0 -13 Td
+0 -13 Td
+(1. Registo de musico, manager e publico nao tiver erros 500.) Tj
+0 -13 Td
 (2. Pagamentos Stripe em modo teste estiverem completos.) Tj
-T*
+0 -13 Td
 (3. Chat funcionar entre pelo menos dois utilizadores.) Tj
-T*
-(4. Admin conseguir entrar em qualquer stream.) Tj
-T*
-(5. Pagina publica do artista estiver visualmente apresentavel.) Tj
-T*
-(6. Existir um guiao simples para o artista preparar o YouTube.) Tj
-T*
-() Tj
-T*
-(#11. Resultado esperado) Tj
-T*
-() Tj
-T*
+0 -13 Td
+(4. Emojis do chat aparecerem corretamente.) Tj
+0 -13 Td
+(5. Contador a ver atualizar ao abrir/fechar uma segunda janela.) Tj
+0 -13 Td
+(6. Admin conseguir entrar em qualquer stream.) Tj
+0 -13 Td
+(7. Pagina publica do artista estiver visualmente apresentavel.) Tj
+0 -13 Td
+(8. Existir um guiao simples para o artista preparar o YouTube.) Tj
+0 -13 Td
+0 -13 Td
+(11. Resultado esperado) Tj
+0 -13 Td
+0 -13 Td
+0 -13 Td
 (No fim deste teste, deves conseguir provar o ciclo completo:) Tj
-T*
-() Tj
-T*
-(Empresa/manager cria artista, artista tem pagina publica, stream e acesso pago; público) Tj
-T*
-(entra, conversa no chat e envia gorjeta; admin consegue supervisionar tudo.) Tj
-T*
-(Pagina 3 de 3) Tj
+0 -13 Td
+0 -13 Td
+(Empresa/manager cria artista, artista tem pagina publica, stream e acesso pago; publico) Tj
+0 -13 Td
+(entra, conversa no chat, usa emojis, ve a contagem de espectadores e envia gorjeta; admin) Tj
+0 -13 Td
+(consegue supervisionar tudo.) Tj
 ET
 endstream
 endobj
@@ -313,15 +332,15 @@ xref
 0000000000 65535 f 
 0000000009 00000 n 
 0000000079 00000 n 
-0000002212 00000 n 
-0000002338 00000 n 
-0000004339 00000 n 
-0000004465 00000 n 
-0000006303 00000 n 
-0000006429 00000 n 
-0000006498 00000 n 
+0000002985 00000 n 
+0000003111 00000 n 
+0000006064 00000 n 
+0000006190 00000 n 
+0000008703 00000 n 
+0000008829 00000 n 
+0000008898 00000 n 
 trailer
 << /Size 10 /Root 9 0 R >>
 startxref
-6547
+8947
 %%EOF
