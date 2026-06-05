@@ -10,8 +10,10 @@
     <button id="quick-guide-button" type="button" class="sl-secondary">
       Guia rapido
     </button>
-    <a class="sl-secondary" href="{% url 'streams:organization_create' %}">Nova equipa</a>
-    <a class="sl-secondary" href="{% url 'streams:managed_artist_create' %}">Novo artista gerido</a>
+    {% if can_manage_organizations %}
+      <a class="sl-secondary" href="{% url 'streams:organization_create' %}">Nova equipa</a>
+      <a class="sl-secondary" href="{% url 'streams:managed_artist_create' %}">Novo artista gerido</a>
+    {% endif %}
     {% if artist %}
       <a class="sl-secondary" href="{% url 'streams:artist_profile_edit' %}?artist={{ artist.id }}">Editar pagina</a>
       <a class="sl-primary" href="{% url 'streams:stream_create' %}">Novo stream</a>
@@ -56,25 +58,29 @@
       </ol>
     </article>
 
-    <article class="sl-card p-4">
-      <h3 class="font-semibold text-emerald-300">Manager / equipa</h3>
-      <ol class="mt-3 space-y-3 text-sm text-zinc-200">
-        <li><strong>1. Cria a equipa.</strong><br>Usa "Nova equipa" para agencia, produtora, label ou management.</li>
-        <li><strong>2. Adiciona artistas.</strong><br>Cria paginas em "Novo artista gerido" e associa cada uma a equipa certa.</li>
-        <li><strong>3. Gere permissoes.</strong><br>Adiciona membros por username como dono, manager, editor ou leitor.</li>
-        <li><strong>4. Opera por artista.</strong><br>Seleciona o artista no dashboard antes de editar pagina, criar stream ou consultar resultados.</li>
-      </ol>
-    </article>
+    {% if can_manage_organizations %}
+      <article class="sl-card p-4">
+        <h3 class="font-semibold text-emerald-300">Manager / equipa</h3>
+        <ol class="mt-3 space-y-3 text-sm text-zinc-200">
+          <li><strong>1. Cria a equipa.</strong><br>Usa "Nova equipa" para agencia, produtora, label ou management.</li>
+          <li><strong>2. Adiciona artistas.</strong><br>Cria paginas em "Novo artista gerido" e associa cada uma a equipa certa.</li>
+          <li><strong>3. Gere permissoes.</strong><br>Adiciona membros por username como dono, manager, editor ou leitor.</li>
+          <li><strong>4. Opera por artista.</strong><br>Seleciona o artista no dashboard antes de editar pagina, criar stream ou consultar resultados.</li>
+        </ol>
+      </article>
+    {% endif %}
 
-    <article class="sl-card p-4">
-      <h3 class="font-semibold text-emerald-300">Admin</h3>
-      <ol class="mt-3 space-y-3 text-sm text-zinc-200">
-        <li><strong>1. Configura o site.</strong><br>No admin Django, define logotipo, imagem de fundo e overlay em Aparencia do site.</li>
-        <li><strong>2. Verifica contas.</strong><br>Confirma users, perfis, artistas, equipas, membros e permissoes.</li>
-        <li><strong>3. Testa acesso livre.</strong><br>O admin deve conseguir entrar em qualquer stream sem subscricao nem bilhete.</li>
-        <li><strong>4. Monitoriza operacao.</strong><br>Confirma pagamentos em modo teste, chat, uploads, idiomas e logs do Fly.io.</li>
-      </ol>
-    </article>
+    {% if user.is_staff or user.is_superuser %}
+      <article class="sl-card p-4">
+        <h3 class="font-semibold text-emerald-300">Admin</h3>
+        <ol class="mt-3 space-y-3 text-sm text-zinc-200">
+          <li><strong>1. Configura o site.</strong><br>No admin Django, define logotipo, imagem de fundo e overlay em Aparencia do site.</li>
+          <li><strong>2. Verifica contas.</strong><br>Confirma users, perfis, artistas, equipas, membros e permissoes.</li>
+          <li><strong>3. Testa acesso livre.</strong><br>O admin deve conseguir entrar em qualquer stream sem subscricao nem bilhete.</li>
+          <li><strong>4. Monitoriza operacao.</strong><br>Confirma pagamentos em modo teste, chat, uploads, idiomas e logs do Fly.io.</li>
+        </ol>
+      </article>
+    {% endif %}
   </div>
 </section>
 

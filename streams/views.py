@@ -157,6 +157,14 @@ def can_access_dashboard(user):
     return OrganizationMember.objects.filter(user=user).exists()
 
 
+def can_manage_organizations(user):
+    if user.is_staff or user.is_superuser:
+        return True
+    if getattr(getattr(user, 'profile', None), 'role', '') == 'manager':
+        return True
+    return OrganizationMember.objects.filter(user=user, role__in=OrganizationMember.EDIT_ROLES).exists()
+
+
 @login_required
 def stream_room(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
@@ -176,12 +184,14 @@ def dashboard(request):
     artist_id = request.GET.get('artist')
     artist = get_object_or_404(artists, pk=artist_id) if artist_id else artists.first()
     organizations = Organization.objects.filter(members__user=request.user).prefetch_related('members', 'artists')
+    can_manage_orgs = can_manage_organizations(request.user)
 
     if not artist:
         messages.info(request, 'Cria uma equipa ou um perfil de artista para comecar a gerir streams.')
         return render(request, 'dashboard/index.html', {
             'artist': None,
             'artists': artists,
+            'can_manage_organizations': can_manage_orgs,
             'organizations': organizations,
             'streams': [],
             'subscribers': [],
@@ -194,6 +204,7 @@ def dashboard(request):
     return render(request, 'dashboard/index.html', {
         'artist': artist,
         'artists': artists,
+        'can_manage_organizations': can_manage_orgs,
         'organizations': organizations,
         'streams': streams,
         'subscribers': subscribers,
@@ -203,9 +214,9 @@ def dashboard(request):
 
 @login_required
 def organization_create(request):
-    if not request.user.is_staff and getattr(getattr(request.user, 'profile', None), 'role', '') == 'fan':
-        messages.error(request, 'Contas de público nao podem criar equipas. Cria uma conta Manager / equipa para gerir artistas.')
-        return redirect('streams:home')
+    if not can_manage_organizations(request.user):
+        messages.error(request, 'Esta area e para managers, equipas ou administradores.')
+        return redirect('streams:dashboard')
 
     if request.method == 'POST':
         form = OrganizationForm(request.POST, request.FILES)
