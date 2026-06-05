@@ -6,50 +6,78 @@
   <section class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
     <div>
       <p class="text-sm text-emerald-400">{% if user.artist_profile %}{{ user.artist_profile.name }}{% else %}StageLink Pro{% endif %}</p>
-      <h1 class="text-4xl font-semibold tracking-tight">{% trans "Prepara e monetiza os teus concertos ao vivo." %}</h1>
-      <p class="mt-3 max-w-2xl text-zinc-300">{% trans "Cria streams, acompanha subscritores e recebe gorjetas do teu público durante a sala ao vivo." %}</p>
+      <h1 class="text-4xl font-semibold tracking-tight">Prepara e monetiza os teus concertos ao vivo.</h1>
+      <p class="mt-3 max-w-2xl text-zinc-300">Cria streams, acompanha subscritores e recebe gorjetas do teu publico durante a sala ao vivo.</p>
     </div>
     <div class="flex flex-wrap gap-3">
       <a class="rounded border border-zinc-700 bg-zinc-900 px-4 py-3 font-semibold text-zinc-100 hover:border-emerald-500" href="{% url 'streams:dashboard' %}">Dashboard</a>
-      <a class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400" href="{% url 'streams:stream_create' %}">{% trans "Novo stream" %}</a>
+      <a class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400" href="{% url 'streams:stream_create' %}">Novo stream</a>
     </div>
+  </section>
+{% elif user.is_authenticated and user.fan_profile %}
+  <section class="mb-8 rounded border border-zinc-800 bg-zinc-900 p-5 md:p-6">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-sm text-emerald-400">{{ user.fan_profile.display_name }}</p>
+        <h1 class="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">A tua area StageLink</h1>
+        <p class="mt-3 max-w-2xl text-zinc-300">Guarda artistas, acompanha concertos e entra em salas privadas quando tiveres acesso.</p>
+      </div>
+      <button id="fan-guide-button" type="button" class="w-fit rounded border border-zinc-700 bg-zinc-950 px-4 py-3 font-semibold text-zinc-100 hover:border-emerald-500">
+        Guia rapido
+      </button>
+    </div>
+
+    <div class="mt-6 grid gap-3 sm:grid-cols-3">
+      <button type="button" data-public-tab="favorites" class="public-tab rounded border border-emerald-600 bg-emerald-500 px-4 py-3 text-left font-semibold text-zinc-950">
+        Favoritos
+        <span class="mt-1 block text-sm font-normal">{{ favorite_artists|length }} artistas guardados</span>
+      </button>
+      <button type="button" data-public-tab="artists" class="public-tab rounded border border-zinc-700 bg-zinc-950 px-4 py-3 text-left font-semibold text-zinc-100 hover:border-emerald-500">
+        Artistas
+        <span class="mt-1 block text-sm font-normal text-zinc-400">{{ artists|length }} disponiveis</span>
+      </button>
+      <button type="button" data-public-tab="concerts" class="public-tab rounded border border-zinc-700 bg-zinc-950 px-4 py-3 text-left font-semibold text-zinc-100 hover:border-emerald-500">
+        Concertos
+        <span class="mt-1 block text-sm font-normal text-zinc-400">{{ upcoming_streams|length }} agendados</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="fan-guide" class="mb-8 hidden rounded border border-emerald-700 bg-emerald-950/30 p-5">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-semibold">Guia rapido para o publico</h2>
+        <p class="mt-1 text-sm text-zinc-300">Segue estes passos para entrar nos concertos e apoiar os teus artistas.</p>
+      </div>
+      <button id="fan-guide-close" type="button" class="rounded bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800">Fechar</button>
+    </div>
+    <ol class="mt-5 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
+      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>1. Escolhe um artista.</strong><br>Abre a pagina de um musico para veres streams futuros, streams passados e opcoes de acesso.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>2. Guarda favoritos.</strong><br>Marca artistas como favoritos para criares a tua lista pessoal.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>3. Garante o acesso.</strong><br>Subscreve mensalmente ou compra bilhete para um concerto especifico.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>4. Entra na sala.</strong><br>Quando tiveres acesso, abre o concerto para ver o player e participar no chat.</li>
+    </ol>
   </section>
 {% else %}
   <section class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
     <div>
-      <h1 class="text-4xl font-semibold tracking-tight">{% trans "Streams ao vivo para público que quer apoiar de perto." %}</h1>
-      <p class="mt-3 max-w-2xl text-zinc-300">{% trans "Subscreve artistas, compra bilhetes para salas privadas e envia gorjetas durante o concerto." %}</p>
+      <h1 class="text-4xl font-semibold tracking-tight">Streams ao vivo para publico que quer apoiar de perto.</h1>
+      <p class="mt-3 max-w-2xl text-zinc-300">Subscreve artistas, compra bilhetes para salas privadas e envia gorjetas durante o concerto.</p>
     </div>
-    {% if user.is_authenticated and user.fan_profile %}
-      <button id="fan-guide-button" type="button" class="w-fit rounded border border-zinc-700 bg-zinc-900 px-4 py-3 font-semibold text-zinc-100 hover:border-emerald-500">
-        {% trans "Guia rapido" %}
-      </button>
-    {% endif %}
+    <a class="w-fit rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400" href="{% url 'accounts:register' %}">Criar conta</a>
   </section>
 {% endif %}
 
 {% if user.is_authenticated and user.fan_profile %}
-  <section id="fan-guide" class="mb-10 hidden rounded border border-emerald-700 bg-emerald-950/30 p-5">
-    <div class="flex items-start justify-between gap-4">
+  <section data-public-panel="favorites" class="public-panel mb-10">
+    <div class="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
       <div>
-        <h2 class="text-xl font-semibold">{% trans "Guia rápido para o público" %}</h2>
-        <p class="mt-1 text-sm text-zinc-300">{% trans "Segue estes passos para entrar nos concertos e apoiar os teus artistas." %}</p>
+        <h2 class="text-2xl font-semibold">Os teus favoritos</h2>
+        <p class="mt-1 text-sm text-zinc-400">Acesso rapido aos artistas que queres acompanhar de perto.</p>
       </div>
-      <button id="fan-guide-close" type="button" class="rounded bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800">{% trans "Fechar" %}</button>
-    </div>
-    <ol class="mt-5 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>{% trans "1. Escolhe um artista." %}</strong><br>{% trans "Abre a pagina de um musico para veres streams futuros, streams passados e opcoes de acesso." %}</li>
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>{% trans "2. Garante o acesso." %}</strong><br>{% trans "Podes subscrever mensalmente o artista ou comprar bilhete para um stream especifico." %}</li>
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>{% trans "3. Entra na sala." %}</strong><br>{% trans "Quando tiveres acesso, abre o stream para ver o player YouTube e participar no chat ao vivo." %}</li>
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>{% trans "4. Apoia em direto." %}</strong><br>{% trans "Durante o concerto, envia gorjetas com valor personalizado e uma mensagem para o artista." %}</li>
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>{% trans "5. Guarda favoritos." %}</strong><br>{% trans "Marca artistas como favoritos para criares a tua lista pessoal." %}</li>
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>{% trans "6. Confirma o perfil." %}</strong><br>{% trans "Abre o teu perfil para atualizar o nome público e a foto circular." %}</li>
-    </ol>
-  </section>
-
-  <section class="mb-10">
-    <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-2xl font-semibold">Os teus favoritos</h2>
+      {% if not favorite_artists %}
+        <button type="button" data-public-tab-jump="artists" class="w-fit rounded border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-semibold hover:border-emerald-500">Descobrir artistas</button>
+      {% endif %}
     </div>
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {% for artist in favorite_artists %}
@@ -72,38 +100,67 @@
           </form>
         </article>
       {% empty %}
-        <p class="text-zinc-400">Ainda nao tens artistas favoritos. Marca artistas para criares a tua lista.</p>
+        <div class="rounded border border-zinc-800 bg-zinc-900 p-5 text-zinc-300">
+          Ainda nao tens favoritos. Vai a Artistas e guarda os que queres seguir.
+        </div>
       {% endfor %}
     </div>
   </section>
 {% endif %}
 
-<section class="mb-10">
+<section data-public-panel="concerts" class="{% if user.is_authenticated and user.fan_profile %}public-panel hidden{% endif %} mb-10">
   <div class="mb-4 flex items-center justify-between">
-    <h2 class="text-2xl font-semibold">{% trans "Ao vivo" %}</h2>
+    <h2 class="text-2xl font-semibold">Concertos</h2>
   </div>
-  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-    {% for stream in live_streams %}
-      <a href="{% url 'streams:room' stream.id %}" class="overflow-hidden rounded border border-zinc-800 bg-zinc-900 hover:border-emerald-500">
-        {% if stream.cover_image %}
-          <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full object-cover">
-        {% else %}
-          <div class="flex aspect-video w-full items-center justify-center bg-zinc-800 px-4 text-center text-sm font-semibold text-zinc-300">{{ stream.title }}</div>
-        {% endif %}
-        <div class="p-4">
-          <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
-          <h3 class="mt-2 font-semibold">{{ stream.title }}</h3>
-          <p class="mt-2 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
-        </div>
-      </a>
-    {% empty %}
-      <p class="text-zinc-400">{% trans "Ainda nao ha streams ativos." %}</p>
-    {% endfor %}
+  {% if live_streams %}
+    <div class="mb-8">
+      <h3 class="mb-3 text-lg font-semibold text-emerald-300">Ao vivo agora</h3>
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {% for stream in live_streams %}
+          <a href="{% url 'streams:room' stream.id %}" class="overflow-hidden rounded border border-zinc-800 bg-zinc-900 hover:border-emerald-500">
+            {% if stream.cover_image %}
+              <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full object-cover">
+            {% else %}
+              <div class="flex aspect-video w-full items-center justify-center bg-zinc-800 px-4 text-center text-sm font-semibold text-zinc-300">{{ stream.title }}</div>
+            {% endif %}
+            <div class="p-4">
+              <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
+              <h3 class="mt-2 font-semibold">{{ stream.title }}</h3>
+              <p class="mt-2 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div>
+    <h3 class="mb-3 text-lg font-semibold">Proximos concertos</h3>
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {% for stream in upcoming_streams %}
+        <a href="{% url 'streams:room' stream.id %}" class="overflow-hidden rounded border border-zinc-800 bg-zinc-900 hover:border-emerald-500">
+          {% if stream.cover_image %}
+            <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full object-cover">
+          {% else %}
+            <div class="flex aspect-video w-full items-center justify-center bg-zinc-800 px-4 text-center text-sm font-semibold text-zinc-300">{{ stream.title }}</div>
+          {% endif %}
+          <div class="p-4">
+            <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
+            <h3 class="mt-2 font-semibold">{{ stream.title }}</h3>
+            <p class="mt-2 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }} · {{ stream.access_price }} EUR</p>
+          </div>
+        </a>
+      {% empty %}
+        <p class="text-zinc-400">Ainda nao ha concertos agendados.</p>
+      {% endfor %}
+    </div>
   </div>
 </section>
 
-<section>
-  <h2 class="mb-4 text-2xl font-semibold">{% trans "Artistas" %}</h2>
+<section data-public-panel="artists" class="{% if user.is_authenticated and user.fan_profile %}public-panel hidden{% endif %}">
+  <div class="mb-4 flex items-center justify-between">
+    <h2 class="text-2xl font-semibold">Artistas</h2>
+  </div>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for artist in artists %}
       <article class="rounded border border-zinc-800 bg-zinc-900 p-4 hover:border-emerald-500">
@@ -131,7 +188,7 @@
         {% endif %}
       </article>
     {% empty %}
-      <p class="text-zinc-400">{% trans "Ainda nao ha artistas registados." %}</p>
+      <p class="text-zinc-400">Ainda nao ha artistas registados.</p>
     {% endfor %}
   </div>
 </section>
@@ -141,14 +198,51 @@
     const fanGuide = document.querySelector('#fan-guide');
     const fanGuideButton = document.querySelector('#fan-guide-button');
     const fanGuideClose = document.querySelector('#fan-guide-close');
+    const tabButtons = Array.from(document.querySelectorAll('.public-tab'));
+    const panels = Array.from(document.querySelectorAll('.public-panel'));
+    const jumpButtons = Array.from(document.querySelectorAll('[data-public-tab-jump]'));
 
-    fanGuideButton.addEventListener('click', function() {
+    function activatePublicTab(tabName) {
+      tabButtons.forEach(function(button) {
+        const active = button.dataset.publicTab === tabName;
+        button.classList.toggle('border-emerald-600', active);
+        button.classList.toggle('bg-emerald-500', active);
+        button.classList.toggle('text-zinc-950', active);
+        button.classList.toggle('border-zinc-700', !active);
+        button.classList.toggle('bg-zinc-950', !active);
+        button.classList.toggle('text-zinc-100', !active);
+      });
+
+      panels.forEach(function(panel) {
+        panel.classList.toggle('hidden', panel.dataset.publicPanel !== tabName);
+      });
+    }
+
+    fanGuideButton?.addEventListener('click', function() {
       fanGuide.classList.toggle('hidden');
     });
 
-    fanGuideClose.addEventListener('click', function() {
+    fanGuideClose?.addEventListener('click', function() {
       fanGuide.classList.add('hidden');
     });
+
+    tabButtons.forEach(function(button) {
+      button.addEventListener('click', function() {
+        activatePublicTab(button.dataset.publicTab);
+      });
+    });
+
+    jumpButtons.forEach(function(button) {
+      button.addEventListener('click', function() {
+        activatePublicTab(button.dataset.publicTabJump);
+      });
+    });
+
+    {% if favorite_artists %}
+      activatePublicTab('favorites');
+    {% else %}
+      activatePublicTab('artists');
+    {% endif %}
   </script>
 {% endif %}
 {% endblock %}
