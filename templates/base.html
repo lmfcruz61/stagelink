@@ -141,7 +141,7 @@
     <div class="fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat" style="background-image: url('{{ site_appearance.background_image.url }}?v={{ site_appearance_version }}');"></div>
     <div class="fixed inset-0 -z-10 bg-zinc-950" style="opacity: {{ site_appearance.background_overlay|default:75 }}%;"></div>
   {% endif %}
-  <header class="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/92 backdrop-blur">
+  <header class="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
     <nav class="sl-shell mx-auto flex items-center gap-4 px-4 py-3">
       <a href="{% url 'streams:home' %}" class="flex shrink-0 items-center gap-3 text-xl font-semibold tracking-tight">
         {% if site_appearance.logo %}
