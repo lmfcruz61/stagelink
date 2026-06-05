@@ -28,17 +28,17 @@
     </div>
 
     <div class="mt-6 grid gap-3 sm:grid-cols-3">
-      <button type="button" data-public-tab="favorites" class="public-tab rounded border border-emerald-600 bg-emerald-500 px-4 py-3 text-left font-semibold text-zinc-950">
-        Favoritos
-        <span class="mt-1 block text-sm font-normal">{{ favorite_artists|length }} artistas guardados</span>
+      <button type="button" data-public-tab="concerts" class="public-tab rounded border border-emerald-600 bg-emerald-500 px-4 py-3 text-left font-semibold text-zinc-950">
+        Concertos
+        <span class="mt-1 block text-sm font-normal">{{ live_streams|length }} ao vivo · {{ upcoming_streams|length }} proximos</span>
       </button>
       <button type="button" data-public-tab="artists" class="public-tab rounded border border-zinc-700 bg-zinc-950 px-4 py-3 text-left font-semibold text-zinc-100 hover:border-emerald-500">
         Artistas
         <span class="mt-1 block text-sm font-normal text-zinc-400">{{ artists|length }} disponiveis</span>
       </button>
-      <button type="button" data-public-tab="concerts" class="public-tab rounded border border-zinc-700 bg-zinc-950 px-4 py-3 text-left font-semibold text-zinc-100 hover:border-emerald-500">
-        Concertos
-        <span class="mt-1 block text-sm font-normal text-zinc-400">{{ upcoming_streams|length }} agendados</span>
+      <button type="button" data-public-tab="favorites" class="public-tab rounded border border-zinc-700 bg-zinc-950 px-4 py-3 text-left font-semibold text-zinc-100 hover:border-emerald-500">
+        Favoritos
+        <span class="mt-1 block text-sm font-normal text-zinc-400">{{ favorite_artists|length }} artistas guardados</span>
       </button>
     </div>
   </section>
@@ -238,11 +238,7 @@
       });
     });
 
-    {% if favorite_artists %}
-      activatePublicTab('favorites');
-    {% else %}
-      activatePublicTab('artists');
-    {% endif %}
+    activatePublicTab('concerts');
   </script>
 {% endif %}
 {% endblock %}

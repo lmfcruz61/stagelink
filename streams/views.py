@@ -22,9 +22,12 @@ from .models import LiveStream
 
 def home(request):
     artists = Artist.objects.all().order_by('name')
-    live_streams = LiveStream.objects.filter(is_active=True).select_related('artist')[:8]
     now = timezone.now()
-    upcoming_streams = LiveStream.objects.filter(scheduled_at__gte=now).select_related('artist').order_by('scheduled_at')[:12]
+    live_streams = LiveStream.objects.filter(is_active=True).select_related('artist').order_by('scheduled_at')[:8]
+    upcoming_streams = LiveStream.objects.filter(
+        is_active=False,
+        scheduled_at__gte=now,
+    ).select_related('artist').order_by('scheduled_at')[:12]
     favorite_artist_ids = set()
     favorite_artists = Artist.objects.none()
 
