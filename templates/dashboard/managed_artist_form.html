@@ -8,7 +8,7 @@
     <p class="mt-2 text-zinc-400">Cria uma pagina de artista associada a uma equipa. Depois podes editar a pagina, galeria e agendar streams.</p>
   </div>
 
-  <form method="post" enctype="multipart/form-data" class="space-y-4 rounded border border-zinc-800 bg-zinc-900 p-6">
+  <form method="post" enctype="multipart/form-data" class="sl-card space-y-4 p-6">
     {% csrf_token %}
     <label>
       <span>Equipa responsavel</span>
@@ -19,7 +19,7 @@
       </select>
     </label>
     {{ form.as_p }}
-    <button class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400">Criar artista</button>
+    <button class="sl-primary">Criar artista</button>
   </form>
 </section>
 {% endblock %}

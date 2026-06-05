@@ -2,16 +2,21 @@
 {% load i18n %}
 {% block title %}{% trans "Acesso" %} - StageLink{% endblock %}
 {% block content %}
-<section class="mx-auto max-w-xl rounded border border-zinc-800 bg-zinc-900 p-6">
+<section class="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[1fr_380px] lg:items-start">
   {% if stream.cover_image %}
-    <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="mb-5 aspect-video w-full rounded object-cover">
+    <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="sl-thumb w-full object-cover">
+  {% else %}
+    <div class="sl-thumb flex items-center justify-center px-6 text-center text-xl font-semibold">{{ stream.title }}</div>
   {% endif %}
-  <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
-  <h1 class="mt-2 text-3xl font-semibold">{{ stream.title }}</h1>
-  <p class="mt-3 text-zinc-300">{% trans "Esta sala está reservada ao público com subscrição ativa ou bilhete comprado." %}</p>
-  <div class="mt-6 flex flex-wrap gap-3">
-    <a class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400" href="{% url 'payments:buy_ticket' stream.id %}">{% trans "Comprar bilhete" %}</a>
-    <a class="rounded bg-zinc-800 px-4 py-3 font-semibold hover:bg-zinc-700" href="{% url 'payments:subscribe_artist' stream.artist.id %}">{% trans "Subscrever artista" %}</a>
+
+  <div class="sl-card p-6">
+    <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
+    <h1 class="mt-2 text-3xl font-semibold">{{ stream.title }}</h1>
+    <p class="mt-3 text-zinc-300">{% trans "Esta sala esta reservada ao publico com subscricao ativa ou bilhete comprado." %}</p>
+    <div class="mt-6 grid gap-3">
+      <a class="sl-primary w-full" href="{% url 'payments:buy_ticket' stream.id %}">{% trans "Comprar bilhete" %}</a>
+      <a class="sl-secondary w-full" href="{% url 'payments:subscribe_artist' stream.artist.id %}">{% trans "Subscrever artista" %}</a>
+    </div>
   </div>
 </section>
 {% endblock %}

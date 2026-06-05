@@ -2,13 +2,13 @@
 {% load static %}
 {% block title %}Perfil - StageLink{% endblock %}
 {% block content %}
-<section class="mx-auto max-w-3xl">
+<section class="mx-auto max-w-4xl">
   <div class="mb-8">
     <p class="text-sm text-emerald-400">Conta</p>
     <h1 class="text-3xl font-semibold">Perfil</h1>
   </div>
 
-  <div class="rounded border border-zinc-800 bg-zinc-900 p-6">
+  <div class="sl-card p-6">
     {% if artist %}
       <div class="flex flex-col gap-5 md:flex-row">
         {% if artist.photo %}
@@ -22,8 +22,8 @@
           <p class="mt-2 text-sm text-zinc-400">{{ user.email|default:"Sem email definido" }}</p>
           <p class="mt-4 whitespace-pre-line text-zinc-300">{{ artist.bio|default:"Ainda nao adicionaste uma bio." }}</p>
           <div class="mt-5 flex flex-wrap gap-3">
-            <a class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400" href="{% url 'streams:artist_profile_edit' %}">Editar perfil de artista</a>
-            <a class="rounded border border-zinc-700 bg-zinc-900 px-4 py-3 font-semibold text-zinc-100 hover:border-emerald-500" href="{% url 'streams:artist_detail' artist.id %}">Ver pagina publica</a>
+            <a class="sl-primary" href="{% url 'streams:artist_profile_edit' %}">Editar perfil de artista</a>
+            <a class="sl-secondary" href="{% url 'streams:artist_detail' artist.id %}">Ver pagina publica</a>
           </div>
         </div>
       </div>
@@ -46,7 +46,7 @@
           <form method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
             {% csrf_token %}
             {{ fan_form.as_p }}
-            <button class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400">Guardar perfil</button>
+            <button class="sl-primary">Guardar perfil</button>
           </form>
         </div>
       </div>

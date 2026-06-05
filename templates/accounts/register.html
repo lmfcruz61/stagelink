@@ -2,17 +2,30 @@
 {% load i18n %}
 {% block title %}{% trans "Registo" %} - StageLink{% endblock %}
 {% block content %}
-<section class="mx-auto max-w-md">
-  <h1 class="mb-6 text-3xl font-semibold">{% trans "Criar conta" %}</h1>
-  <div class="mb-5 rounded border border-zinc-800 bg-zinc-900 p-4 text-sm text-zinc-300">
-    <p><strong>Musico:</strong> cria a tua pagina de artista individual.</p>
-    <p class="mt-2"><strong>Manager / equipa:</strong> cria uma empresa, agencia ou equipa para gerir varios artistas.</p>
-    <p class="mt-2"><strong>Público:</strong> segue artistas, compra acesso e participa nos streams.</p>
+<section class="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[1fr_440px] lg:items-start">
+  <div>
+    <p class="text-sm font-semibold text-emerald-400">Criar conta</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight">{% trans "Entrar na StageLink" %}</h1>
+    <div class="mt-6 grid gap-3">
+      <div class="sl-card p-4 text-sm text-zinc-300">
+        <p class="font-semibold text-zinc-100">Musico</p>
+        <p class="mt-1">Cria a tua pagina de artista individual.</p>
+      </div>
+      <div class="sl-card p-4 text-sm text-zinc-300">
+        <p class="font-semibold text-zinc-100">Manager / equipa</p>
+        <p class="mt-1">Cria uma empresa, agencia ou equipa para gerir varios artistas.</p>
+      </div>
+      <div class="sl-card p-4 text-sm text-zinc-300">
+        <p class="font-semibold text-zinc-100">Publico</p>
+        <p class="mt-1">Segue artistas, compra acesso e participa nos streams.</p>
+      </div>
+    </div>
   </div>
-  <form method="post" class="space-y-4 rounded border border-zinc-800 bg-zinc-900 p-6">
+
+  <form method="post" class="sl-card space-y-4 p-6">
     {% csrf_token %}
     {{ form.as_p }}
-    <button class="w-full rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400">{% trans "Entrar na StageLink" %}</button>
+    <button class="sl-primary w-full">{% trans "Entrar na StageLink" %}</button>
   </form>
 </section>
 <script>

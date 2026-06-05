@@ -1,25 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}StageLink{% endblock %}
 {% block content %}
-<style>
-  .favorite-star {
-    color: #f59e0b;
-    display: inline-block;
-    filter: drop-shadow(0 2px 2px rgba(120, 53, 15, 0.55));
-    font-size: 1.25rem;
-    line-height: 1;
-    position: relative;
-    text-shadow:
-      0 1px 0 #fef3c7,
-      0 0 8px rgba(251, 191, 36, 0.85),
-      0 0 16px rgba(217, 119, 6, 0.55);
-  }
-
-  .favorite-star-lg {
-    font-size: 1.55rem;
-  }
-</style>
-
 {% if user.is_authenticated and user.artist_profile or user.is_authenticated and user.organization_memberships.exists %}
   <section class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
     <div>
@@ -28,8 +9,8 @@
       <p class="mt-3 max-w-2xl text-zinc-300">Cria streams, acompanha subscritores e recebe gorjetas do teu publico durante a sala ao vivo.</p>
     </div>
     <div class="flex flex-wrap gap-3">
-      <a class="rounded border border-zinc-700 bg-zinc-900 px-4 py-3 font-semibold text-zinc-100 hover:border-emerald-500" href="{% url 'streams:dashboard' %}">Dashboard</a>
-      <a class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400" href="{% url 'streams:stream_create' %}">Novo stream</a>
+      <a class="sl-secondary" href="{% url 'streams:dashboard' %}">Dashboard</a>
+      <a class="sl-primary" href="{% url 'streams:stream_create' %}">Novo stream</a>
     </div>
   </section>
 {% elif user.is_authenticated and user.fan_profile %}
@@ -40,7 +21,7 @@
         <h1 class="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">A tua area StageLink</h1>
         <p class="mt-3 max-w-2xl text-zinc-300">Guarda artistas, acompanha concertos e entra em salas privadas quando tiveres acesso.</p>
       </div>
-      <button id="fan-guide-button" type="button" class="w-fit rounded border border-zinc-700 bg-zinc-950 px-4 py-3 font-semibold text-zinc-100 hover:border-emerald-500">
+      <button id="fan-guide-button" type="button" class="sl-secondary w-fit bg-zinc-950">
         Guia rapido
       </button>
     </div>
@@ -82,7 +63,7 @@
       <h1 class="text-4xl font-semibold tracking-tight">Streams ao vivo para publico que quer apoiar de perto.</h1>
       <p class="mt-3 max-w-2xl text-zinc-300">Subscreve artistas, compra bilhetes para salas privadas e envia gorjetas durante o concerto.</p>
     </div>
-    <a class="w-fit rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400" href="{% url 'accounts:register' %}">Criar conta</a>
+      <a class="sl-primary w-fit" href="{% url 'accounts:register' %}">Criar conta</a>
   </section>
 {% endif %}
 
@@ -139,12 +120,12 @@
   </div>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for stream in concert_streams %}
-      <a href="{% url 'streams:room' stream.id %}" class="group overflow-hidden rounded border {% if stream.artist_id in favorite_artist_ids %}border-emerald-600 bg-emerald-950/20{% else %}border-zinc-800 bg-zinc-900{% endif %} hover:border-emerald-500">
-        <div class="relative">
+      <a href="{% url 'streams:room' stream.id %}" class="sl-video-card group">
+        <div class="sl-thumb relative border {% if stream.artist_id in favorite_artist_ids %}border-emerald-600{% else %}border-zinc-800{% endif %}">
           {% if stream.cover_image %}
             <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full object-cover">
           {% else %}
-            <div class="flex aspect-video w-full items-center justify-center bg-zinc-800 px-4 text-center text-sm font-semibold text-zinc-300">{{ stream.title }}</div>
+            <div class="flex h-full w-full items-center justify-center px-4 text-center text-sm font-semibold text-zinc-300">{{ stream.title }}</div>
           {% endif %}
           <div class="absolute left-3 top-3 flex flex-wrap gap-2">
             {% if stream.is_active %}
@@ -155,7 +136,7 @@
             {% endif %}
           </div>
         </div>
-        <div class="p-4">
+        <div class="px-1 py-3">
           <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
           <h3 class="mt-2 font-semibold group-hover:text-emerald-200">{{ stream.title }}</h3>
           <p class="mt-2 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ stream.access_price }} EUR</p>
@@ -176,7 +157,7 @@
   </div>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for artist in artists %}
-      <article class="rounded border {% if artist.id in favorite_artist_ids %}border-emerald-700 bg-emerald-950/20{% else %}border-zinc-800 bg-zinc-900{% endif %} p-4 hover:border-emerald-500">
+      <article class="sl-card {% if artist.id in favorite_artist_ids %}border-emerald-700 bg-emerald-950/20{% endif %} p-4">
         <a href="{% url 'streams:artist_detail' artist.id %}" class="flex gap-4">
           {% if artist.photo %}
             <img src="{{ artist.photo.url }}" alt="{{ artist.name }}" class="h-16 w-16 rounded object-cover">
