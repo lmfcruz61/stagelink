@@ -8,7 +8,7 @@
   {% endif %}
   <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
   <h1 class="mt-2 text-3xl font-semibold">{{ stream.title }}</h1>
-  <p class="mt-3 text-zinc-300">{% trans "Esta sala está reservada a fãs com subscrição ativa ou bilhete comprado." %}</p>
+  <p class="mt-3 text-zinc-300">{% trans "Esta sala está reservada ao público com subscrição ativa ou bilhete comprado." %}</p>
   <div class="mt-6 flex flex-wrap gap-3">
     <a class="rounded bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400" href="{% url 'payments:buy_ticket' stream.id %}">{% trans "Comprar bilhete" %}</a>
     <a class="rounded bg-zinc-800 px-4 py-3 font-semibold hover:bg-zinc-700" href="{% url 'payments:subscribe_artist' stream.artist.id %}">{% trans "Subscrever artista" %}</a>

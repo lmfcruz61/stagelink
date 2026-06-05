@@ -65,7 +65,7 @@ def favorite_artist_toggle(request, artist_id):
 
     fan = getattr(request.user, 'fan_profile', None)
     if not fan:
-        messages.error(request, 'Apenas fas podem guardar artistas favoritos.')
+        messages.error(request, 'Apenas contas de público podem guardar artistas favoritos.')
         return redirect('streams:artist_detail', artist_id=artist_id)
 
     artist = get_object_or_404(Artist, pk=artist_id)
@@ -130,7 +130,7 @@ def stream_room(request, stream_id):
 @login_required
 def dashboard(request):
     if not can_access_dashboard(request.user):
-        messages.info(request, 'A tua conta de fa nao tem dashboard de gestao. Usa a homepage para seguir artistas, entrar em streams e gerir o teu perfil.')
+        messages.info(request, 'A tua conta de público nao tem dashboard de gestao. Usa a homepage para seguir artistas, entrar em streams e gerir o teu perfil.')
         return redirect('streams:home')
 
     artists = editable_artists_for(request.user).order_by('name')
@@ -165,7 +165,7 @@ def dashboard(request):
 @login_required
 def organization_create(request):
     if not request.user.is_staff and getattr(getattr(request.user, 'profile', None), 'role', '') == 'fan':
-        messages.error(request, 'Contas de fa nao podem criar equipas. Cria uma conta Manager / equipa para gerir artistas.')
+        messages.error(request, 'Contas de público nao podem criar equipas. Cria uma conta Manager / equipa para gerir artistas.')
         return redirect('streams:home')
 
     if request.method == 'POST':

@@ -33,7 +33,7 @@ def subscribe_artist(request, artist_id):
     artist = get_object_or_404(Artist, pk=artist_id)
     fan = getattr(request.user, 'fan_profile', None)
     if fan is None:
-        messages.error(request, 'Só contas de fã podem subscrever artistas.')
+        messages.error(request, 'Só contas de público podem subscrever artistas.')
         return redirect('streams:artist_detail', artist_id=artist.id)
 
     if not settings.STRIPE_SECRET_KEY:
@@ -64,7 +64,7 @@ def buy_ticket(request, stream_id):
     stream = get_object_or_404(LiveStream, pk=stream_id)
     fan = getattr(request.user, 'fan_profile', None)
     if fan is None:
-        messages.error(request, 'Só contas de fã podem comprar bilhetes.')
+        messages.error(request, 'Só contas de público podem comprar bilhetes.')
         return redirect('streams:room', stream_id=stream.id)
 
     if stream.access_price <= 0:
@@ -103,7 +103,7 @@ def create_tip(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     fan = getattr(request.user, 'fan_profile', None)
     if fan is None:
-        messages.error(request, 'Só contas de fã podem enviar gorjetas.')
+        messages.error(request, 'Só contas de público podem enviar gorjetas.')
         return redirect('streams:room', stream_id=stream.id)
 
     try:

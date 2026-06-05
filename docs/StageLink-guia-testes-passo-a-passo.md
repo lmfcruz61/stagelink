@@ -58,12 +58,12 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
    - Leitor deve ficar limitado.
 10. Confirmar que o manager consegue entrar na sala do stream para operar/testar.
 
-## 5. Teste como fa
+## 5. Teste como público
 
-1. Criar conta nova como fa.
+1. Criar conta nova como público.
 2. Confirmar avatar circular por defeito no header/perfil.
 3. Atualizar nome publico e foto do perfil.
-4. Abrir a homepage e o `Guia rapido para fas`.
+4. Abrir a homepage e o `Guia rápido para o público`.
 5. Abrir pagina de um artista.
 6. Tentar entrar num stream pago sem acesso. Deve aparecer bloqueio.
 7. Comprar bilhete em modo teste ou criar acesso/subscricao de teste.
@@ -110,7 +110,7 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 
 Avancar para um artista piloto quando:
 
-1. Registo de musico, manager e fa nao tiver erros 500.
+1. Registo de musico, manager e público nao tiver erros 500.
 2. Pagamentos Stripe em modo teste estiverem completos.
 3. Chat funcionar entre pelo menos dois utilizadores.
 4. Admin conseguir entrar em qualquer stream.
@@ -121,4 +121,4 @@ Avancar para um artista piloto quando:
 
 No fim deste teste, deves conseguir provar o ciclo completo:
 
-Empresa/manager cria artista, artista tem pagina publica, stream e acesso pago; fa entra, conversa no chat e envia gorjeta; admin consegue supervisionar tudo.
+Empresa/manager cria artista, artista tem pagina publica, stream e acesso pago; público entra, conversa no chat e envia gorjeta; admin consegue supervisionar tudo.

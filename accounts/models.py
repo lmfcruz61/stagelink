@@ -8,7 +8,7 @@ class Profile(models.Model):
     MANAGER = 'manager'
     ROLE_CHOICES = (
         (MUSICIAN, 'Músico'),
-        (FAN, 'Fã'),
+        (FAN, 'Público'),
         (MANAGER, 'Manager / equipa'),
     )
 

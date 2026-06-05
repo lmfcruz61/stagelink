@@ -7,7 +7,7 @@
     <div>
       <p class="text-sm text-emerald-400">{% if user.artist_profile %}{{ user.artist_profile.name }}{% else %}StageLink Pro{% endif %}</p>
       <h1 class="text-4xl font-semibold tracking-tight">{% trans "Prepara e monetiza os teus concertos ao vivo." %}</h1>
-      <p class="mt-3 max-w-2xl text-zinc-300">{% trans "Cria streams, acompanha subscritores e recebe gorjetas dos teus fas durante a sala ao vivo." %}</p>
+      <p class="mt-3 max-w-2xl text-zinc-300">{% trans "Cria streams, acompanha subscritores e recebe gorjetas do teu público durante a sala ao vivo." %}</p>
     </div>
     <div class="flex flex-wrap gap-3">
       <a class="rounded border border-zinc-700 bg-zinc-900 px-4 py-3 font-semibold text-zinc-100 hover:border-emerald-500" href="{% url 'streams:dashboard' %}">Dashboard</a>
@@ -17,7 +17,7 @@
 {% else %}
   <section class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
     <div>
-      <h1 class="text-4xl font-semibold tracking-tight">{% trans "Streams ao vivo para fas que querem apoiar de perto." %}</h1>
+      <h1 class="text-4xl font-semibold tracking-tight">{% trans "Streams ao vivo para público que quer apoiar de perto." %}</h1>
       <p class="mt-3 max-w-2xl text-zinc-300">{% trans "Subscreve artistas, compra bilhetes para salas privadas e envia gorjetas durante o concerto." %}</p>
     </div>
     {% if user.is_authenticated and user.fan_profile %}
@@ -32,7 +32,7 @@
   <section id="fan-guide" class="mb-10 hidden rounded border border-emerald-700 bg-emerald-950/30 p-5">
     <div class="flex items-start justify-between gap-4">
       <div>
-        <h2 class="text-xl font-semibold">{% trans "Guia rapido para fas" %}</h2>
+        <h2 class="text-xl font-semibold">{% trans "Guia rápido para o público" %}</h2>
         <p class="mt-1 text-sm text-zinc-300">{% trans "Segue estes passos para entrar nos concertos e apoiar os teus artistas." %}</p>
       </div>
       <button id="fan-guide-close" type="button" class="rounded bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800">{% trans "Fechar" %}</button>
@@ -43,7 +43,7 @@
       <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>{% trans "3. Entra na sala." %}</strong><br>{% trans "Quando tiveres acesso, abre o stream para ver o player YouTube e participar no chat ao vivo." %}</li>
       <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>{% trans "4. Apoia em direto." %}</strong><br>{% trans "Durante o concerto, envia gorjetas com valor personalizado e uma mensagem para o artista." %}</li>
       <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>{% trans "5. Guarda favoritos." %}</strong><br>{% trans "Marca artistas como favoritos para criares a tua lista pessoal." %}</li>
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>{% trans "6. Confirma o perfil." %}</strong><br>{% trans "Abre o teu perfil para atualizar o nome publico e a foto circular de fa." %}</li>
+      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>{% trans "6. Confirma o perfil." %}</strong><br>{% trans "Abre o teu perfil para atualizar o nome público e a foto circular." %}</li>
     </ol>
   </section>
 

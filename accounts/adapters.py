@@ -10,7 +10,7 @@ class StageLinkSocialAccountAdapter(DefaultSocialAccountAdapter):
         display_name = user.get_full_name() or user.username
         avatar_url = extra_data.get('picture') or extra_data.get('avatar_url') or ''
 
-        # Logins sociais entram como fa por defeito.
+        # Logins sociais entram como publico por defeito.
         Profile.objects.get_or_create(user=user, defaults={'role': Profile.FAN})
         Fan.objects.get_or_create(
             user=user,

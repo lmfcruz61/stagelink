@@ -3,7 +3,7 @@
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 2 0 obj
-<< /Length 2082 >>
+<< /Length 2081 >>
 stream
 BT
 /F1 10 Tf
@@ -97,7 +97,6 @@ T*
 T*
 (9. Entrar na sala como artista e confirmar player, chat e botoes.) Tj
 T*
-
 (Pagina 1 de 3) Tj
 ET
 endstream
@@ -106,7 +105,7 @@ endobj
 << /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
 endobj
 4 0 obj
-<< /Length 1934 >>
+<< /Length 1949 >>
 stream
 BT
 /F1 10 Tf
@@ -152,17 +151,17 @@ T*
 T*
 () Tj
 T*
-(#5. Teste como fa) Tj
+(#5. Teste como público) Tj
 T*
 () Tj
 T*
-(1. Criar conta nova como fa.) Tj
+(1. Criar conta nova como público.) Tj
 T*
 (2. Confirmar avatar circular por defeito no header/perfil.) Tj
 T*
 (3. Atualizar nome publico e foto do perfil.) Tj
 T*
-(4. Abrir a homepage e o `Guia rapido para fas`.) Tj
+(4. Abrir a homepage e o `Guia rápido para o público`.) Tj
 T*
 (5. Abrir pagina de um artista.) Tj
 T*
@@ -200,7 +199,6 @@ T*
 T*
 (7. Confirmar comportamento se o pagamento falhar.) Tj
 T*
-
 (Pagina 2 de 3) Tj
 ET
 endstream
@@ -209,7 +207,7 @@ endobj
 << /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
 endobj
 6 0 obj
-<< /Length 1777 >>
+<< /Length 1786 >>
 stream
 BT
 /F1 10 Tf
@@ -271,7 +269,7 @@ T*
 T*
 () Tj
 T*
-(1. Registo de musico, manager e fa nao tiver erros 500.) Tj
+(1. Registo de musico, manager e público nao tiver erros 500.) Tj
 T*
 (2. Pagamentos Stripe em modo teste estiverem completos.) Tj
 T*
@@ -293,11 +291,10 @@ T*
 T*
 () Tj
 T*
-(Empresa/manager cria artista, artista tem pagina publica, stream e acesso pago; fa) Tj
+(Empresa/manager cria artista, artista tem pagina publica, stream e acesso pago; público) Tj
 T*
 (entra, conversa no chat e envia gorjeta; admin consegue supervisionar tudo.) Tj
 T*
-
 (Pagina 3 de 3) Tj
 ET
 endstream
@@ -316,15 +313,15 @@ xref
 0000000000 65535 f 
 0000000009 00000 n 
 0000000079 00000 n 
-0000002213 00000 n 
-0000002339 00000 n 
-0000004325 00000 n 
-0000004451 00000 n 
-0000006280 00000 n 
-0000006406 00000 n 
-0000006475 00000 n 
+0000002212 00000 n 
+0000002338 00000 n 
+0000004339 00000 n 
+0000004465 00000 n 
+0000006303 00000 n 
+0000006429 00000 n 
+0000006498 00000 n 
 trailer
 << /Size 10 /Root 9 0 R >>
 startxref
-6524
+6547
 %%EOF
