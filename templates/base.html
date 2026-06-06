@@ -150,11 +150,17 @@
           <span>{{ site_appearance.name|default:'StageLink' }}</span>
         {% endif %}
       </a>
-      <div class="hidden min-w-0 flex-1 md:block">
-        <div class="mx-auto flex max-w-xl items-center rounded-full border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm text-zinc-400">
-          <span class="truncate">Pesquisar artistas, espetáculos e salas ao vivo</span>
-        </div>
-      </div>
+      <form method="get" action="{% url 'streams:home' %}" class="hidden min-w-0 flex-1 md:block">
+        <label for="site-search" class="sr-only">Pesquisar</label>
+        <input
+          id="site-search"
+          name="q"
+          type="search"
+          value="{{ search_query|default:request.GET.q }}"
+          placeholder="Pesquisar artistas, espetáculos e salas ao vivo"
+          class="mx-auto block max-w-xl rounded-full border-zinc-700 bg-zinc-900 px-4 py-2 text-sm text-zinc-100 placeholder:text-zinc-400"
+        >
+      </form>
       <div class="ml-auto flex shrink-0 items-center gap-2 text-sm">
         {% if user.is_authenticated %}
           <a class="flex items-center gap-2 text-zinc-300 hover:text-white" href="{% url 'accounts:profile' %}">

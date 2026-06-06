@@ -22,6 +22,7 @@ from .models import LiveStream
 
 def home(request):
     now = timezone.now()
+    query = request.GET.get('q', '').strip()
     visible_streams_filter = Q(is_active=True) | Q(scheduled_at__gte=now)
     visible_artist_streams = Prefetch(
         'streams',
@@ -39,6 +40,23 @@ def home(request):
 
     artists = Artist.objects.prefetch_related(visible_artist_streams)
     concert_streams = LiveStream.objects.filter(visible_streams_filter).select_related('artist')
+
+    if query:
+        artist_filter = (
+            Q(name__icontains=query)
+            | Q(bio__icontains=query)
+            | Q(headline__icontains=query)
+            | Q(location__icontains=query)
+        )
+        stream_filter = (
+            Q(title__icontains=query)
+            | Q(artist__name__icontains=query)
+            | Q(artist__bio__icontains=query)
+            | Q(artist__headline__icontains=query)
+            | Q(artist__location__icontains=query)
+        )
+        artists = artists.filter(artist_filter)
+        concert_streams = concert_streams.filter(stream_filter)
 
     if favorite_artist_ids:
         artists = artists.annotate(
@@ -74,6 +92,7 @@ def home(request):
         'concert_streams': concert_streams,
         'favorite_artists': favorite_artists,
         'favorite_artist_ids': favorite_artist_ids,
+        'search_query': query,
     })
 
 
