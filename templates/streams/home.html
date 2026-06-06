@@ -51,7 +51,7 @@
       <button id="fan-guide-close" type="button" class="rounded bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800">Fechar</button>
     </div>
     <ol class="mt-5 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>1. Escolhe um artista.</strong><br>Abre a pagina de um musico para veres streams futuros, streams passados e opcoes de acesso.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>1. Escolhe um artista.</strong><br>Abre a pagina de um artista para veres streams futuros, streams passados e opcoes de acesso.</li>
       <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>2. Guarda favoritos.</strong><br>Marca artistas como favoritos para criares a tua lista pessoal.</li>
       <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>3. Garante o acesso.</strong><br>Subscreve mensalmente ou compra bilhete para um concerto especifico.</li>
       <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>4. Entra na sala.</strong><br>Quando tiveres acesso, abre o concerto para ver o player e participar no chat.</li>
@@ -92,7 +92,7 @@
                 <h3 class="font-semibold"><span class="favorite-star favorite-star-lg mr-1 align-middle">&#9733;</span>{{ artist.name }}</h3>
                 <span class="rounded-full border border-amber-300 bg-zinc-950/90 px-2 py-1 text-xs font-semibold text-amber-100">Favorito</span>
               </div>
-              <p class="mt-1 line-clamp-2 text-sm text-zinc-400">{{ artist.bio|default:"Perfil de musico StageLink" }}</p>
+              <p class="mt-1 line-clamp-2 text-sm text-zinc-400">{{ artist.bio|default:"Perfil de artista StageLink" }}</p>
             </div>
           </a>
           <form method="post" action="{% url 'streams:favorite_artist_toggle' artist.id %}" class="mt-4">
@@ -171,7 +171,7 @@
             <h3 class="font-semibold">
               {% if artist.id in favorite_artist_ids %}<span class="favorite-star favorite-star-lg mr-1 align-middle">&#9733;</span>{% endif %}{{ artist.name }}
             </h3>
-            <p class="mt-1 line-clamp-2 text-sm text-zinc-400">{{ artist.bio|default:"Perfil de musico StageLink" }}</p>
+            <p class="mt-1 line-clamp-2 text-sm text-zinc-400">{{ artist.bio|default:"Perfil de artista StageLink" }}</p>
           </div>
         </a>
         {% if artist.id in favorite_artist_ids and artist.homepage_streams %}

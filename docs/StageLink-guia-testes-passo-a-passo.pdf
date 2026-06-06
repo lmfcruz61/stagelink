@@ -3,7 +3,7 @@
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 2 0 obj
-<< /Length 2854 >>
+<< /Length 2855 >>
 stream
 BT
 /F1 10 Tf
@@ -69,7 +69,7 @@ BT
 0 -13 Td
 0 -13 Td
 0 -13 Td
-(1. Criar conta nova como musico.) Tj
+(1. Criar conta nova como artista.) Tj
 0 -13 Td
 (2. Entrar no dashboard.) Tj
 0 -13 Td
@@ -231,7 +231,7 @@ endobj
 << /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
 endobj
 6 0 obj
-<< /Length 2461 >>
+<< /Length 2462 >>
 stream
 BT
 /F1 10 Tf
@@ -286,7 +286,7 @@ BT
 (Avancar para um artista piloto quando:) Tj
 0 -13 Td
 0 -13 Td
-(1. Registo de musico, manager e publico nao tiver erros 500.) Tj
+(1. Registo de artista, manager e publico nao tiver erros 500.) Tj
 0 -13 Td
 (2. Pagamentos Stripe em modo teste estiverem completos.) Tj
 0 -13 Td
@@ -329,18 +329,18 @@ endobj
 endobj
 xref
 0 10
-0000000000 65535 f 
-0000000009 00000 n 
-0000000079 00000 n 
-0000002985 00000 n 
-0000003111 00000 n 
-0000006064 00000 n 
-0000006190 00000 n 
-0000008703 00000 n 
-0000008829 00000 n 
-0000008898 00000 n 
+0000000000 65535 f
+0000000009 00000 n
+0000000079 00000 n
+0000002986 00000 n
+0000003112 00000 n
+0000006065 00000 n
+0000006191 00000 n
+0000008705 00000 n
+0000008831 00000 n
+0000008900 00000 n
 trailer
 << /Size 10 /Root 9 0 R >>
 startxref
-8947
+8949
 %%EOF

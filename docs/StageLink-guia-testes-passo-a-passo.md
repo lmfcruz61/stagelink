@@ -25,7 +25,7 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 
 ## 3. Teste como artista individual
 
-1. Criar conta nova como musico.
+1. Criar conta nova como artista.
 2. Entrar no dashboard.
 3. Confirmar que nao aparecem botoes de equipa como `Nova equipa` ou `Novo artista gerido`.
 4. Abrir o `Guia rapido`.
@@ -124,7 +124,7 @@ Nota: nesta fase piloto, o contador mede ligacoes WebSocket ativas na sala. Em e
 
 Avancar para um artista piloto quando:
 
-1. Registo de musico, manager e publico nao tiver erros 500.
+1. Registo de artista, manager e publico nao tiver erros 500.
 2. Pagamentos Stripe em modo teste estiverem completos.
 3. Chat funcionar entre pelo menos dois utilizadores.
 4. Emojis do chat aparecerem corretamente.

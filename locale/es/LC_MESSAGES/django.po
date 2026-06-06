@@ -118,7 +118,7 @@ msgstr "1. Elige un artista."
 
 #: .\templates\streams\home.html:41
 msgid ""
-"Abre a página de um músico para veres streams futuros, streams passados e "
+"Abre a página de um artista para veres streams futuros, streams passados e "
 "opções de acesso."
 msgstr ""
 
@@ -187,7 +187,7 @@ msgstr "Enviar"
 #: .\templates\streams\room.html:41
 msgid ""
 "Não foi possível carregar este vídeo. Confirma o ID ou link do YouTube no "
-"dashboard do músico."
+"dashboard do artista."
 msgstr ""
 
 #: .\templates\streams\room.html:42
