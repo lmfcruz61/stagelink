@@ -156,7 +156,7 @@
           id="site-search"
           name="q"
           type="search"
-          value="{{ search_query|default:request.GET.q }}"
+          value="{{ search_query|default:'' }}"
           placeholder="Pesquisar artistas, espetáculos e salas ao vivo"
           class="mx-auto block max-w-xl rounded-full border-zinc-700 bg-zinc-900 px-4 py-2 text-sm text-zinc-100 placeholder:text-zinc-400"
         >
