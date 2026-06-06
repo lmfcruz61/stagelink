@@ -67,7 +67,8 @@ def buy_ticket(request, stream_id):
         messages.error(request, 'Só contas de público podem comprar bilhetes.')
         return redirect('streams:room', stream_id=stream.id)
 
-    if stream.user_has_access(request.user):
+    access = stream.log_access_decision(request.user, 'buy_ticket')
+    if access['allowed']:
         return redirect('streams:room', stream_id=stream.id)
 
     if stream.access_price <= 0:

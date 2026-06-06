@@ -72,7 +72,7 @@ class StreamChatConsumer(AsyncWebsocketConsumer):
             stream = LiveStream.objects.select_related('artist__user').get(pk=self.stream_id)
         except LiveStream.DoesNotExist:
             return False
-        return stream.user_has_access(user)
+        return stream.log_access_decision(user, 'websocket_connect')['allowed']
 
     @database_sync_to_async
     def save_message(self, message):

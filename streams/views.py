@@ -187,7 +187,8 @@ def can_manage_organizations(user):
 @login_required
 def stream_room(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
-    if not stream.user_has_access(request.user):
+    access = stream.log_access_decision(request.user, 'stream_room')
+    if not access['allowed']:
         messages.warning(request, 'Precisas de uma subscricao ativa ou bilhete para entrar nesta sala.')
         return render(request, 'streams/access_required.html', {'stream': stream})
     now = timezone.now()

@@ -1,9 +1,13 @@
+import logging
+
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from urllib.parse import parse_qs, urlparse
 
 from accounts.models import Artist
+
+logger = logging.getLogger(__name__)
 
 
 class LiveStream(models.Model):
@@ -43,14 +47,19 @@ class LiveStream(models.Model):
                         return parts[index + 1]
         return value
 
-    def user_has_access(self, user):
+    def access_decision(self, user):
         # Centraliza a regra de acesso usada pelas views e pelo WebSocket.
+        base = {
+            'user_id': getattr(user, 'id', None),
+            'stream_id': self.id,
+            'access_price': str(self.access_price),
+        }
         if not user.is_authenticated:
-            return False
+            return {**base, 'allowed': False, 'reason': 'anonymous'}
         if user.is_staff or user.is_superuser:
-            return True
+            return {**base, 'allowed': True, 'reason': 'staff_or_superuser'}
         if self.artist.user_id == user.id:
-            return True
+            return {**base, 'allowed': True, 'reason': 'artist_owner'}
         if self.artist.organization_id:
             from accounts.models import OrganizationMember
 
@@ -59,7 +68,10 @@ class LiveStream(models.Model):
                 user=user,
                 role__in=OrganizationMember.EDIT_ROLES,
             ).exists():
-                return True
+                return {**base, 'allowed': True, 'reason': 'organization_manager'}
+
+        if self.access_price <= 0:
+            return {**base, 'allowed': True, 'reason': 'free_event'}
 
         from payments.models import StreamTicketPurchase, Subscription
 
@@ -69,12 +81,43 @@ class LiveStream(models.Model):
             status=Subscription.ACTIVE,
             current_period_end__gte=timezone.now(),
         ).exists()
-        has_ticket = StreamTicketPurchase.objects.filter(
+        if has_subscription:
+            return {**base, 'allowed': True, 'reason': 'active_subscription'}
+
+        has_paid_ticket = StreamTicketPurchase.objects.filter(
             fan__user=user,
             stream=self,
             paid=True,
+        ).exclude(stripe_session_id='').exists()
+        if has_paid_ticket:
+            return {**base, 'allowed': True, 'reason': 'paid_ticket'}
+
+        has_stale_free_ticket = StreamTicketPurchase.objects.filter(
+            fan__user=user,
+            stream=self,
+            paid=True,
+            stripe_session_id='',
         ).exists()
-        return has_subscription or has_ticket
+        if has_stale_free_ticket:
+            return {**base, 'allowed': False, 'reason': 'stale_free_ticket_on_paid_event'}
+
+        return {**base, 'allowed': False, 'reason': 'missing_paid_access'}
+
+    def log_access_decision(self, user, source):
+        decision = self.access_decision(user)
+        logger.info(
+            'StageLink access check source=%s user_id=%s stream_id=%s access_price=%s allowed=%s reason=%s',
+            source,
+            decision['user_id'],
+            decision['stream_id'],
+            decision['access_price'],
+            decision['allowed'],
+            decision['reason'],
+        )
+        return decision
+
+    def user_has_access(self, user):
+        return self.access_decision(user)['allowed']
 
 
 class Tip(models.Model):

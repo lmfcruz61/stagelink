@@ -68,7 +68,15 @@
           <h2 class="mt-2 text-2xl font-semibold">{{ featured_stream.title }}</h2>
           <p class="mt-2 text-zinc-400">{{ featured_stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ featured_stream.access_price }} EUR</p>
           <div class="mt-5">
-            <a class="sl-primary" href="{% url 'streams:room' featured_stream.id %}">Entrar / comprar acesso</a>
+            {% if user.is_authenticated and user.fan_profile %}
+              <a class="sl-primary" href="{% url 'payments:buy_ticket' featured_stream.id %}">
+                {% if featured_stream.access_price > 0 %}Comprar bilhete{% else %}Entrar gratis{% endif %}
+              </a>
+            {% elif user.is_authenticated %}
+              <a class="sl-primary" href="{% url 'streams:room' featured_stream.id %}">Entrar na sala</a>
+            {% else %}
+              <a class="sl-primary" href="{% url 'accounts:login' %}?next={% url 'streams:room' featured_stream.id %}">Entrar para comprar</a>
+            {% endif %}
           </div>
         </div>
       </div>
