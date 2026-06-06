@@ -5,8 +5,8 @@
   <section class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
     <div>
       <p class="text-sm text-emerald-400">{% if user.artist_profile %}{{ user.artist_profile.name }}{% else %}StageLink Pro{% endif %}</p>
-      <h1 class="text-4xl font-semibold tracking-tight">Prepara e monetiza os teus concertos ao vivo.</h1>
-      <p class="mt-3 max-w-2xl text-zinc-300">Cria streams, acompanha subscritores e recebe gorjetas do teu publico durante a sala ao vivo.</p>
+      <h1 class="text-4xl font-semibold tracking-tight">Cria eventos ao vivo e aproxima-te do teu publico.</h1>
+      <p class="mt-3 max-w-2xl text-zinc-300">Organiza eventos exclusivos, vende acessos, cria uma comunidade de seguidores e recebe apoio direto atraves de subscricoes e gorjetas.</p>
     </div>
     <div class="flex flex-wrap gap-3">
       <a class="sl-secondary" href="{% url 'streams:dashboard' %}">Dashboard</a>
@@ -60,8 +60,8 @@
 {% else %}
   <section class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
     <div>
-      <h1 class="text-4xl font-semibold tracking-tight">Streams ao vivo para publico que quer apoiar de perto.</h1>
-      <p class="mt-3 max-w-2xl text-zinc-300">Subscreve artistas, compra bilhetes para salas privadas e envia gorjetas durante o concerto.</p>
+      <h1 class="text-4xl font-semibold tracking-tight">Cria eventos ao vivo e aproxima-te do teu publico.</h1>
+      <p class="mt-3 max-w-2xl text-zinc-300">Organiza eventos exclusivos, vende acessos, cria uma comunidade de seguidores e recebe apoio direto atraves de subscricoes e gorjetas.</p>
     </div>
       <a class="sl-primary w-fit" href="{% url 'accounts:register' %}">Criar conta</a>
   </section>
