@@ -67,6 +67,9 @@ def buy_ticket(request, stream_id):
         messages.error(request, 'Só contas de público podem comprar bilhetes.')
         return redirect('streams:room', stream_id=stream.id)
 
+    if stream.user_has_access(request.user):
+        return redirect('streams:room', stream_id=stream.id)
+
     if stream.access_price <= 0:
         StreamTicketPurchase.objects.update_or_create(fan=fan, stream=stream, defaults={'paid': True})
         return redirect('streams:room', stream_id=stream.id)

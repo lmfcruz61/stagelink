@@ -136,28 +136,43 @@
   </div>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for stream in concert_streams %}
-      <a href="{% url 'streams:room' stream.id %}" class="sl-video-card group">
-        <div class="sl-thumb relative border {% if stream.artist_id in favorite_artist_ids %}border-emerald-600{% else %}border-zinc-800{% endif %}">
-          {% if stream.cover_image %}
-            <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full object-cover">
-          {% else %}
-            <div class="flex h-full w-full items-center justify-center px-4 text-center text-sm font-semibold text-zinc-300">{{ stream.title }}</div>
-          {% endif %}
-          <div class="absolute left-3 top-3 flex flex-wrap gap-2">
-            {% if stream.is_active %}
-              <span class="rounded bg-emerald-500 px-2 py-1 text-xs font-semibold text-zinc-950">Ao vivo</span>
+      <article class="sl-video-card group">
+        <a href="{% url 'streams:room' stream.id %}" class="block">
+          <div class="sl-thumb relative border {% if stream.artist_id in favorite_artist_ids %}border-emerald-600{% else %}border-zinc-800{% endif %}">
+            {% if stream.cover_image %}
+              <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full object-cover">
+            {% else %}
+              <div class="flex h-full w-full items-center justify-center px-4 text-center text-sm font-semibold text-zinc-300">{{ stream.title }}</div>
             {% endif %}
-            {% if stream.artist_id in favorite_artist_ids %}
-              <span class="rounded border border-amber-300 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-amber-100"><span class="favorite-star mr-1">&#9733;</span> Favorito</span>
+            <div class="absolute left-3 top-3 flex flex-wrap gap-2">
+              {% if stream.is_active %}
+                <span class="rounded bg-emerald-500 px-2 py-1 text-xs font-semibold text-zinc-950">Ao vivo</span>
+              {% endif %}
+              {% if stream.artist_id in favorite_artist_ids %}
+                <span class="rounded border border-amber-300 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-amber-100"><span class="favorite-star mr-1">&#9733;</span> Favorito</span>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+        <div class="px-1 py-3">
+          <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
+          <a href="{% url 'streams:room' stream.id %}" class="mt-2 block font-semibold group-hover:text-emerald-200">{{ stream.title }}</a>
+          <p class="mt-2 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ stream.access_price }} EUR</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            {% if user.is_authenticated and user.fan_profile %}
+              <a class="sl-primary px-3 py-2 text-sm" href="{% url 'payments:buy_ticket' stream.id %}">
+                {% if stream.access_price > 0 %}Comprar bilhete{% else %}Entrar grátis{% endif %}
+              </a>
+              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:room' stream.id %}">Ver sala</a>
+            {% elif user.is_authenticated %}
+              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:room' stream.id %}">Ver sala</a>
+            {% else %}
+              <a class="sl-primary px-3 py-2 text-sm" href="{% url 'accounts:login' %}?next={% url 'streams:room' stream.id %}">Entrar para comprar</a>
+              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:artist_detail' stream.artist.id %}">Ver artista</a>
             {% endif %}
           </div>
         </div>
-        <div class="px-1 py-3">
-          <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
-          <h3 class="mt-2 font-semibold group-hover:text-emerald-200">{{ stream.title }}</h3>
-          <p class="mt-2 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ stream.access_price }} EUR</p>
-        </div>
-      </a>
+      </article>
     {% empty %}
       <p class="text-zinc-400">Ainda nao ha espetáculos agendados.</p>
     {% endfor %}
