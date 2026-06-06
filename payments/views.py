@@ -1,6 +1,7 @@
 from decimal import Decimal
 from decimal import InvalidOperation
 from datetime import timedelta
+from urllib.parse import urlencode
 
 import stripe
 from django.conf import settings
@@ -24,8 +25,59 @@ def _absolute_url(request, name, *args):
     return request.build_absolute_uri(reverse(name, args=args))
 
 
+def _absolute_url_with_query(request, name, query):
+    return f"{request.build_absolute_uri(reverse(name))}?{urlencode(query)}"
+
+
 def _amount_to_cents(amount):
     return int((Decimal(amount) * 100).quantize(Decimal('1')))
+
+
+def _complete_checkout_session(session):
+    metadata = session.get('metadata', {}) or {}
+    session_id = session.get('id', '')
+    payment_status = session.get('payment_status', '')
+    checkout_type = metadata.get('type')
+
+    if checkout_type in {'ticket', 'tip'} and payment_status != 'paid':
+        return checkout_type, False
+
+    if checkout_type == 'ticket':
+        StreamTicketPurchase.objects.update_or_create(
+            fan_id=metadata['fan_id'],
+            stream_id=metadata['stream_id'],
+            defaults={'stripe_session_id': session_id, 'paid': True},
+        )
+        return checkout_type, True
+
+    if checkout_type == 'tip':
+        payment_intent = session.get('payment_intent') or session_id
+        if not Tip.objects.filter(stripe_payment_intent=payment_intent).exists():
+            Tip.objects.create(
+                fan_id=metadata['fan_id'],
+                artist_id=metadata['artist_id'],
+                stream_id=metadata['stream_id'],
+                amount=Decimal(metadata['amount']),
+                message=metadata.get('message', ''),
+                stripe_payment_intent=payment_intent,
+            )
+        return checkout_type, True
+
+    if checkout_type == 'subscription':
+        Subscription.objects.update_or_create(
+            fan_id=metadata['fan_id'],
+            artist_id=metadata['artist_id'],
+            defaults={
+                'stripe_subscription_id': session.get('subscription', ''),
+                'stripe_customer_id': session.get('customer', ''),
+                'status': Subscription.ACTIVE,
+                # Valor inicial conservador; eventos invoice/subscription podem refiná-lo.
+                'current_period_end': timezone.now() + timedelta(days=31),
+            },
+        )
+        return checkout_type, True
+
+    return checkout_type, False
 
 
 @login_required
@@ -52,8 +104,12 @@ def subscribe_artist(request, artist_id):
             },
             'quantity': 1,
         }],
-        success_url=_absolute_url(request, 'streams:artist_detail', artist.id),
-        cancel_url=_absolute_url(request, 'streams:artist_detail', artist.id),
+        success_url=_absolute_url_with_query(request, 'payments:checkout_success', {
+            'session_id': '{CHECKOUT_SESSION_ID}',
+        }),
+        cancel_url=_absolute_url_with_query(request, 'payments:checkout_cancel', {
+            'artist_id': artist.id,
+        }),
         metadata={'type': 'subscription', 'fan_id': fan.id, 'artist_id': artist.id},
     )
     return redirect(session.url)
@@ -79,6 +135,22 @@ def buy_ticket(request, stream_id):
         messages.error(request, 'Configura STRIPE_SECRET_KEY para ativar venda de bilhetes.')
         return redirect('streams:artist_detail', artist_id=stream.artist_id)
 
+    pending_purchase = StreamTicketPurchase.objects.filter(
+        fan=fan,
+        stream=stream,
+        paid=False,
+    ).exclude(stripe_session_id='').first()
+    if pending_purchase:
+        try:
+            pending_session = stripe.checkout.Session.retrieve(pending_purchase.stripe_session_id)
+        except stripe.error.StripeError:
+            pending_session = None
+        if pending_session:
+            checkout_type, completed = _complete_checkout_session(pending_session)
+            if checkout_type == 'ticket' and completed:
+                messages.success(request, 'Bilhete confirmado. Ja podes entrar no espetaculo.')
+                return redirect('streams:room', stream_id=stream.id)
+
     session = stripe.checkout.Session.create(
         mode='payment',
         payment_method_types=['card'],
@@ -90,8 +162,13 @@ def buy_ticket(request, stream_id):
             },
             'quantity': 1,
         }],
-        success_url=_absolute_url(request, 'streams:room', stream.id),
-        cancel_url=_absolute_url(request, 'streams:artist_detail', stream.artist_id),
+        success_url=_absolute_url_with_query(request, 'payments:checkout_success', {
+            'session_id': '{CHECKOUT_SESSION_ID}',
+        }),
+        cancel_url=_absolute_url_with_query(request, 'payments:checkout_cancel', {
+            'stream_id': stream.id,
+            'artist_id': stream.artist_id,
+        }),
         metadata={'type': 'ticket', 'fan_id': fan.id, 'stream_id': stream.id},
     )
     StreamTicketPurchase.objects.update_or_create(
@@ -134,8 +211,12 @@ def create_tip(request, stream_id):
             },
             'quantity': 1,
         }],
-        success_url=_absolute_url(request, 'streams:room', stream.id),
-        cancel_url=_absolute_url(request, 'streams:room', stream.id),
+        success_url=_absolute_url_with_query(request, 'payments:checkout_success', {
+            'session_id': '{CHECKOUT_SESSION_ID}',
+        }),
+        cancel_url=_absolute_url_with_query(request, 'payments:checkout_cancel', {
+            'stream_id': stream.id,
+        }),
         metadata={
             'type': 'tip',
             'fan_id': fan.id,
@@ -146,6 +227,66 @@ def create_tip(request, stream_id):
         },
     )
     return redirect(session.url)
+
+
+@login_required
+def checkout_success(request):
+    session_id = request.GET.get('session_id', '').strip()
+    if not session_id:
+        messages.error(request, 'Nao foi possivel confirmar o pagamento.')
+        return redirect('streams:home')
+
+    if not settings.STRIPE_SECRET_KEY:
+        messages.error(request, 'Stripe nao esta configurado.')
+        return redirect('streams:home')
+
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+    except stripe.error.StripeError:
+        messages.error(request, 'Nao foi possivel confirmar o pagamento no Stripe.')
+        return redirect('streams:home')
+
+    checkout_type, completed = _complete_checkout_session(session)
+    metadata = session.get('metadata', {}) or {}
+
+    if checkout_type == 'ticket':
+        stream_id = metadata.get('stream_id')
+        if completed:
+            messages.success(request, 'Bilhete confirmado. Ja podes entrar no espetaculo.')
+        else:
+            messages.warning(request, 'O pagamento ainda nao foi confirmado pelo Stripe.')
+        return redirect('streams:room', stream_id=stream_id)
+
+    if checkout_type == 'tip':
+        stream_id = metadata.get('stream_id')
+        if completed:
+            messages.success(request, 'Gorjeta enviada com sucesso. Obrigado pelo apoio!')
+        else:
+            messages.warning(request, 'A gorjeta ainda nao foi confirmada pelo Stripe.')
+        return redirect('streams:room', stream_id=stream_id)
+
+    if checkout_type == 'subscription':
+        artist_id = metadata.get('artist_id')
+        if completed:
+            messages.success(request, 'Subscricao confirmada.')
+        else:
+            messages.warning(request, 'A subscricao ainda nao foi confirmada pelo Stripe.')
+        return redirect('streams:artist_detail', artist_id=artist_id)
+
+    messages.error(request, 'Tipo de pagamento desconhecido.')
+    return redirect('streams:home')
+
+
+@login_required
+def checkout_cancel(request):
+    messages.info(request, 'Pagamento cancelado. Podes tentar novamente quando quiseres.')
+    stream_id = request.GET.get('stream_id')
+    artist_id = request.GET.get('artist_id')
+    if stream_id:
+        return redirect('streams:room', stream_id=stream_id)
+    if artist_id:
+        return redirect('streams:artist_detail', artist_id=artist_id)
+    return redirect('streams:home')
 
 
 @csrf_exempt
@@ -159,6 +300,8 @@ def stripe_webhook(request):
 
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
+        _complete_checkout_session(session)
+        return HttpResponse(status=200)
         metadata = session.get('metadata', {})
         if metadata.get('type') == 'ticket':
             StreamTicketPurchase.objects.update_or_create(
