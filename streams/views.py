@@ -128,6 +128,24 @@ def artist_detail(request, artist_id):
     })
 
 
+def stream_detail(request, stream_id):
+    stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
+    event_path = reverse('streams:event_detail', args=[stream.id])
+    access = None
+    has_access = False
+    if request.user.is_authenticated:
+        access = stream.access_decision(request.user)
+        has_access = access['allowed']
+
+    return render(request, 'streams/event_detail.html', {
+        'access': access,
+        'event_path': event_path,
+        'event_url': request.build_absolute_uri(event_path),
+        'has_access': has_access,
+        'stream': stream,
+    })
+
+
 @login_required
 def favorite_artist_toggle(request, artist_id):
     if request.method != 'POST':

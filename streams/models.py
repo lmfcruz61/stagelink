@@ -24,6 +24,7 @@ class LiveStream(models.Model):
 
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='streams')
     title = models.CharField(max_length=180)
+    description = models.TextField(blank=True)
     cover_image = models.ImageField(upload_to='streams/covers/', blank=True, null=True)
     youtube_video_id = models.CharField(max_length=200)
     event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default=LIVE)

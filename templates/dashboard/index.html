@@ -126,7 +126,9 @@
             </div>
             <div class="flex flex-wrap gap-2">
               <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:stream_update' stream.id %}">Editar</a>
+              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:event_detail' stream.id %}">Ver evento</a>
               <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:room' stream.id %}">Ver sala</a>
+              <button type="button" class="copy-event-link sl-secondary px-3 py-2 text-sm" data-copy-url="{{ request.scheme }}://{{ request.get_host }}{% url 'streams:event_detail' stream.id %}">Copiar link</button>
               <form method="post" action="{% url 'streams:stream_delete' stream.id %}" onsubmit="return confirm('Apagar este espetáculo? Esta acao nao pode ser desfeita.');">
                 {% csrf_token %}
                 <button class="rounded-full border border-red-700 bg-red-950/40 px-3 py-2 text-sm font-semibold text-red-200 hover:border-red-500">Apagar</button>
@@ -163,6 +165,21 @@
 
   quickGuideClose.addEventListener('click', function() {
     quickGuide.classList.add('hidden');
+  });
+
+  document.querySelectorAll('.copy-event-link').forEach(function(button) {
+    button.addEventListener('click', async function() {
+      const originalText = button.textContent;
+      try {
+        await navigator.clipboard.writeText(button.dataset.copyUrl);
+        button.textContent = 'Link copiado';
+      } catch (error) {
+        button.textContent = button.dataset.copyUrl;
+      }
+      setTimeout(function() {
+        button.textContent = originalText;
+      }, 2200);
+    });
   });
 </script>
 {% endblock %}

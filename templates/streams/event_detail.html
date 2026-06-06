@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}{{ stream.title }} - StageLink{% endblock %}
+{% block content %}
+<section class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_420px] lg:items-start">
+  <div class="space-y-5">
+    <div class="overflow-hidden rounded border border-zinc-800 bg-zinc-950">
+      <div class="sl-thumb relative">
+        {% if stream.cover_image %}
+          <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="h-full w-full object-cover">
+        {% else %}
+          <div class="flex h-full w-full items-center justify-center px-6 text-center text-xl font-semibold">{{ stream.title }}</div>
+        {% endif %}
+        <span class="absolute left-3 top-3 rounded border border-zinc-700 bg-zinc-950/85 px-3 py-2 text-sm font-semibold text-zinc-100">
+          {{ stream.visual_icon }} {{ stream.visual_label }}
+        </span>
+      </div>
+    </div>
+
+    {% if stream.description %}
+      <div class="sl-card p-5">
+        <h2 class="text-xl font-semibold">Sobre o evento</h2>
+        <div class="mt-3 whitespace-pre-line text-zinc-300">{{ stream.description }}</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <aside class="sl-card p-6 lg:sticky lg:top-28">
+    <a href="{% url 'streams:artist_detail' stream.artist.id %}" class="text-sm font-semibold text-emerald-400 hover:text-emerald-300">{{ stream.artist.name }}</a>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight">{{ stream.title }}</h1>
+
+    <div class="mt-5 grid gap-3 text-sm text-zinc-300">
+      <div class="rounded border border-zinc-800 bg-zinc-950 p-3">
+        <span class="block text-zinc-500">Data e hora</span>
+        <span class="mt-1 block font-semibold text-zinc-100">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</span>
+      </div>
+      <div class="rounded border border-zinc-800 bg-zinc-950 p-3">
+        <span class="block text-zinc-500">Estado</span>
+        <span class="mt-1 block font-semibold text-zinc-100">{{ stream.visual_icon }} {{ stream.visual_label }}</span>
+      </div>
+      <div class="rounded border border-zinc-800 bg-zinc-950 p-3">
+        <span class="block text-zinc-500">Preco</span>
+        <span class="mt-1 block font-semibold text-zinc-100">
+          {% if stream.access_price > 0 %}{{ stream.access_price }} EUR{% else %}Gratuito{% endif %}
+        </span>
+      </div>
+    </div>
+
+    <div class="mt-6 grid gap-3">
+      {% if user.is_authenticated %}
+        {% if has_access %}
+          <a class="sl-primary w-full" href="{% url 'streams:room' stream.id %}">Entrar na sala</a>
+        {% elif stream.access_price > 0 %}
+          <a class="sl-primary w-full" href="{% url 'payments:buy_ticket' stream.id %}">Comprar acesso</a>
+        {% else %}
+          <a class="sl-primary w-full" href="{% url 'streams:room' stream.id %}">Entrar na sala</a>
+        {% endif %}
+      {% else %}
+        <a class="sl-primary w-full" href="{% url 'accounts:login' %}?next={{ event_path|urlencode }}">
+          {% if stream.access_price > 0 %}Comprar acesso{% else %}Entrar na sala{% endif %}
+        </a>
+        <a class="sl-secondary w-full" href="{% url 'accounts:register' %}?next={{ event_path|urlencode }}">Criar conta</a>
+      {% endif %}
+      <a class="sl-secondary w-full" href="{% url 'streams:artist_detail' stream.artist.id %}">Ver artista</a>
+      <button id="copy-event-link" type="button" class="sl-secondary w-full" data-copy-url="{{ event_url }}">Copiar link do evento</button>
+    </div>
+
+    <p id="copy-event-feedback" class="mt-3 hidden text-sm text-emerald-300">Link copiado.</p>
+  </aside>
+</section>
+
+<script>
+  const copyEventButton = document.querySelector('#copy-event-link');
+  const copyEventFeedback = document.querySelector('#copy-event-feedback');
+
+  copyEventButton?.addEventListener('click', async function() {
+    const url = copyEventButton.dataset.copyUrl;
+    try {
+      await navigator.clipboard.writeText(url);
+      copyEventFeedback.textContent = 'Link copiado.';
+    } catch (error) {
+      copyEventFeedback.textContent = url;
+    }
+    copyEventFeedback.classList.remove('hidden');
+  });
+</script>
+{% endblock %}

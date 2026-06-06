@@ -124,7 +124,7 @@ def buy_ticket(request, stream_id):
     fan = getattr(request.user, 'fan_profile', None)
     if fan is None:
         messages.error(request, 'Só contas de público podem comprar bilhetes.')
-        return redirect('streams:room', stream_id=stream.id)
+        return redirect('streams:event_detail', stream_id=stream.id)
 
     access = stream.log_access_decision(request.user, 'buy_ticket')
     if access['allowed']:
@@ -136,7 +136,7 @@ def buy_ticket(request, stream_id):
 
     if not settings.STRIPE_SECRET_KEY:
         messages.error(request, 'Configura STRIPE_SECRET_KEY para ativar venda de bilhetes.')
-        return redirect('streams:artist_detail', artist_id=stream.artist_id)
+        return redirect('streams:event_detail', stream_id=stream.id)
 
     pending_purchase = StreamTicketPurchase.objects.filter(
         fan=fan,
@@ -315,7 +315,7 @@ def checkout_cancel(request):
     stream_id = request.GET.get('stream_id')
     artist_id = request.GET.get('artist_id')
     if stream_id:
-        return redirect('streams:room', stream_id=stream_id)
+        return redirect('streams:event_detail', stream_id=stream_id)
     if artist_id:
         return redirect('streams:artist_detail', artist_id=artist_id)
     return redirect('streams:home')

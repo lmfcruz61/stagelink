@@ -138,7 +138,7 @@
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for stream in concert_streams %}
       <article class="sl-video-card group">
-        <a href="{% url 'streams:room' stream.id %}" class="block">
+        <a href="{% url 'streams:event_detail' stream.id %}" class="block">
           <div class="sl-thumb relative border {% if stream.artist_id in favorite_artist_ids %}border-emerald-600{% else %}border-zinc-800{% endif %}">
             {% if stream.cover_image %}
               <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full object-cover">
@@ -155,18 +155,18 @@
         </a>
         <div class="px-1 py-3">
           <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
-          <a href="{% url 'streams:room' stream.id %}" class="mt-2 block font-semibold group-hover:text-emerald-200">{{ stream.title }}</a>
+          <a href="{% url 'streams:event_detail' stream.id %}" class="mt-2 block font-semibold group-hover:text-emerald-200">{{ stream.title }}</a>
           <p class="mt-2 text-sm text-zinc-400">{{ stream.visual_label }} &middot; {{ stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ stream.access_price }} EUR</p>
           <div class="mt-3 flex flex-wrap gap-2">
             {% if user.is_authenticated and user.fan_profile %}
               <a class="sl-primary px-3 py-2 text-sm" href="{% url 'payments:buy_ticket' stream.id %}">
                 {% if stream.access_price > 0 %}Comprar bilhete{% else %}Entrar grátis{% endif %}
               </a>
-              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:room' stream.id %}">Ver sala</a>
+              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:event_detail' stream.id %}">Ver evento</a>
             {% elif user.is_authenticated %}
-              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:room' stream.id %}">Ver sala</a>
+              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:event_detail' stream.id %}">Ver evento</a>
             {% else %}
-              <a class="sl-primary px-3 py-2 text-sm" href="{% url 'accounts:login' %}?next={% url 'streams:room' stream.id %}">Entrar para comprar</a>
+              <a class="sl-primary px-3 py-2 text-sm" href="{% url 'streams:event_detail' stream.id %}">Ver evento</a>
               <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:artist_detail' stream.artist.id %}">Ver artista</a>
             {% endif %}
           </div>
@@ -206,7 +206,7 @@
             <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Espetáculos deste favorito</p>
             <div class="space-y-2">
               {% for stream in artist.homepage_streams|slice:":3" %}
-                <a href="{% url 'streams:room' stream.id %}" class="block rounded border border-zinc-800 px-3 py-2 text-sm hover:border-emerald-500">
+                <a href="{% url 'streams:event_detail' stream.id %}" class="block rounded border border-zinc-800 px-3 py-2 text-sm hover:border-emerald-500">
                   <span class="font-semibold text-zinc-100">{{ stream.title }}</span>
                   <span class="mt-1 block text-xs text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</span>
                 </a>

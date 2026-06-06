@@ -22,9 +22,10 @@ class LiveStreamForm(forms.ModelForm):
 
     class Meta:
         model = LiveStream
-        fields = ('title', 'cover_image', 'youtube_video_id', 'event_type', 'access_price', 'scheduled_at', 'is_active')
+        fields = ('title', 'description', 'cover_image', 'youtube_video_id', 'event_type', 'access_price', 'scheduled_at', 'is_active')
         labels = {
             'title': 'Titulo',
+            'description': 'Descricao publica',
             'event_type': 'Tipo de conteúdo',
             'access_price': 'Preco do bilhete',
             'is_active': 'Espetáculo ativo',

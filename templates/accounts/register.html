@@ -24,6 +24,9 @@
 
   <form method="post" class="sl-card space-y-4 p-6">
     {% csrf_token %}
+    {% if next_url %}
+      <input type="hidden" name="next" value="{{ next_url }}">
+    {% endif %}
     {{ form.as_p }}
     <button class="sl-primary w-full">{% trans "Entrar na StageLink" %}</button>
   </form>
