@@ -64,7 +64,7 @@
           <img src="{{ featured_stream.cover_image.url }}" alt="{{ featured_stream.title }}" class="aspect-video w-full object-cover">
         {% endif %}
         <div class="p-5">
-          <p class="sl-chip border-emerald-500 text-emerald-200">Proximo espetáculo</p>
+          <p class="sl-chip border-emerald-500 text-emerald-200">{{ featured_stream.visual_icon }} {{ featured_stream.visual_label }}</p>
           <h2 class="mt-2 text-2xl font-semibold">{{ featured_stream.title }}</h2>
           <p class="mt-2 text-zinc-400">{{ featured_stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ featured_stream.access_price }} EUR</p>
           <div class="mt-5">
@@ -114,17 +114,17 @@
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for stream in upcoming_streams %}
       <a class="sl-video-card" href="{% url 'streams:room' stream.id %}">
-        {% if stream.cover_image %}
-          <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="sl-thumb w-full object-cover">
-        {% else %}
-          <div class="sl-thumb flex items-center justify-center px-4 text-center font-semibold">{{ stream.title }}</div>
-        {% endif %}
+        <div class="sl-thumb relative">
+          {% if stream.cover_image %}
+            <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="h-full w-full object-cover">
+          {% else %}
+            <div class="flex h-full w-full items-center justify-center px-4 text-center font-semibold">{{ stream.title }}</div>
+          {% endif %}
+          <span class="absolute left-3 top-3 rounded border border-zinc-700 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-zinc-100">{{ stream.visual_icon }} {{ stream.visual_label }}</span>
+        </div>
         <div class="px-1 py-3">
           <h3 class="font-semibold">{{ stream.title }}</h3>
-          <p class="mt-1 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ stream.access_price }} EUR</p>
-          {% if stream.is_active %}
-            <p class="mt-2 text-sm text-emerald-400">Ao vivo / ativo</p>
-          {% endif %}
+          <p class="mt-1 text-sm text-zinc-400">{{ stream.visual_label }} &middot; {{ stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ stream.access_price }} EUR</p>
         </div>
       </a>
     {% empty %}
@@ -154,14 +154,17 @@
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for stream in past_streams %}
       <a class="sl-video-card opacity-80 hover:opacity-100" href="{% url 'streams:room' stream.id %}">
-        {% if stream.cover_image %}
-          <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="sl-thumb w-full object-cover">
-        {% else %}
-          <div class="sl-thumb flex items-center justify-center px-4 text-center font-semibold">{{ stream.title }}</div>
-        {% endif %}
+        <div class="sl-thumb relative">
+          {% if stream.cover_image %}
+            <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="h-full w-full object-cover">
+          {% else %}
+            <div class="flex h-full w-full items-center justify-center px-4 text-center font-semibold">{{ stream.title }}</div>
+          {% endif %}
+          <span class="absolute left-3 top-3 rounded border border-zinc-700 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-zinc-100">{{ stream.visual_icon }} {{ stream.visual_label }}</span>
+        </div>
         <div class="px-1 py-3">
           <h3 class="font-semibold">{{ stream.title }}</h3>
-          <p class="mt-1 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
+          <p class="mt-1 text-sm text-zinc-400">{{ stream.visual_label }} &middot; {{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
         </div>
       </a>
     {% empty %}

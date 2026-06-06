@@ -11,10 +11,22 @@ logger = logging.getLogger(__name__)
 
 
 class LiveStream(models.Model):
+    LIVE = 'live'
+    PREMIERE = 'premiere'
+    RECORDED = 'recorded'
+    REPLAY = 'replay'
+    EVENT_TYPE_CHOICES = (
+        (LIVE, 'Ao vivo'),
+        (PREMIERE, 'Estreia'),
+        (RECORDED, 'Vídeo gravado'),
+        (REPLAY, 'Replay'),
+    )
+
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='streams')
     title = models.CharField(max_length=180)
     cover_image = models.ImageField(upload_to='streams/covers/', blank=True, null=True)
     youtube_video_id = models.CharField(max_length=200)
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default=LIVE)
     access_price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     scheduled_at = models.DateTimeField()
     is_active = models.BooleanField(default=False)
@@ -28,6 +40,67 @@ class LiveStream(models.Model):
     @property
     def is_past(self):
         return self.scheduled_at < timezone.now()
+
+    @property
+    def visual_state(self):
+        now = timezone.now()
+        if self.scheduled_at > now:
+            return 'scheduled'
+        return self.post_start_visual_state
+
+    @property
+    def post_start_visual_state(self):
+        if self.event_type == self.REPLAY:
+            return 'replay'
+        if self.event_type == self.RECORDED:
+            return 'recorded'
+        if self.event_type == self.PREMIERE:
+            return 'premiere'
+        if self.event_type == self.LIVE and self.is_active:
+            return 'live'
+        return 'replay'
+
+    @property
+    def visual_label(self):
+        labels = {
+            'scheduled': 'Agendado',
+            'live': 'Ao vivo',
+            'premiere': 'Estreia',
+            'recorded': 'Vídeo gravado',
+            'replay': 'Replay disponível',
+        }
+        return labels[self.visual_state]
+
+    @property
+    def post_start_visual_label(self):
+        labels = {
+            'live': 'Ao vivo',
+            'premiere': 'Estreia',
+            'recorded': 'Vídeo gravado',
+            'replay': 'Replay disponível',
+        }
+        return labels[self.post_start_visual_state]
+
+    @property
+    def visual_icon(self):
+        icons = {
+            'scheduled': '📅',
+            'live': '🔴',
+            'premiere': '▶',
+            'recorded': '🎬',
+            'replay': '📼',
+        }
+        return icons[self.visual_state]
+
+    @property
+    def post_start_visual_icon(self):
+        icons = {
+            'live': '🔴',
+            'premiere': '▶',
+            'recorded': '🎬',
+            'replay': '📼',
+        }
+        return icons[self.post_start_visual_state]
 
     @property
     def youtube_embed_id(self):
