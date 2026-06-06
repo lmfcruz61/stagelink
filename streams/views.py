@@ -171,7 +171,13 @@ def stream_room(request, stream_id):
     if not stream.user_has_access(request.user):
         messages.warning(request, 'Precisas de uma subscricao ativa ou bilhete para entrar nesta sala.')
         return render(request, 'streams/access_required.html', {'stream': stream})
-    return render(request, 'streams/room.html', {'stream': stream})
+    now = timezone.now()
+    return render(request, 'streams/room.html', {
+        'is_stream_started': stream.scheduled_at <= now,
+        'scheduled_at_iso': stream.scheduled_at.isoformat(),
+        'server_now_iso': now.isoformat(),
+        'stream': stream,
+    })
 
 
 @login_required
