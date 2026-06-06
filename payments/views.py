@@ -26,7 +26,9 @@ def _absolute_url(request, name, *args):
 
 
 def _absolute_url_with_query(request, name, query):
-    return f"{request.build_absolute_uri(reverse(name))}?{urlencode(query)}"
+    query_string = urlencode(query)
+    query_string = query_string.replace('%7BCHECKOUT_SESSION_ID%7D', '{CHECKOUT_SESSION_ID}')
+    return f"{request.build_absolute_uri(reverse(name))}?{query_string}"
 
 
 def _amount_to_cents(amount):
@@ -106,6 +108,7 @@ def subscribe_artist(request, artist_id):
         }],
         success_url=_absolute_url_with_query(request, 'payments:checkout_success', {
             'session_id': '{CHECKOUT_SESSION_ID}',
+            'artist_id': artist.id,
         }),
         cancel_url=_absolute_url_with_query(request, 'payments:checkout_cancel', {
             'artist_id': artist.id,
@@ -164,6 +167,8 @@ def buy_ticket(request, stream_id):
         }],
         success_url=_absolute_url_with_query(request, 'payments:checkout_success', {
             'session_id': '{CHECKOUT_SESSION_ID}',
+            'stream_id': stream.id,
+            'artist_id': stream.artist_id,
         }),
         cancel_url=_absolute_url_with_query(request, 'payments:checkout_cancel', {
             'stream_id': stream.id,
@@ -213,6 +218,7 @@ def create_tip(request, stream_id):
         }],
         success_url=_absolute_url_with_query(request, 'payments:checkout_success', {
             'session_id': '{CHECKOUT_SESSION_ID}',
+            'stream_id': stream.id,
         }),
         cancel_url=_absolute_url_with_query(request, 'payments:checkout_cancel', {
             'stream_id': stream.id,
@@ -232,6 +238,8 @@ def create_tip(request, stream_id):
 @login_required
 def checkout_success(request):
     session_id = request.GET.get('session_id', '').strip()
+    stream_id = request.GET.get('stream_id')
+    artist_id = request.GET.get('artist_id')
     if not session_id:
         messages.error(request, 'Nao foi possivel confirmar o pagamento.')
         return redirect('streams:home')
@@ -243,7 +251,31 @@ def checkout_success(request):
     try:
         session = stripe.checkout.Session.retrieve(session_id)
     except stripe.error.StripeError:
+        fan = getattr(request.user, 'fan_profile', None)
+        if fan and stream_id:
+            pending_purchase = StreamTicketPurchase.objects.filter(
+                fan=fan,
+                stream_id=stream_id,
+                paid=False,
+            ).exclude(stripe_session_id='').first()
+            if pending_purchase:
+                try:
+                    pending_session = stripe.checkout.Session.retrieve(pending_purchase.stripe_session_id)
+                except stripe.error.StripeError:
+                    pending_session = None
+                if pending_session:
+                    checkout_type, completed = _complete_checkout_session(pending_session)
+                    if checkout_type == 'ticket':
+                        if completed:
+                            messages.success(request, 'Bilhete confirmado. Ja podes entrar no espetaculo.')
+                        else:
+                            messages.warning(request, 'O pagamento ainda nao foi confirmado pelo Stripe.')
+                        return redirect('streams:room', stream_id=stream_id)
         messages.error(request, 'Nao foi possivel confirmar o pagamento no Stripe.')
+        if stream_id:
+            return redirect('streams:room', stream_id=stream_id)
+        if artist_id:
+            return redirect('streams:artist_detail', artist_id=artist_id)
         return redirect('streams:home')
 
     checkout_type, completed = _complete_checkout_session(session)
