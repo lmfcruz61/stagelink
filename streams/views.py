@@ -10,6 +10,7 @@ from accounts.forms import (
     ArtistGalleryUploadForm,
     ArtistProfileForm,
     ManagedArtistForm,
+    NewsletterSubscriberForm,
     OrganizationForm,
     OrganizationMemberForm,
 )
@@ -23,6 +24,16 @@ from .models import LiveStream
 def home(request):
     now = timezone.now()
     query = request.GET.get('q', '').strip()
+    newsletter_form = NewsletterSubscriberForm()
+
+    if request.method == 'POST' and request.POST.get('newsletter_submit'):
+        newsletter_form = NewsletterSubscriberForm(request.POST)
+        if newsletter_form.is_valid():
+            newsletter_form.save()
+            messages.success(request, 'Subscricao efetuada com sucesso. Obrigado pelo interesse no StageLink!')
+            return redirect('streams:home')
+        messages.warning(request, 'Nao foi possivel subscrever a newsletter. Confirma os dados abaixo.')
+
     visible_streams_filter = Q(is_active=True) | Q(scheduled_at__gte=now)
     visible_artist_streams = Prefetch(
         'streams',
@@ -92,6 +103,7 @@ def home(request):
         'concert_streams': concert_streams,
         'favorite_artists': favorite_artists,
         'favorite_artist_ids': favorite_artist_ids,
+        'newsletter_form': newsletter_form,
         'search_query': query,
     })
 

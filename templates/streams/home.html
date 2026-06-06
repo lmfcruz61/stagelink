@@ -233,6 +233,42 @@
   </div>
 </section>
 
+<section class="mt-12 rounded border border-zinc-800 bg-zinc-900/90 p-5 md:p-6">
+  <div class="grid gap-6 lg:grid-cols-[1fr_420px] lg:items-start">
+    <div>
+      <p class="text-sm font-semibold text-emerald-400">Newsletter</p>
+      <h2 class="mt-2 text-2xl font-semibold">Recebe novidades do StageLink</h2>
+      <p class="mt-3 max-w-2xl text-zinc-300">Fica a par de novos artistas, eventos, funcionalidades e lançamentos da plataforma.</p>
+    </div>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="newsletter_submit" value="1">
+      <label>
+        <span>Nome <span class="text-zinc-500">(opcional)</span></span>
+        {{ newsletter_form.name }}
+        {% for error in newsletter_form.name.errors %}
+          <span class="mt-1 block text-sm text-red-300">{{ error }}</span>
+        {% endfor %}
+      </label>
+      <label>
+        <span>Email</span>
+        {{ newsletter_form.email }}
+        {% for error in newsletter_form.email.errors %}
+          <span class="mt-1 block text-sm text-red-300">{{ error }}</span>
+        {% endfor %}
+      </label>
+      <label>
+        <span>Tipo de interesse</span>
+        {{ newsletter_form.interest_type }}
+        {% for error in newsletter_form.interest_type.errors %}
+          <span class="mt-1 block text-sm text-red-300">{{ error }}</span>
+        {% endfor %}
+      </label>
+      <button class="sl-primary w-full" type="submit">Subscrever</button>
+    </form>
+  </div>
+</section>
+
 {% if user.is_authenticated and user.fan_profile %}
   <script>
     const fanGuide = document.querySelector('#fan-guide');

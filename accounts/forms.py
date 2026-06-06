@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import transaction
 
-from .models import Artist, ArtistPhoto, Fan, Organization, OrganizationMember, Profile
+from .models import Artist, ArtistPhoto, Fan, NewsletterSubscriber, Organization, OrganizationMember, Profile
 
 
 class SignUpForm(UserCreationForm):
@@ -190,3 +190,24 @@ class ArtistGalleryUploadForm(forms.Form):
         required=False,
         help_text='Opcional. Sera aplicada a todas as fotos deste envio.',
     )
+
+
+class NewsletterSubscriberForm(forms.ModelForm):
+    class Meta:
+        model = NewsletterSubscriber
+        fields = ('name', 'email', 'interest_type')
+        labels = {
+            'name': 'Nome',
+            'email': 'Email',
+            'interest_type': 'Tipo de interesse',
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'O teu nome'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'email@exemplo.com'}),
+        }
+
+    def clean_email(self):
+        email = self.cleaned_data['email'].strip().lower()
+        if NewsletterSubscriber.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('Este email ja esta subscrito na newsletter.')
+        return email

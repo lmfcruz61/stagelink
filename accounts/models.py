@@ -106,6 +106,31 @@ class Fan(models.Model):
         return self.display_name
 
 
+class NewsletterSubscriber(models.Model):
+    FAN = 'fan'
+    ARTIST = 'artist'
+    BOTH = 'both'
+    INTEREST_CHOICES = (
+        (FAN, 'Fã'),
+        (ARTIST, 'Artista'),
+        (BOTH, 'Ambos'),
+    )
+
+    name = models.CharField(max_length=120, blank=True)
+    email = models.EmailField(unique=True)
+    interest_type = models.CharField(max_length=20, choices=INTEREST_CHOICES, default=FAN)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-subscribed_at']
+        verbose_name = 'Subscritor da newsletter'
+        verbose_name_plural = 'Subscritores da newsletter'
+
+    def __str__(self):
+        return self.email
+
+
 class SiteAppearance(models.Model):
     name = models.CharField(max_length=80, default='StageLink')
     logo = models.ImageField(
