@@ -31,16 +31,17 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 4. Abrir o `Guia rapido`.
 5. Editar pagina publica: nome artistico, frase, cidade, bio, foto principal, capa e links.
 6. Adicionar varias fotos a galeria.
-7. Criar espetáculo com titulo, capa 16:9, data futura, preco e ID/link YouTube.
-8. Ativar o espetáculo.
-9. Abrir a pagina publica do artista e confirmar:
+7. Criar espetáculo com titulo, capa 16:9, tipo de conteudo, data futura, preco e ID/link YouTube.
+8. Para evento realmente em direto, escolher `Ao vivo`; para video preparado, escolher `Estreia` ou `Video gravado`; para conteudo passado ainda disponivel, escolher `Replay`.
+9. Ativar o espetáculo.
+10. Abrir a pagina publica do artista e confirmar:
    - capa visivel;
    - foto principal visivel;
    - bio e links;
    - galeria;
    - espetáculo agendado;
    - espetáculo ativo.
-10. Entrar na sala como artista e confirmar player, chat, contador `a ver` e botoes de apoio.
+11. Entrar na sala como artista e confirmar countdown, player, badge do estado, marca do artista no video, chat, contador `a ver` e botoes de apoio.
 
 ## 4. Teste como manager / equipa
 
@@ -56,11 +57,12 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 6. Criar `Novo artista gerido` associado a equipa.
 7. Selecionar o artista no dashboard.
 8. Editar pagina publica desse artista.
-9. Criar espetáculo para esse artista.
-10. Entrar com outro membro da equipa e confirmar permissoes:
+9. Criar espetáculo para esse artista e escolher o tipo correto: `Ao vivo`, `Estreia`, `Video gravado` ou `Replay`.
+10. Depois de um evento terminado, editar o espetáculo e mudar para `Replay` se o video continuar disponivel.
+11. Entrar com outro membro da equipa e confirmar permissoes:
    - Dono/Manager/Editor conseguem gerir;
    - Leitor deve ficar limitado.
-11. Confirmar que o manager consegue entrar na sala do espetáculo para operar/testar.
+12. Confirmar que o manager consegue entrar na sala do espetáculo para operar/testar.
 
 ## 5. Teste como publico
 
@@ -73,13 +75,16 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 7. Tentar entrar num espetáculo pago sem acesso. Deve aparecer bloqueio.
 8. Comprar bilhete em modo teste ou criar acesso/subscricao de teste.
 9. Entrar na sala.
-10. Enviar mensagem no chat e confirmar que aparece imediatamente.
-11. Enviar mensagem com emojis escritos manualmente, por exemplo `👏🔥❤️`.
-12. Usar os botoes rapidos de emoji do chat: palmas, fogo, coracao, guitarra e musica.
-13. Abrir outra janela/navegador com outro utilizador e confirmar chat em tempo real.
-14. Confirmar que o contador `a ver` aumenta quando entra outro utilizador na sala e diminui quando fecha a janela.
-15. Enviar gorjeta em modo teste.
-16. Confirmar que a gorjeta aparece no dashboard do artista/manager.
+10. Se o espetáculo ainda estiver no futuro, confirmar o estado `Agendado` e a contagem decrescente.
+11. Confirmar que eventos aparecem com o estado correto: `Ao vivo`, `Estreia`, `Video gravado` ou `Replay disponivel`.
+12. Confirmar que o nome do artista aparece discretamente no canto superior esquerdo do player.
+13. Enviar mensagem no chat e confirmar que aparece imediatamente.
+14. Enviar mensagem com emojis escritos manualmente, por exemplo `palmas`, `fogo` ou `coracao`.
+15. Usar os botoes rapidos de emoji do chat: palmas, fogo, coracao, guitarra e musica.
+16. Abrir outra janela/navegador com outro utilizador e confirmar chat em tempo real.
+17. Confirmar que o contador `a ver` aumenta quando entra outro utilizador na sala e diminui quando fecha a janela.
+18. Enviar gorjeta em modo teste.
+19. Confirmar que a gorjeta aparece no dashboard do artista/manager.
 
 ## 6. Teste de pagamentos Stripe
 
@@ -101,14 +106,20 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 
 ## 8. Teste de sala ao vivo, chat e presenca
 
-1. Entrar na mesma sala com dois utilizadores diferentes.
-2. Confirmar que ambos veem o player e o chat.
-3. Confirmar que o contador `a ver` aparece junto ao titulo do espetáculo e no cabecalho do chat.
-4. Confirmar que o contador mostra pelo menos `2 a ver` quando existem dois browsers ligados.
-5. Enviar texto normal, texto com acentos e texto com emojis.
-6. Confirmar que emojis aparecem corretamente para todos os utilizadores ligados.
-7. Fechar uma das janelas e confirmar que a contagem reduz.
-8. Recarregar a pagina e confirmar que o WebSocket volta a ligar ao chat.
+1. Criar um espetáculo marcado para daqui a 5 minutos e confirmar `Agendado` + countdown ao segundo.
+2. Quando chegar a hora marcada, confirmar que o player aparece sem refresh manual.
+3. Confirmar que um espetáculo ja iniciado abre diretamente com o player.
+4. Criar/testar eventos dos tipos `Ao vivo`, `Estreia`, `Video gravado` e `Replay`.
+5. Confirmar que video gravado e replay nunca aparecem como `Ao vivo`.
+6. Confirmar que o badge no player mostra estado + nome do artista.
+7. Entrar na mesma sala com dois utilizadores diferentes.
+8. Confirmar que ambos veem o player e o chat.
+9. Confirmar que o contador `a ver` aparece junto ao titulo do espetáculo e no cabecalho do chat.
+10. Confirmar que o contador mostra pelo menos `2 a ver` quando existem dois browsers ligados.
+11. Enviar texto normal, texto com acentos e texto com emojis.
+12. Confirmar que emojis aparecem corretamente para todos os utilizadores ligados.
+13. Fechar uma das janelas e confirmar que a contagem reduz.
+14. Recarregar a pagina e confirmar que o WebSocket volta a ligar ao chat.
 
 Nota: nesta fase piloto, o contador mede ligacoes WebSocket ativas na sala. Em escala com varias maquinas Fly.io, deve passar para presenca partilhada via Redis/Upstash.
 
@@ -132,9 +143,10 @@ Avancar para um artista piloto quando:
 6. Admin conseguir entrar em qualquer espetáculo.
 7. Pagina publica do artista estiver visualmente apresentavel.
 8. Existir um guiao simples para o artista preparar o YouTube.
+9. Estados dos eventos aparecerem corretamente: agendado, ao vivo, estreia, video gravado e replay.
 
 ## 11. Resultado esperado
 
 No fim deste teste, deves conseguir provar o ciclo completo:
 
-Empresa/manager cria artista, artista tem pagina publica, espetáculo e acesso pago; publico entra, conversa no chat, usa emojis, ve a contagem de espectadores e envia gorjeta; admin consegue supervisionar tudo.
+Empresa/manager cria artista, artista tem pagina publica, espetáculo com tipo correto e acesso pago; publico entra, ve countdown/player com marca do artista, conversa no chat, usa emojis, ve a contagem de espectadores e envia gorjeta; admin consegue supervisionar tudo.
