@@ -10,7 +10,7 @@
     </div>
     <div class="flex flex-wrap gap-3">
       <a class="sl-secondary" href="{% url 'streams:dashboard' %}">Dashboard</a>
-      <a class="sl-primary" href="{% url 'streams:stream_create' %}">Novo stream</a>
+      <a class="sl-primary" href="{% url 'streams:stream_create' %}">Novo espetáculo</a>
     </div>
   </section>
 {% elif user.is_authenticated and user.fan_profile %}
@@ -19,7 +19,7 @@
       <div>
         <p class="text-sm text-emerald-400">{{ user.fan_profile.display_name }}</p>
         <h1 class="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">A tua area StageLink</h1>
-        <p class="mt-3 max-w-2xl text-zinc-300">Guarda artistas, acompanha concertos e entra em salas privadas quando tiveres acesso.</p>
+        <p class="mt-3 max-w-2xl text-zinc-300">Guarda artistas, acompanha espetáculos e entra em salas privadas quando tiveres acesso.</p>
       </div>
       <button id="fan-guide-button" type="button" class="sl-secondary w-fit bg-zinc-950">
         Guia rapido
@@ -28,7 +28,7 @@
 
     <div class="mt-6 grid gap-3 sm:grid-cols-3">
       <button type="button" data-public-tab="concerts" class="public-tab rounded border border-emerald-600 bg-emerald-500 px-4 py-3 text-left font-semibold text-zinc-950">
-        Concertos
+        Espetáculos
         <span class="mt-1 block text-sm font-normal">{{ concert_streams|length }} disponiveis</span>
       </button>
       <button type="button" data-public-tab="artists" class="public-tab rounded border border-zinc-700 bg-zinc-950 px-4 py-3 text-left font-semibold text-zinc-100 hover:border-emerald-500">
@@ -46,15 +46,15 @@
     <div class="flex items-start justify-between gap-4">
       <div>
         <h2 class="text-xl font-semibold">Guia rapido para o publico</h2>
-        <p class="mt-1 text-sm text-zinc-300">Segue estes passos para entrar nos concertos e apoiar os teus artistas.</p>
+        <p class="mt-1 text-sm text-zinc-300">Segue estes passos para entrar nos espetáculos e apoiar os teus artistas.</p>
       </div>
       <button id="fan-guide-close" type="button" class="rounded bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800">Fechar</button>
     </div>
     <ol class="mt-5 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>1. Escolhe um artista.</strong><br>Abre a pagina de um artista para veres streams futuros, streams passados e opcoes de acesso.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>1. Escolhe um artista.</strong><br>Abre a pagina de um artista para veres espetáculos futuros, espetáculos passados e opcoes de acesso.</li>
       <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>2. Guarda favoritos.</strong><br>Marca artistas como favoritos para criares a tua lista pessoal.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>3. Garante o acesso.</strong><br>Subscreve mensalmente ou compra bilhete para um concerto especifico.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>4. Entra na sala.</strong><br>Quando tiveres acesso, abre o concerto para ver o player e participar no chat.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>3. Garante o acesso.</strong><br>Subscreve mensalmente ou compra bilhete para um espetáculo especifico.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>4. Entra na sala.</strong><br>Quando tiveres acesso, abre o espetáculo para ver o player e participar no chat.</li>
     </ol>
   </section>
 {% else %}
@@ -113,11 +113,11 @@
 <section data-public-panel="concerts" class="{% if user.is_authenticated and user.fan_profile %}public-panel hidden{% endif %} mb-10">
   <div class="mb-4 flex flex-col gap-1 md:flex-row md:items-end md:justify-between">
     <div>
-      <h2 class="text-2xl font-semibold">Concertos</h2>
+      <h2 class="text-2xl font-semibold">Espetáculos</h2>
       {% if user.is_authenticated and user.fan_profile %}
-        <p class="text-sm text-zinc-400">Os concertos dos teus artistas favoritos aparecem primeiro e ficam marcados com estrela.</p>
+        <p class="text-sm text-zinc-400">Os espetáculos dos teus artistas favoritos aparecem primeiro e ficam marcados com estrela.</p>
       {% else %}
-        <p class="text-sm text-zinc-400">Shows ao vivo e agendados na StageLink.</p>
+        <p class="text-sm text-zinc-400">Espetáculos ao vivo e agendados na StageLink.</p>
       {% endif %}
     </div>
   </div>
@@ -146,7 +146,7 @@
         </div>
       </a>
     {% empty %}
-      <p class="text-zinc-400">Ainda nao ha concertos agendados.</p>
+      <p class="text-zinc-400">Ainda nao ha espetáculos agendados.</p>
     {% endfor %}
   </div>
 </section>
@@ -155,7 +155,7 @@
   <div class="mb-4">
     <h2 class="text-2xl font-semibold">Artistas</h2>
     {% if user.is_authenticated and user.fan_profile %}
-      <p class="mt-1 text-sm text-zinc-400">Os teus favoritos aparecem primeiro. Nos favoritos mostramos tambem os concertos associados.</p>
+      <p class="mt-1 text-sm text-zinc-400">Os teus favoritos aparecem primeiro. Nos favoritos mostramos tambem os espetáculos associados.</p>
     {% endif %}
   </div>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -176,7 +176,7 @@
         </a>
         {% if artist.id in favorite_artist_ids and artist.homepage_streams %}
           <div class="mt-4 rounded border border-zinc-800 bg-zinc-950 p-3">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Concertos deste favorito</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Espetáculos deste favorito</p>
             <div class="space-y-2">
               {% for stream in artist.homepage_streams|slice:":3" %}
                 <a href="{% url 'streams:room' stream.id %}" class="block rounded border border-zinc-800 px-3 py-2 text-sm hover:border-emerald-500">

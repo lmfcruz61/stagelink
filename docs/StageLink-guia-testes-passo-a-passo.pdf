@@ -3,7 +3,7 @@
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 2 0 obj
-<< /Length 2855 >>
+<< /Length 2877 >>
 stream
 BT
 /F1 10 Tf
@@ -50,9 +50,9 @@ BT
 0 -13 Td
 (2. Abrir a homepage e confirmar header, logo, fundo e imagem de perfil.) Tj
 0 -13 Td
-(3. Abrir /admin/ e verificar Users, Artists, Organizations, Organization Members, Streams,) Tj
+(3. Abrir /admin/ e verificar Users, Artists, Organizations, Organization Members,) Tj
 0 -13 Td
-(Subscriptions, Tips e Site Appearance.) Tj
+(Espetáculos, Subscriptions, Tips e Site Appearance.) Tj
 0 -13 Td
 (4. Confirmar que o admin ve o nome/logo do site no cabecalho da administracao.) Tj
 0 -13 Td
@@ -60,7 +60,7 @@ BT
 0 -13 Td
 (6. Criar ou rever artistas associados a essa equipa.) Tj
 0 -13 Td
-(7. Abrir uma sala de stream como admin. O admin deve entrar sem bilhete nem subscricao.) Tj
+(7. Abrir uma sala de espetáculo como admin. O admin deve entrar sem bilhete nem subscricao.) Tj
 0 -13 Td
 (8. Confirmar que uploads de imagens aparecem no site publico.) Tj
 0 -13 Td
@@ -81,9 +81,9 @@ BT
 0 -13 Td
 (6. Adicionar varias fotos a galeria.) Tj
 0 -13 Td
-(7. Criar stream com titulo, capa 16:9, data futura, preco e ID/link YouTube.) Tj
+(7. Criar espetáculo com titulo, capa 16:9, data futura, preco e ID/link YouTube.) Tj
 0 -13 Td
-(8. Ativar o stream.) Tj
+(8. Ativar o espetáculo.) Tj
 0 -13 Td
 (9. Abrir a pagina publica do artista e confirmar:) Tj
 0 -13 Td
@@ -95,9 +95,9 @@ BT
 0 -13 Td
 (   - galeria;) Tj
 0 -13 Td
-(   - concerto agendado;) Tj
+(   - espetáculo agendado;) Tj
 0 -13 Td
-(   - stream ativo.) Tj
+(   - espetáculo ativo.) Tj
 0 -13 Td
 (10. Entrar na sala como artista e confirmar player, chat, contador a ver e botoes de apoio.) Tj
 0 -13 Td
@@ -116,7 +116,7 @@ endobj
 << /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
 endobj
 4 0 obj
-<< /Length 2901 >>
+<< /Length 2913 >>
 stream
 BT
 /F1 10 Tf
@@ -141,7 +141,7 @@ BT
 0 -13 Td
 (8. Editar pagina publica desse artista.) Tj
 0 -13 Td
-(9. Criar stream para esse artista.) Tj
+(9. Criar espetáculo para esse artista.) Tj
 0 -13 Td
 (10. Entrar com outro membro da equipa e confirmar permissoes:) Tj
 0 -13 Td
@@ -149,7 +149,7 @@ BT
 0 -13 Td
 (   - Leitor deve ficar limitado.) Tj
 0 -13 Td
-(11. Confirmar que o manager consegue entrar na sala do stream para operar/testar.) Tj
+(11. Confirmar que o manager consegue entrar na sala do espetáculo para operar/testar.) Tj
 0 -13 Td
 0 -13 Td
 (5. Teste como publico) Tj
@@ -168,7 +168,7 @@ BT
 0 -13 Td
 (6. Marcar e remover artista favorito; confirmar estrela dourada na homepage.) Tj
 0 -13 Td
-(7. Tentar entrar num stream pago sem acesso. Deve aparecer bloqueio.) Tj
+(7. Tentar entrar num espetáculo pago sem acesso. Deve aparecer bloqueio.) Tj
 0 -13 Td
 (8. Comprar bilhete em modo teste ou criar acesso/subscricao de teste.) Tj
 0 -13 Td
@@ -231,7 +231,7 @@ endobj
 << /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
 endobj
 6 0 obj
-<< /Length 2462 >>
+<< /Length 2472 >>
 stream
 BT
 /F1 10 Tf
@@ -244,7 +244,7 @@ BT
 0 -13 Td
 (2. Confirmar que ambos veem o player e o chat.) Tj
 0 -13 Td
-(3. Confirmar que o contador a ver aparece junto ao titulo do concerto e no cabecalho do) Tj
+(3. Confirmar que o contador a ver aparece junto ao titulo do espetáculo e no cabecalho do) Tj
 0 -13 Td
 (chat.) Tj
 0 -13 Td
@@ -296,7 +296,7 @@ BT
 0 -13 Td
 (5. Contador a ver atualizar ao abrir/fechar uma segunda janela.) Tj
 0 -13 Td
-(6. Admin conseguir entrar em qualquer stream.) Tj
+(6. Admin conseguir entrar em qualquer espetáculo.) Tj
 0 -13 Td
 (7. Pagina publica do artista estiver visualmente apresentavel.) Tj
 0 -13 Td
@@ -310,7 +310,7 @@ BT
 (No fim deste teste, deves conseguir provar o ciclo completo:) Tj
 0 -13 Td
 0 -13 Td
-(Empresa/manager cria artista, artista tem pagina publica, stream e acesso pago; publico) Tj
+(Empresa/manager cria artista, artista tem pagina publica, espetáculo e acesso pago; publico) Tj
 0 -13 Td
 (entra, conversa no chat, usa emojis, ve a contagem de espectadores e envia gorjeta; admin) Tj
 0 -13 Td
@@ -332,15 +332,15 @@ xref
 0000000000 65535 f
 0000000009 00000 n
 0000000079 00000 n
-0000002986 00000 n
-0000003112 00000 n
-0000006065 00000 n
-0000006191 00000 n
-0000008705 00000 n
-0000008831 00000 n
-0000008900 00000 n
+0000003008 00000 n
+0000003134 00000 n
+0000006099 00000 n
+0000006225 00000 n
+0000008749 00000 n
+0000008875 00000 n
+0000008944 00000 n
 trailer
 << /Size 10 /Root 9 0 R >>
 startxref
-8949
+8993
 %%EOF

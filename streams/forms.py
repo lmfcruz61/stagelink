@@ -6,7 +6,7 @@ from .models import LiveStream
 
 class LiveStreamForm(forms.ModelForm):
     cover_image = forms.ImageField(
-        label='Foto de capa do stream',
+        label='Foto de capa do espetáculo',
         required=False,
         help_text='Recomendado: imagem horizontal 16:9, pelo menos 1280x720 px, em JPG ou PNG.',
     )
@@ -26,7 +26,7 @@ class LiveStreamForm(forms.ModelForm):
         labels = {
             'title': 'Titulo',
             'access_price': 'Preco do bilhete',
-            'is_active': 'Stream ativo',
+            'is_active': 'Espetáculo ativo',
         }
 
     def clean_youtube_video_id(self):

@@ -41,7 +41,7 @@
           <a class="sl-primary" href="{% url 'payments:subscribe_artist' artist.id %}">Subscrever</a>
         {% endif %}
         {% if featured_stream %}
-          <a class="sl-secondary bg-zinc-950/80" href="{% url 'streams:room' featured_stream.id %}">Proximo concerto</a>
+          <a class="sl-secondary bg-zinc-950/80" href="{% url 'streams:room' featured_stream.id %}">Proximo espetáculo</a>
         {% endif %}
         {% if user.is_authenticated and user == artist.user %}
           <a class="sl-secondary bg-zinc-950/80" href="{% url 'streams:artist_profile_edit' %}">Editar pagina</a>
@@ -64,7 +64,7 @@
           <img src="{{ featured_stream.cover_image.url }}" alt="{{ featured_stream.title }}" class="aspect-video w-full object-cover">
         {% endif %}
         <div class="p-5">
-          <p class="sl-chip border-emerald-500 text-emerald-200">Proximo concerto</p>
+          <p class="sl-chip border-emerald-500 text-emerald-200">Proximo espetáculo</p>
           <h2 class="mt-2 text-2xl font-semibold">{{ featured_stream.title }}</h2>
           <p class="mt-2 text-zinc-400">{{ featured_stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ featured_stream.access_price }} EUR</p>
           <div class="mt-5">
@@ -78,7 +78,7 @@
   <aside class="space-y-5">
     <div class="sl-card p-5">
       <h2 class="text-xl font-semibold">Apoiar artista</h2>
-      <p class="mt-2 text-sm text-zinc-400">Subscreve, compra bilhetes para concertos privados e envia gorjetas durante os streams.</p>
+      <p class="mt-2 text-sm text-zinc-400">Subscreve, compra bilhetes para espetáculos privados e envia gorjetas durante os espetáculos.</p>
       {% if user.is_authenticated and user.fan_profile %}
         <a class="sl-primary mt-4" href="{% url 'payments:subscribe_artist' artist.id %}">Subscrever mensalmente</a>
       {% endif %}
@@ -101,7 +101,7 @@
 
 <section class="mb-10">
   <div class="mb-4 flex items-center justify-between">
-    <h2 class="text-2xl font-semibold">Concertos agendados</h2>
+    <h2 class="text-2xl font-semibold">Espetáculos agendados</h2>
   </div>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for stream in upcoming_streams %}
@@ -120,7 +120,7 @@
         </div>
       </a>
     {% empty %}
-      <p class="text-zinc-400">Sem concertos agendados.</p>
+      <p class="text-zinc-400">Sem espetáculos agendados.</p>
     {% endfor %}
   </div>
 </section>
@@ -142,7 +142,7 @@
 {% endif %}
 
 <section>
-  <h2 class="mb-4 text-2xl font-semibold">Arquivo de streams</h2>
+  <h2 class="mb-4 text-2xl font-semibold">Arquivo de espetáculos</h2>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for stream in past_streams %}
       <a class="sl-video-card opacity-80 hover:opacity-100" href="{% url 'streams:room' stream.id %}">
@@ -157,7 +157,7 @@
         </div>
       </a>
     {% empty %}
-      <p class="text-zinc-400">Ainda nao ha streams no arquivo.</p>
+      <p class="text-zinc-400">Ainda nao ha espetáculos no arquivo.</p>
     {% endfor %}
   </div>
 </section>

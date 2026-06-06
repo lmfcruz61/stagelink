@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% block title %}Stream - StageLink{% endblock %}
+{% block title %}Espetáculo - StageLink{% endblock %}
 {% block content %}
 <section class="mx-auto max-w-3xl">
-  <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar stream{% else %}Novo stream{% endif %}</h1>
+  <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar espetáculo{% else %}Novo espetáculo{% endif %}</h1>
   <div class="mb-5 rounded border border-emerald-700 bg-emerald-950/30 p-4 text-sm text-zinc-200">
     Para tocar dentro da StageLink, a live do YouTube tem de permitir incorporacao. No YouTube Studio, usa uma live publica ou nao listada e confirma que a opcao de incorporar esta ativa. Videos privados, com restricao de idade, copyright ou embed bloqueado vao mostrar "ver no YouTube".
   </div>
@@ -37,10 +37,10 @@
     </div>
   </form>
   {% if stream %}
-    <form method="post" action="{% url 'streams:stream_delete' stream.id %}" class="mt-6 rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('Apagar este concerto? Esta acao nao pode ser desfeita.');">
+    <form method="post" action="{% url 'streams:stream_delete' stream.id %}" class="mt-6 rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('Apagar este espetáculo? Esta acao nao pode ser desfeita.');">
       {% csrf_token %}
-      <h2 class="text-lg font-semibold text-red-200">Apagar concerto</h2>
-      <p class="mt-2 text-sm text-red-100/80">Remove este concerto, incluindo mensagens de chat associadas a ele.</p>
+      <h2 class="text-lg font-semibold text-red-200">Apagar espetáculo</h2>
+      <p class="mt-2 text-sm text-red-100/80">Remove este espetáculo, incluindo mensagens de chat associadas a ele.</p>
       <button class="mt-4 rounded-full border border-red-700 bg-red-950/60 px-4 py-3 font-semibold text-red-100 hover:border-red-500">Apagar definitivamente</button>
     </form>
   {% endif %}
