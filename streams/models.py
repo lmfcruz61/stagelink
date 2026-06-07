@@ -44,25 +44,45 @@ class LiveStream(models.Model):
 
     @property
     def visual_state(self):
-        now = timezone.now()
-        if self.scheduled_at > now:
-            return 'scheduled'
-        return self.post_start_visual_state
+        return self.display_status['code']
 
     @property
     def post_start_visual_state(self):
-        if self.event_type == self.REPLAY:
-            return 'replay'
-        if self.event_type == self.RECORDED:
-            return 'recorded'
-        if self.event_type == self.PREMIERE:
-            return 'premiere'
-        if self.event_type == self.LIVE and self.is_active:
-            return 'live'
-        return 'replay'
+        return self.post_start_display_status['code']
 
     @property
     def visual_label(self):
+        return self.display_status['label']
+
+    @property
+    def post_start_visual_label(self):
+        return self.post_start_display_status['label']
+
+    @property
+    def visual_icon(self):
+        return self.display_status['icon']
+
+    @property
+    def post_start_visual_icon(self):
+        return self.post_start_display_status['icon']
+
+    @property
+    def display_status(self):
+        if self.scheduled_at > timezone.now():
+            return self._status_payload('scheduled')
+        return self.post_start_display_status
+
+    @property
+    def post_start_display_status(self):
+        if self.event_type == self.LIVE and self.is_active:
+            return self._status_payload('live')
+        if self.event_type == self.PREMIERE:
+            return self._status_payload('premiere')
+        if self.event_type == self.RECORDED:
+            return self._status_payload('recorded')
+        return self._status_payload('replay')
+
+    def _status_payload(self, code):
         labels = {
             'scheduled': 'Agendado',
             'live': 'Ao vivo',
@@ -70,20 +90,6 @@ class LiveStream(models.Model):
             'recorded': 'Vídeo gravado',
             'replay': 'Replay disponível',
         }
-        return labels[self.visual_state]
-
-    @property
-    def post_start_visual_label(self):
-        labels = {
-            'live': 'Ao vivo',
-            'premiere': 'Estreia',
-            'recorded': 'Vídeo gravado',
-            'replay': 'Replay disponível',
-        }
-        return labels[self.post_start_visual_state]
-
-    @property
-    def visual_icon(self):
         icons = {
             'scheduled': '📅',
             'live': '🔴',
@@ -91,17 +97,12 @@ class LiveStream(models.Model):
             'recorded': '🎬',
             'replay': '📼',
         }
-        return icons[self.visual_state]
-
-    @property
-    def post_start_visual_icon(self):
-        icons = {
-            'live': '🔴',
-            'premiere': '▶',
-            'recorded': '🎬',
-            'replay': '📼',
+        return {
+            'code': code,
+            'icon': icons[code],
+            'label': labels[code],
+            'text': f'{icons[code]} {labels[code]}',
         }
-        return icons[self.post_start_visual_state]
 
     @property
     def youtube_embed_id(self):

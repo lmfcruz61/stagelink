@@ -11,7 +11,7 @@
           <div class="flex h-full w-full items-center justify-center px-6 text-center text-xl font-semibold">{{ stream.title }}</div>
         {% endif %}
         <span class="absolute left-3 top-3 rounded border border-zinc-700 bg-zinc-950/85 px-3 py-2 text-sm font-semibold text-zinc-100">
-          {{ stream.visual_icon }} {{ stream.visual_label }}
+          {{ stream.display_status.text }}
         </span>
       </div>
     </div>
@@ -35,8 +35,14 @@
       </div>
       <div class="rounded border border-zinc-800 bg-zinc-950 p-3">
         <span class="block text-zinc-500">Estado</span>
-        <span class="mt-1 block font-semibold text-zinc-100">{{ stream.visual_icon }} {{ stream.visual_label }}</span>
+        <span class="mt-1 block font-semibold text-zinc-100">{{ stream.display_status.text }}</span>
       </div>
+      {% if stream.display_status.code == 'scheduled' %}
+        <div class="rounded border border-zinc-800 bg-zinc-950 p-3">
+          <span class="block text-zinc-500">Comeca em</span>
+          <span id="event-countdown" class="mt-1 block font-mono text-xl font-semibold text-zinc-100">--:--:--</span>
+        </div>
+      {% endif %}
       <div class="rounded border border-zinc-800 bg-zinc-950 p-3">
         <span class="block text-zinc-500">Preco</span>
         <span class="mt-1 block font-semibold text-zinc-100">
@@ -69,8 +75,31 @@
 </section>
 
 <script>
+  const eventCountdown = document.querySelector('#event-countdown');
   const copyEventButton = document.querySelector('#copy-event-link');
   const copyEventFeedback = document.querySelector('#copy-event-feedback');
+
+  if (eventCountdown) {
+    const scheduledAt = new Date('{{ scheduled_at_iso|escapejs }}');
+    const serverNow = new Date('{{ server_now_iso|escapejs }}');
+    const browserServerOffset = serverNow.getTime() - Date.now();
+    function formatRemaining(milliseconds) {
+      const seconds = Math.max(0, Math.floor(milliseconds / 1000));
+      const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
+      const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+      const remainingSeconds = String(seconds % 60).padStart(2, '0');
+      return `${hours}:${minutes}:${remainingSeconds}`;
+    }
+    function tickEventCountdown() {
+      const remaining = scheduledAt.getTime() - (Date.now() + browserServerOffset);
+      eventCountdown.textContent = formatRemaining(remaining);
+      if (remaining <= 0) {
+        window.location.reload();
+      }
+    }
+    tickEventCountdown();
+    setInterval(tickEventCountdown, 1000);
+  }
 
   copyEventButton?.addEventListener('click', async function() {
     const url = copyEventButton.dataset.copyUrl;

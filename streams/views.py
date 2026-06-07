@@ -130,6 +130,7 @@ def artist_detail(request, artist_id):
 
 def stream_detail(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
+    now = timezone.now()
     event_path = reverse('streams:event_detail', args=[stream.id])
     access = None
     has_access = False
@@ -142,6 +143,8 @@ def stream_detail(request, stream_id):
         'event_path': event_path,
         'event_url': request.build_absolute_uri(event_path),
         'has_access': has_access,
+        'scheduled_at_iso': stream.scheduled_at.isoformat(),
+        'server_now_iso': now.isoformat(),
         'stream': stream,
     })
 
