@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}StageLink{% endblock %}</title>
+  <title>{% block title %}StageHub{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     input, select, textarea {
@@ -53,7 +53,7 @@
     }
 
     .sl-card:hover {
-      border-color: rgb(16 185 129);
+      border-color: #2596BE;
       background: rgba(24, 24, 27, 0.98);
     }
 
@@ -90,8 +90,8 @@
 
     .sl-primary {
       border-radius: 999px;
-      background: rgb(16 185 129);
-      color: rgb(9 9 11);
+      background: #5230EF;
+      color: rgb(255 255 255);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -112,11 +112,11 @@
     }
 
     .sl-primary:hover {
-      background: rgb(52 211 153);
+      background: #2596BE;
     }
 
     .sl-secondary:hover {
-      border-color: rgb(16 185 129);
+      border-color: #5230EF;
     }
 
     .favorite-star {
@@ -145,9 +145,9 @@
     <nav class="sl-shell mx-auto flex items-center gap-4 px-4 py-3">
       <a href="{% url 'streams:home' %}" class="flex shrink-0 items-center gap-3 text-xl font-semibold tracking-tight">
         {% if site_appearance.logo %}
-          <img src="{{ site_appearance.logo.url }}?v={{ site_appearance_version }}" alt="{{ site_appearance.name|default:'StageLink' }}" class="h-12 w-auto max-w-52 object-contain md:h-14 md:max-w-64">
+          <img src="{{ site_appearance.logo.url }}?v={{ site_appearance_version }}" alt="{{ site_appearance.name|default:'StageHub' }}" class="h-12 w-auto max-w-52 object-contain md:h-14 md:max-w-64">
         {% else %}
-          <span>{{ site_appearance.name|default:'StageLink' }}</span>
+          <span>{{ site_appearance.name|default:'StageHub' }}</span>
         {% endif %}
       </a>
       <form method="get" action="{% url 'streams:home' %}" class="hidden min-w-0 flex-1 md:block">

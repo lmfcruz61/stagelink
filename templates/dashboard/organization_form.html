@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}{% if organization %}Equipa{% else %}Nova equipa{% endif %} - StageLink{% endblock %}
+{% block title %}{% if organization %}Equipa{% else %}Nova equipa{% endif %} - StageHub{% endblock %}
 {% block content %}
 <section class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
   <div>
-    <p class="text-sm text-emerald-400">Gestao profissional</p>
+    <p class="text-sm text-[#2596BE]">Gestao profissional</p>
     <h1 class="text-3xl font-semibold">{% if organization %}{{ organization.name }}{% else %}Nova equipa{% endif %}</h1>
     <p class="mt-2 max-w-2xl text-zinc-400">Cria uma agencia, empresa, label ou equipa para gerir varios artistas, espetáculos e paginas publicas.</p>
   </div>
@@ -25,7 +25,7 @@
     <aside class="space-y-6">
       <div class="sl-card p-6">
         <h2 class="text-xl font-semibold">Adicionar membro</h2>
-        <p class="mt-1 mb-5 text-sm text-zinc-400">O utilizador tem de existir primeiro no StageLink. Adiciona pelo username.</p>
+        <p class="mt-1 mb-5 text-sm text-zinc-400">O utilizador tem de existir primeiro no StageHub. Adiciona pelo username.</p>
         <form method="post" class="space-y-4">
           {% csrf_token %}
           <input type="hidden" name="action" value="add_member">

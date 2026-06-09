@@ -132,7 +132,7 @@ class NewsletterSubscriber(models.Model):
 
 
 class SiteAppearance(models.Model):
-    name = models.CharField(max_length=80, default='StageLink')
+    name = models.CharField(max_length=80, default='StageHub')
     logo = models.ImageField(
         upload_to='site/',
         blank=True,

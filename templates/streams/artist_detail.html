@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}{{ artist.name }} - StageLink{% endblock %}
+{% block title %}{{ artist.name }} - StageHub{% endblock %}
 {% block content %}
 <section class="relative -mx-4 -mt-8 mb-8 min-h-[380px] overflow-hidden border-b border-zinc-800 bg-zinc-950">
   {% if artist.hero_image %}
@@ -17,7 +17,7 @@
           <div class="flex h-32 w-32 items-center justify-center rounded border border-zinc-700 bg-zinc-900 text-5xl font-semibold">{{ artist.name|first }}</div>
         {% endif %}
         <div>
-          <p class="text-sm text-emerald-400">Canal do artista</p>
+          <p class="text-sm text-[#2596BE]">Canal do artista</p>
           <h1 class="mt-2 text-5xl font-semibold tracking-tight">{{ artist.name }}</h1>
           {% if artist.headline %}
             <p class="mt-3 max-w-2xl text-xl text-zinc-200">{{ artist.headline }}</p>
@@ -59,12 +59,12 @@
     </div>
 
     {% if featured_stream %}
-      <div class="sl-card border-emerald-700">
+      <div class="sl-card border-[#5230EF]">
         {% if featured_stream.cover_image %}
           <img src="{{ featured_stream.cover_image.url }}" alt="{{ featured_stream.title }}" class="aspect-video w-full object-cover">
         {% endif %}
         <div class="p-5">
-          <p class="sl-chip border-emerald-500 text-emerald-200">{{ featured_stream.display_status.text }}</p>
+          <p class="sl-chip border-[#5230EF] text-[#2596BE]">{{ featured_stream.display_status.text }}</p>
           <h2 class="mt-2 text-2xl font-semibold">{{ featured_stream.title }}</h2>
           <p class="mt-2 text-zinc-400">{{ featured_stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ featured_stream.access_price }} EUR</p>
           <div class="mt-5">
@@ -95,10 +95,10 @@
     <div class="sl-card p-5">
       <h2 class="mb-4 text-xl font-semibold">Links</h2>
       <div class="space-y-2 text-sm">
-        {% if artist.youtube_link %}<a class="block text-emerald-400 hover:text-emerald-300" href="{{ artist.youtube_link }}">YouTube</a>{% endif %}
-        {% if artist.instagram_link %}<a class="block text-emerald-400 hover:text-emerald-300" href="{{ artist.instagram_link }}">Instagram</a>{% endif %}
-        {% if artist.spotify_link %}<a class="block text-emerald-400 hover:text-emerald-300" href="{{ artist.spotify_link }}">Spotify</a>{% endif %}
-        {% if artist.website_link %}<a class="block text-emerald-400 hover:text-emerald-300" href="{{ artist.website_link }}">Site oficial</a>{% endif %}
+        {% if artist.youtube_link %}<a class="block text-[#2596BE] hover:text-[#2596BE]" href="{{ artist.youtube_link }}">YouTube</a>{% endif %}
+        {% if artist.instagram_link %}<a class="block text-[#2596BE] hover:text-[#2596BE]" href="{{ artist.instagram_link }}">Instagram</a>{% endif %}
+        {% if artist.spotify_link %}<a class="block text-[#2596BE] hover:text-[#2596BE]" href="{{ artist.spotify_link }}">Spotify</a>{% endif %}
+        {% if artist.website_link %}<a class="block text-[#2596BE] hover:text-[#2596BE]" href="{{ artist.website_link }}">Site oficial</a>{% endif %}
         {% if not artist.youtube_link and not artist.instagram_link and not artist.spotify_link and not artist.website_link %}
           <p class="text-zinc-400">Sem links adicionados.</p>
         {% endif %}

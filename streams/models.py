@@ -43,6 +43,10 @@ class LiveStream(models.Model):
         return self.scheduled_at < timezone.now()
 
     @property
+    def is_publicly_available(self):
+        return self.is_active or self.scheduled_at >= timezone.now()
+
+    @property
     def visual_state(self):
         return self.display_status['code']
 

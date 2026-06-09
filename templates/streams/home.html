@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}StageLink{% endblock %}
+{% block title %}StageHub{% endblock %}
 {% block content %}
 {% if user.is_authenticated and user.artist_profile or user.is_authenticated and user.organization_memberships.exists %}
   <section class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
     <div>
-      <p class="text-sm text-emerald-400">{% if user.artist_profile %}{{ user.artist_profile.name }}{% else %}StageLink Pro{% endif %}</p>
+      <p class="text-sm text-[#2596BE]">{% if user.artist_profile %}{{ user.artist_profile.name }}{% else %}StageHub Pro{% endif %}</p>
       <h1 class="text-4xl font-semibold tracking-tight">Cria eventos ao vivo e aproxima-te do teu publico.</h1>
       <p class="mt-3 max-w-2xl text-zinc-300">Organiza eventos exclusivos, vende acessos, cria uma comunidade de seguidores e recebe apoio direto atraves de subscricoes e gorjetas.</p>
     </div>
@@ -17,8 +17,8 @@
   <section class="mb-8 rounded border border-zinc-800 bg-zinc-900 p-5 md:p-6">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
       <div>
-        <p class="text-sm text-emerald-400">{{ user.fan_profile.display_name }}</p>
-        <h1 class="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">A tua area StageLink</h1>
+        <p class="text-sm text-[#2596BE]">{{ user.fan_profile.display_name }}</p>
+        <h1 class="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">A tua area StageHub</h1>
         <p class="mt-3 max-w-2xl text-zinc-300">Guarda artistas, acompanha espetáculos e entra em salas privadas quando tiveres acesso.</p>
       </div>
       <button id="fan-guide-button" type="button" class="sl-secondary w-fit bg-zinc-950">
@@ -27,22 +27,22 @@
     </div>
 
     <div class="mt-6 grid gap-3 sm:grid-cols-3">
-      <button type="button" data-public-tab="concerts" class="public-tab rounded border border-emerald-600 bg-emerald-500 px-4 py-3 text-left font-semibold text-zinc-950">
+      <button type="button" data-public-tab="concerts" class="public-tab rounded border border-[#5230EF] bg-[#5230EF] px-4 py-3 text-left font-semibold text-white">
         Espetáculos
         <span class="mt-1 block text-sm font-normal">{{ concert_streams|length }} disponiveis</span>
       </button>
-      <button type="button" data-public-tab="artists" class="public-tab rounded border border-zinc-700 bg-zinc-950 px-4 py-3 text-left font-semibold text-zinc-100 hover:border-emerald-500">
+      <button type="button" data-public-tab="artists" class="public-tab rounded border border-zinc-700 bg-zinc-950 px-4 py-3 text-left font-semibold text-zinc-100 hover:border-[#5230EF]">
         Artistas
         <span class="mt-1 block text-sm font-normal text-zinc-400">{{ artists|length }} disponiveis</span>
       </button>
-      <button type="button" data-public-tab="favorites" class="public-tab rounded border border-zinc-700 bg-zinc-950 px-4 py-3 text-left font-semibold text-zinc-100 hover:border-emerald-500">
+      <button type="button" data-public-tab="favorites" class="public-tab rounded border border-zinc-700 bg-zinc-950 px-4 py-3 text-left font-semibold text-zinc-100 hover:border-[#5230EF]">
         <span class="favorite-star mr-1 align-middle">&#9733;</span> Favoritos
         <span class="mt-1 block text-sm font-normal text-zinc-400">{{ favorite_artists|length }} artistas guardados</span>
       </button>
     </div>
   </section>
 
-  <section id="fan-guide" class="mb-8 hidden rounded border border-emerald-700 bg-emerald-950/30 p-5">
+  <section id="fan-guide" class="mb-8 hidden rounded border border-[#5230EF] bg-[#5230EF]/15 p-5">
     <div class="flex items-start justify-between gap-4">
       <div>
         <h2 class="text-xl font-semibold">Guia rapido para o publico</h2>
@@ -89,12 +89,12 @@
         <p class="mt-1 text-sm text-zinc-400">Acesso rapido aos artistas que queres acompanhar de perto.</p>
       </div>
       {% if not favorite_artists %}
-        <button type="button" data-public-tab-jump="artists" class="w-fit rounded border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-semibold hover:border-emerald-500">Descobrir artistas</button>
+        <button type="button" data-public-tab-jump="artists" class="w-fit rounded border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-semibold hover:border-[#5230EF]">Descobrir artistas</button>
       {% endif %}
     </div>
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {% for artist in favorite_artists %}
-        <article class="rounded border border-emerald-800 bg-zinc-900 p-4">
+        <article class="rounded border border-[#5230EF] bg-zinc-900 p-4">
           <a href="{% url 'streams:artist_detail' artist.id %}" class="flex gap-4">
             {% if artist.photo %}
               <img src="{{ artist.photo.url }}" alt="{{ artist.name }}" class="h-16 w-16 rounded object-cover">
@@ -106,13 +106,13 @@
                 <h3 class="font-semibold"><span class="favorite-star favorite-star-lg mr-1 align-middle">&#9733;</span>{{ artist.name }}</h3>
                 <span class="rounded-full border border-amber-300 bg-zinc-950/90 px-2 py-1 text-xs font-semibold text-amber-100">Favorito</span>
               </div>
-              <p class="mt-1 line-clamp-2 text-sm text-zinc-400">{{ artist.bio|default:"Perfil de artista StageLink" }}</p>
+              <p class="mt-1 line-clamp-2 text-sm text-zinc-400">{{ artist.bio|default:"Perfil de artista StageHub" }}</p>
             </div>
           </a>
           <form method="post" action="{% url 'streams:favorite_artist_toggle' artist.id %}" class="mt-4">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <button class="rounded-full border border-zinc-700 px-3 py-2 text-sm text-zinc-200 hover:border-emerald-500">Remover dos favoritos</button>
+            <button class="rounded-full border border-zinc-700 px-3 py-2 text-sm text-zinc-200 hover:border-[#5230EF]">Remover dos favoritos</button>
           </form>
         </article>
       {% empty %}
@@ -131,7 +131,7 @@
       {% if user.is_authenticated and user.fan_profile %}
         <p class="text-sm text-zinc-400">Os espetáculos dos teus artistas favoritos aparecem primeiro e ficam marcados com estrela.</p>
       {% else %}
-        <p class="text-sm text-zinc-400">Espetáculos ao vivo e agendados na StageLink.</p>
+        <p class="text-sm text-zinc-400">Espetáculos ao vivo e agendados na StageHub.</p>
       {% endif %}
     </div>
   </div>
@@ -139,7 +139,7 @@
     {% for stream in concert_streams %}
       <article class="sl-video-card group">
         <a href="{% url 'streams:event_detail' stream.id %}" class="block">
-          <div class="sl-thumb relative border {% if stream.artist_id in favorite_artist_ids %}border-emerald-600{% else %}border-zinc-800{% endif %}">
+          <div class="sl-thumb relative border {% if stream.artist_id in favorite_artist_ids %}border-[#5230EF]{% else %}border-zinc-800{% endif %}">
             {% if stream.cover_image %}
               <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="aspect-video w-full object-cover">
             {% else %}
@@ -154,8 +154,8 @@
           </div>
         </a>
         <div class="px-1 py-3">
-          <p class="text-sm text-emerald-400">{{ stream.artist.name }}</p>
-          <a href="{% url 'streams:event_detail' stream.id %}" class="mt-2 block font-semibold group-hover:text-emerald-200">{{ stream.title }}</a>
+          <p class="text-sm text-[#2596BE]">{{ stream.artist.name }}</p>
+          <a href="{% url 'streams:event_detail' stream.id %}" class="mt-2 block font-semibold group-hover:text-[#2596BE]">{{ stream.title }}</a>
           <p class="mt-2 text-sm text-zinc-400">{{ stream.display_status.label }} &middot; {{ stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ stream.access_price }} EUR</p>
           <div class="mt-3 flex flex-wrap gap-2">
             {% if user.is_authenticated and user.fan_profile %}
@@ -187,7 +187,7 @@
   </div>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for artist in artists %}
-      <article class="sl-card {% if artist.id in favorite_artist_ids %}border-emerald-700 bg-emerald-950/20{% endif %} p-4">
+      <article class="sl-card {% if artist.id in favorite_artist_ids %}border-[#5230EF] bg-[#5230EF]/10{% endif %} p-4">
         <a href="{% url 'streams:artist_detail' artist.id %}" class="flex gap-4">
           {% if artist.photo %}
             <img src="{{ artist.photo.url }}" alt="{{ artist.name }}" class="h-16 w-16 rounded object-cover">
@@ -198,7 +198,7 @@
             <h3 class="font-semibold">
               {% if artist.id in favorite_artist_ids %}<span class="favorite-star favorite-star-lg mr-1 align-middle">&#9733;</span>{% endif %}{{ artist.name }}
             </h3>
-            <p class="mt-1 line-clamp-2 text-sm text-zinc-400">{{ artist.bio|default:"Perfil de artista StageLink" }}</p>
+            <p class="mt-1 line-clamp-2 text-sm text-zinc-400">{{ artist.bio|default:"Perfil de artista StageHub" }}</p>
           </div>
         </a>
         {% if artist.id in favorite_artist_ids and artist.homepage_streams %}
@@ -206,7 +206,7 @@
             <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Espetáculos deste favorito</p>
             <div class="space-y-2">
               {% for stream in artist.homepage_streams|slice:":3" %}
-                <a href="{% url 'streams:event_detail' stream.id %}" class="block rounded border border-zinc-800 px-3 py-2 text-sm hover:border-emerald-500">
+                <a href="{% url 'streams:event_detail' stream.id %}" class="block rounded border border-zinc-800 px-3 py-2 text-sm hover:border-[#5230EF]">
                   <span class="font-semibold text-zinc-100">{{ stream.title }}</span>
                   <span class="mt-1 block text-xs text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</span>
                 </a>
@@ -219,9 +219,9 @@
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
             {% if artist.id in favorite_artist_ids %}
-              <button class="w-full rounded border border-emerald-600 bg-emerald-950/40 px-3 py-2 text-sm font-semibold text-emerald-200 hover:bg-emerald-900/50">Favorito</button>
+              <button class="w-full rounded border border-[#5230EF] bg-[#5230EF]/20 px-3 py-2 text-sm font-semibold text-[#2596BE] hover:bg-[#5230EF]/50">Favorito</button>
             {% else %}
-              <button class="w-full rounded border border-zinc-700 px-3 py-2 text-sm text-zinc-200 hover:border-emerald-500">Adicionar aos favoritos</button>
+              <button class="w-full rounded border border-zinc-700 px-3 py-2 text-sm text-zinc-200 hover:border-[#5230EF]">Adicionar aos favoritos</button>
             {% endif %}
           </form>
         {% endif %}
@@ -235,8 +235,8 @@
 <section class="mt-12 rounded border border-zinc-800 bg-zinc-900/90 p-5 md:p-6">
   <div class="grid gap-6 lg:grid-cols-[1fr_420px] lg:items-start">
     <div>
-      <p class="text-sm font-semibold text-emerald-400">Newsletter</p>
-      <h2 class="mt-2 text-2xl font-semibold">Recebe novidades do StageLink</h2>
+      <p class="text-sm font-semibold text-[#2596BE]">Newsletter</p>
+      <h2 class="mt-2 text-2xl font-semibold">Recebe novidades do StageHub</h2>
       <p class="mt-3 max-w-2xl text-zinc-300">Fica a par de novos artistas, eventos, funcionalidades e lançamentos da plataforma.</p>
     </div>
     <form method="post" class="space-y-4">
@@ -280,9 +280,9 @@
     function activatePublicTab(tabName) {
       tabButtons.forEach(function(button) {
         const active = button.dataset.publicTab === tabName;
-        button.classList.toggle('border-emerald-600', active);
-        button.classList.toggle('bg-emerald-500', active);
-        button.classList.toggle('text-zinc-950', active);
+        button.classList.toggle('border-[#5230EF]', active);
+        button.classList.toggle('bg-[#5230EF]', active);
+        button.classList.toggle('text-white', active);
         button.classList.toggle('border-zinc-700', !active);
         button.classList.toggle('bg-zinc-950', !active);
         button.classList.toggle('text-zinc-100', !active);

@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block title %}{% trans "Registo" %} - StageLink{% endblock %}
+{% block title %}{% trans "Registo" %} - StageHub{% endblock %}
 {% block content %}
 <section class="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[1fr_440px] lg:items-start">
   <div>
-    <p class="text-sm font-semibold text-emerald-400">Criar conta</p>
-    <h1 class="mt-2 text-4xl font-semibold tracking-tight">{% trans "Entrar na StageLink" %}</h1>
+    <p class="text-sm font-semibold text-[#2596BE]">Criar conta</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight">{% trans "Entrar na StageHub" %}</h1>
     <div class="mt-6 grid gap-3">
       <div class="sl-card p-4 text-sm text-zinc-300">
         <p class="font-semibold text-zinc-100">Artista</p>
@@ -28,7 +28,7 @@
       <input type="hidden" name="next" value="{{ next_url }}">
     {% endif %}
     {{ form.as_p }}
-    <button class="sl-primary w-full">{% trans "Entrar na StageLink" %}</button>
+    <button class="sl-primary w-full">{% trans "Entrar na StageHub" %}</button>
   </form>
 </section>
 <script>

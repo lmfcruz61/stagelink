@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Avatar padrao de fa">
   <rect width="256" height="256" rx="128" fill="#18181b"/>
-  <circle cx="128" cy="92" r="42" fill="#10b981"/>
-  <path d="M54 218c9-43 38-68 74-68s65 25 74 68" fill="#10b981"/>
+  <circle cx="128" cy="92" r="42" fill="#5230EF"/>
+  <path d="M54 218c9-43 38-68 74-68s65 25 74 68" fill="#5230EF"/>
   <circle cx="128" cy="128" r="122" fill="none" stroke="#3f3f46" stroke-width="12"/>
 </svg>

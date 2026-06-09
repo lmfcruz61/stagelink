@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Perfil - StageLink{% endblock %}
+{% block title %}Perfil - StageHub{% endblock %}
 {% block content %}
 <section class="mx-auto max-w-4xl">
   <div class="mb-8">
-    <p class="text-sm text-emerald-400">Conta</p>
+    <p class="text-sm text-[#2596BE]">Conta</p>
     <h1 class="text-3xl font-semibold">Perfil</h1>
   </div>
 
@@ -31,9 +31,9 @@
       <div class="flex flex-col gap-6 md:flex-row">
         <div>
           {% if fan.photo %}
-            <img src="{{ fan.photo.url }}" alt="{{ fan.display_name }}" class="h-32 w-32 rounded-full object-cover ring-2 ring-emerald-500/60">
+            <img src="{{ fan.photo.url }}" alt="{{ fan.display_name }}" class="h-32 w-32 rounded-full object-cover ring-2 ring-[#5230EF]/60">
           {% elif fan.social_avatar_url %}
-            <img src="{{ fan.social_avatar_url }}" alt="{{ fan.display_name }}" class="h-32 w-32 rounded-full object-cover ring-2 ring-emerald-500/60">
+            <img src="{{ fan.social_avatar_url }}" alt="{{ fan.display_name }}" class="h-32 w-32 rounded-full object-cover ring-2 ring-[#5230EF]/60">
           {% else %}
             <img src="{% static 'img/default-fan-avatar.svg' %}" alt="{{ fan.display_name }}" class="h-32 w-32 rounded-full object-cover ring-2 ring-zinc-700">
           {% endif %}

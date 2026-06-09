@@ -1,4 +1,4 @@
-# StageLink - Guia de Testes Passo a Passo
+# StageHub - Guia de Testes Passo a Passo
 
 Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Stripe em modo teste e YouTube com video publico ou nao listado com incorporacao ativa.
 

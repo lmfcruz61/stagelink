@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             name='SiteAppearance',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(default='StageLink', max_length=80)),
+                ('name', models.CharField(default='StageHub', max_length=80)),
                 ('background_image', models.ImageField(blank=True, null=True, upload_to='site/')),
                 ('background_overlay', models.PositiveSmallIntegerField(default=75)),
                 ('updated_at', models.DateTimeField(auto_now=True)),

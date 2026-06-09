@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block title %}{{ stream.title }} - StageLink{% endblock %}
+{% block title %}{{ stream.title }} - StageHub{% endblock %}
 {% block content %}
 <section class="grid gap-6 xl:grid-cols-[1fr_390px]">
   <div class="min-w-0">
@@ -17,13 +17,13 @@
 
         <div id="player-panel" class="{% if not is_stream_started %}hidden {% endif %}relative h-full w-full">
           <div id="player" class="h-full w-full"></div>
-          <div class="pointer-events-none absolute left-3 top-3 z-10 max-w-[calc(100%-1.5rem)] rounded-full border border-zinc-700 bg-zinc-950/82 px-3 py-1 text-xs font-semibold text-zinc-100 shadow-lg md:text-sm">
+          <div class="pointer-events-none absolute left-3 top-14 z-10 max-w-[calc(100%-1.5rem)] rounded-full border border-zinc-700 bg-zinc-950/82 px-3 py-1 text-xs font-semibold text-zinc-100 shadow-lg md:text-sm">
             <span id="player-brand-badge">{{ stream.display_status.text }} &middot; {{ stream.artist.name }}</span>
           </div>
           <div id="video-status" class="pointer-events-none absolute inset-0 hidden items-center justify-center bg-black/82 p-6 text-center">
             <div class="max-w-md">
               <p id="video-status-message" class="text-sm text-zinc-200"></p>
-              <button id="reload-video-button" type="button" class="pointer-events-auto mt-4 rounded-full bg-emerald-500 px-4 py-3 font-semibold text-zinc-950 hover:bg-emerald-400">Recarregar video</button>
+              <button id="reload-video-button" type="button" class="pointer-events-auto mt-4 rounded-full bg-[#5230EF] px-4 py-3 font-semibold text-white hover:bg-[#2596BE]">Recarregar video</button>
             </div>
           </div>
         </div>
@@ -32,13 +32,16 @@
 
     <div class="mt-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
       <div class="min-w-0">
-        <a href="{% url 'streams:artist_detail' stream.artist.id %}" class="text-sm font-semibold text-emerald-400 hover:text-emerald-300">{{ stream.artist.name }}</a>
+        <a href="{% url 'streams:artist_detail' stream.artist.id %}" class="text-sm font-semibold text-[#2596BE] hover:text-[#2596BE]">{{ stream.artist.name }}</a>
         <h1 class="mt-2 text-3xl font-semibold tracking-tight">{{ stream.title }}</h1>
         <div class="mt-3 flex flex-wrap gap-2 text-sm text-zinc-300">
-          <span id="state-chip" class="sl-chip border-emerald-500 text-emerald-200">{{ stream.display_status.text }}</span>
+          <span id="state-chip" class="sl-chip border-[#5230EF] text-[#2596BE]">{{ stream.display_status.text }}</span>
           <span class="sl-chip"><span id="viewer-count">0</span> a ver</span>
           <span class="sl-chip">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</span>
           <span class="sl-chip">{{ stream.access_price }} EUR</span>
+          {% if stream.event_type == stream.LIVE %}
+            <button id="go-live-button" type="button" class="{% if not is_stream_started %}hidden {% endif %}sl-chip border-red-500 text-red-100 hover:bg-red-950/40">Ir para direto</button>
+          {% endif %}
         </div>
       </div>
 
@@ -64,7 +67,7 @@
         <h2 class="font-semibold">Chat da sala</h2>
         <p class="text-xs text-zinc-500">{{ stream.artist.name }} &middot; <span id="viewer-count-chat">0</span> a ver</p>
       </div>
-      <span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+      <span class="h-2.5 w-2.5 rounded-full bg-[#10B981]"></span>
     </div>
     <div id="chat-log" class="min-h-0 flex-1 space-y-3 overflow-y-auto p-4 text-sm"></div>
     <div class="flex gap-1 border-t border-zinc-800 px-3 py-2 text-lg">
@@ -76,7 +79,7 @@
     </div>
     <form id="chat-form" class="flex border-t border-zinc-800 p-3">
       <input id="chat-message-input" autocomplete="off" class="min-w-0 flex-1 rounded-l-full border border-zinc-700 bg-zinc-950 px-4 py-2" placeholder="{% trans 'Escreve no chat' %}">
-      <button class="rounded-r-full bg-emerald-500 px-4 py-2 font-semibold text-zinc-950">{% trans "Enviar" %}</button>
+      <button class="rounded-r-full bg-[#5230EF] px-4 py-2 font-semibold text-white">{% trans "Enviar" %}</button>
     </form>
   </aside>
 </section>
@@ -102,6 +105,7 @@
   const videoStatus = document.querySelector('#video-status');
   const videoStatusMessage = document.querySelector('#video-status-message');
   const reloadVideoButton = document.querySelector('#reload-video-button');
+  const goLiveButton = document.querySelector('#go-live-button');
   const stateChip = document.querySelector('#state-chip');
   const playerBrandBadge = document.querySelector('#player-brand-badge');
   const postStartLabel = '{{ stream.post_start_display_status.text|escapejs }}';
@@ -109,6 +113,8 @@
   let player = null;
   let playerReady = false;
   let playerLoadTimer = null;
+  let playerRetryTimer = null;
+  let playerRetryCount = 0;
   let youtubeApiLoading = false;
   let streamStarted = streamStartedInitially;
 
@@ -140,11 +146,13 @@
     playerReady = false;
     hideVideoStatus();
     clearTimeout(playerLoadTimer);
+    clearTimeout(playerRetryTimer);
     playerContainer.innerHTML = '';
     player = new YT.Player('player', {
       videoId: '{{ stream.youtube_embed_id|escapejs }}',
       playerVars: {
-        autoplay: 0,
+        autoplay: streamStarted ? 1 : 0,
+        mute: streamStarted ? 1 : 0,
         modestbranding: 1,
         playsinline: 1,
         rel: 0,
@@ -153,8 +161,14 @@
       events: {
         onReady: function() {
           playerReady = true;
+          playerRetryCount = 0;
           clearTimeout(playerLoadTimer);
           hideVideoStatus();
+          if (streamStarted) {
+            try {
+              player.playVideo();
+            } catch (error) {}
+          }
         },
         onError: function(event) {
           let message = videoErrorDefault;
@@ -171,8 +185,19 @@
     playerLoadTimer = setTimeout(function() {
       if (!playerReady) {
         showVideoStatus(videoSlowMessage);
+        schedulePlayerRetry();
       }
     }, 10000);
+  }
+
+  function schedulePlayerRetry() {
+    if (playerRetryCount >= 3) return;
+    playerRetryCount += 1;
+    clearTimeout(playerRetryTimer);
+    playerRetryTimer = setTimeout(function() {
+      player = null;
+      buildPlayer();
+    }, 4000);
   }
 
   function loadPlayerWhenReady() {
@@ -191,6 +216,7 @@
     playerPanel.classList.remove('hidden');
     stateChip.textContent = postStartLabel;
     playerBrandBadge.textContent = `${postStartLabel} \u00b7 {{ stream.artist.name|escapejs }}`;
+    goLiveButton?.classList.remove('hidden');
     loadPlayerWhenReady();
   }
 
@@ -212,10 +238,22 @@
 
   reloadVideoButton.addEventListener('click', function() {
     player = null;
+    playerRetryCount = 0;
     if (!youtubeApiReady) {
       requestYouTubeApi();
     }
     loadPlayerWhenReady();
+  });
+
+  goLiveButton?.addEventListener('click', function() {
+    if (!player || !playerReady) return;
+    try {
+      const duration = player.getDuration();
+      if (duration && Number.isFinite(duration)) {
+        player.seekTo(duration, true);
+      }
+      player.playVideo();
+    } catch (error) {}
   });
 
   function requestYouTubeApi() {
@@ -252,7 +290,7 @@
 
   function appendChatLine(username, message) {
     const row = document.createElement('div');
-    row.innerHTML = `<strong class="text-emerald-400"></strong> <span></span>`;
+    row.innerHTML = `<strong class="text-[#2596BE]"></strong> <span></span>`;
     row.querySelector('strong').textContent = username;
     row.querySelector('span').textContent = message;
     chatLog.appendChild(row);
@@ -260,15 +298,15 @@
   }
 
   chatSocket.onopen = function() {
-    appendChatLine('StageLink', chatConnected);
+    appendChatLine('StageHub', chatConnected);
   };
 
   chatSocket.onerror = function() {
-    appendChatLine('StageLink', chatError);
+    appendChatLine('StageHub', chatError);
   };
 
   chatSocket.onclose = function() {
-    appendChatLine('StageLink', chatDisconnected);
+    appendChatLine('StageHub', chatDisconnected);
   };
 
   chatSocket.onmessage = function(event) {
@@ -293,7 +331,7 @@
     const message = chatInput.value.trim();
     if (!message) return;
     if (chatSocket.readyState !== WebSocket.OPEN) {
-      appendChatLine('StageLink', chatReload);
+      appendChatLine('StageHub', chatReload);
       return;
     }
     chatSocket.send(JSON.stringify({ message }));

@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard - StageLink{% endblock %}
+{% block title %}Dashboard - StageHub{% endblock %}
 {% block content %}
 <section class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
   <div>
-    <p class="text-sm text-emerald-400">{% if artist %}{{ artist.name }}{% else %}StageLink Pro{% endif %}</p>
+    <p class="text-sm text-[#2596BE]">{% if artist %}{{ artist.name }}{% else %}StageHub Pro{% endif %}</p>
     <h1 class="text-3xl font-semibold">Dashboard</h1>
   </div>
   <div class="flex flex-wrap gap-3">
@@ -39,7 +39,7 @@
   </section>
 {% endif %}
 
-<section id="quick-guide" class="mb-8 hidden rounded-xl border border-emerald-700 bg-emerald-950/30 p-5">
+<section id="quick-guide" class="mb-8 hidden rounded-xl border border-[#5230EF] bg-[#5230EF]/15 p-5">
   <div class="flex items-start justify-between gap-4">
     <div>
       <h2 class="text-xl font-semibold">Guia rapido de operacao</h2>
@@ -49,7 +49,7 @@
   </div>
   <div class="mt-5 grid gap-4 lg:grid-cols-3">
     <article class="sl-card p-4">
-      <h3 class="font-semibold text-emerald-300">Artista</h3>
+      <h3 class="font-semibold text-[#2596BE]">Artista</h3>
       <ol class="mt-3 space-y-3 text-sm text-zinc-200">
         <li><strong>1. Completa a pagina.</strong><br>Adiciona capa, foto principal, frase de destaque, cidade, bio e links.</li>
         <li><strong>2. Cria a galeria.</strong><br>Mostra palco, bastidores, ensaios, cartazes ou momentos com o público.</li>
@@ -61,7 +61,7 @@
 
     {% if can_manage_organizations %}
       <article class="sl-card p-4">
-        <h3 class="font-semibold text-emerald-300">Manager / equipa</h3>
+        <h3 class="font-semibold text-[#2596BE]">Manager / equipa</h3>
         <ol class="mt-3 space-y-3 text-sm text-zinc-200">
           <li><strong>1. Cria a equipa.</strong><br>Usa "Nova equipa" para agencia, produtora, label ou management.</li>
           <li><strong>2. Adiciona artistas.</strong><br>Cria paginas em "Novo artista gerido" e associa cada uma a equipa certa.</li>
@@ -74,7 +74,7 @@
 
     {% if user.is_staff or user.is_superuser %}
       <article class="sl-card p-4">
-        <h3 class="font-semibold text-emerald-300">Admin</h3>
+        <h3 class="font-semibold text-[#2596BE]">Admin</h3>
         <ol class="mt-3 space-y-3 text-sm text-zinc-200">
           <li><strong>1. Configura o site.</strong><br>No admin Django, define logotipo, imagem de fundo e overlay em Aparencia do site.</li>
           <li><strong>2. Verifica contas.</strong><br>Confirma users, perfis, artistas, equipas, membros e permissoes.</li>
@@ -120,7 +120,7 @@
         <article class="sl-card p-4">
           <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <a class="font-semibold hover:text-emerald-300" href="{% url 'streams:stream_update' stream.id %}">{{ stream.title }}</a>
+              <a class="font-semibold hover:text-[#2596BE]" href="{% url 'streams:stream_update' stream.id %}">{{ stream.title }}</a>
               <p class="mt-1 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
               <p class="mt-1 text-sm text-zinc-400">{{ stream.access_price }} EUR &middot; {% if stream.is_active %}ativo{% else %}inativo{% endif %}</p>
             </div>

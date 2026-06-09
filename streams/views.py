@@ -30,7 +30,7 @@ def home(request):
         newsletter_form = NewsletterSubscriberForm(request.POST)
         if newsletter_form.is_valid():
             newsletter_form.save()
-            messages.success(request, 'Subscricao efetuada com sucesso. Obrigado pelo interesse no StageLink!')
+            messages.success(request, 'Subscricao efetuada com sucesso. Obrigado pelo interesse no StageHub!')
             return redirect('streams:home')
         messages.warning(request, 'Nao foi possivel subscrever a newsletter. Confirma os dados abaixo.')
 
