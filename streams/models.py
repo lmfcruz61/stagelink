@@ -11,6 +11,15 @@ logger = logging.getLogger(__name__)
 
 
 class LiveStream(models.Model):
+    VIDEO_PROVIDER_CLOUDFLARE = 'cloudflare_stream'
+    VIDEO_PROVIDER_CLOUDFLARE_WEBRTC = 'cloudflare_webrtc'
+    VIDEO_PROVIDER_YOUTUBE = 'youtube'
+    VIDEO_PROVIDER_CHOICES = (
+        (VIDEO_PROVIDER_CLOUDFLARE, 'Cloudflare Stream'),
+        (VIDEO_PROVIDER_CLOUDFLARE_WEBRTC, 'Cloudflare WebRTC'),
+        (VIDEO_PROVIDER_YOUTUBE, 'YouTube legado'),
+    )
+
     LIVE = 'live'
     PREMIERE = 'premiere'
     RECORDED = 'recorded'
@@ -26,7 +35,11 @@ class LiveStream(models.Model):
     title = models.CharField(max_length=180)
     description = models.TextField(blank=True)
     cover_image = models.ImageField(upload_to='streams/covers/', blank=True, null=True)
-    youtube_video_id = models.CharField(max_length=200)
+    video_provider = models.CharField(max_length=30, choices=VIDEO_PROVIDER_CHOICES, default=VIDEO_PROVIDER_CLOUDFLARE)
+    cloudflare_video_uid = models.CharField(max_length=120, blank=True)
+    cloudflare_live_input_uid = models.CharField(max_length=120, blank=True)
+    cloudflare_playback_url = models.URLField(blank=True)
+    youtube_video_id = models.CharField(max_length=200, blank=True)
     event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default=LIVE)
     access_price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     scheduled_at = models.DateTimeField()
@@ -125,6 +138,32 @@ class LiveStream(models.Model):
                     if len(parts) > index + 1:
                         return parts[index + 1]
         return value
+
+    @property
+    def uses_youtube(self):
+        return self.video_provider == self.VIDEO_PROVIDER_YOUTUBE
+
+    @property
+    def uses_cloudflare(self):
+        return self.video_provider in {
+            self.VIDEO_PROVIDER_CLOUDFLARE,
+            self.VIDEO_PROVIDER_CLOUDFLARE_WEBRTC,
+        }
+
+    @property
+    def cloudflare_identifier(self):
+        return (self.cloudflare_video_uid or self.cloudflare_live_input_uid).strip()
+
+    @property
+    def cloudflare_embed_url(self):
+        # Para o MVP usamos o Stream Player. A URL manual permite colar a URL do separador Embed.
+        if self.cloudflare_playback_url:
+            return self.cloudflare_playback_url
+        subdomain = getattr(settings, 'CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN', '').strip()
+        identifier = self.cloudflare_identifier
+        if not subdomain or not identifier:
+            return ''
+        return f'https://{subdomain}.cloudflarestream.com/{identifier}/iframe'
 
     def access_decision(self, user):
         # Centraliza a regra de acesso usada pelas views e pelo WebSocket.

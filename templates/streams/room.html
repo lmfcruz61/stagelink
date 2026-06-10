@@ -85,7 +85,7 @@
 </section>
 
 <script>
-  const videoErrorDefault = 'Nao foi possivel carregar este video. Confirma o ID ou link do YouTube no dashboard do artista.';
+  const videoErrorDefault = 'Nao foi possivel carregar este video. Confirma a configuracao Cloudflare no dashboard do artista.';
   const videoErrorEmbed = 'Este video bloqueia incorporacao fora do YouTube. No YouTube Studio, ativa a incorporacao ou usa uma live publica/nao listada que permita embed.';
   const videoErrorInvalid = 'O ID/link do YouTube nao parece valido ou o video nao esta publico/disponivel.';
   const videoSlowMessage = 'O video esta a demorar a carregar. Podes tentar recarregar o player sem atualizar a pagina.';
@@ -109,6 +109,9 @@
   const stateChip = document.querySelector('#state-chip');
   const playerBrandBadge = document.querySelector('#player-brand-badge');
   const postStartLabel = '{{ stream.post_start_display_status.text|escapejs }}';
+  const videoProvider = '{{ stream.video_provider|escapejs }}';
+  const cloudflareEmbedUrl = '{{ stream.cloudflare_embed_url|escapejs }}';
+  const youtubeVideoId = '{{ stream.youtube_embed_id|escapejs }}';
   let youtubeApiReady = false;
   let player = null;
   let playerReady = false;
@@ -148,8 +151,42 @@
     clearTimeout(playerLoadTimer);
     clearTimeout(playerRetryTimer);
     playerContainer.innerHTML = '';
+    if (videoProvider === 'cloudflare_stream' || videoProvider === 'cloudflare_webrtc') {
+      buildCloudflarePlayer();
+      return;
+    }
+    buildYouTubePlayer();
+  }
+
+  function buildCloudflarePlayer() {
+    if (!cloudflareEmbedUrl) {
+      showVideoStatus('Este espetaculo ainda nao tem URL/UID Cloudflare configurado.');
+      return;
+    }
+    const iframe = document.createElement('iframe');
+    iframe.src = cloudflareEmbedUrl;
+    iframe.className = 'h-full w-full';
+    iframe.allow = 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;';
+    iframe.allowFullscreen = true;
+    iframe.setAttribute('title', '{{ stream.title|escapejs }}');
+    iframe.onload = function() {
+      playerReady = true;
+      playerRetryCount = 0;
+      clearTimeout(playerLoadTimer);
+      hideVideoStatus();
+    };
+    playerContainer.appendChild(iframe);
+    player = iframe;
+    playerLoadTimer = setTimeout(function() {
+      if (!playerReady) {
+        showVideoStatus(videoSlowMessage);
+      }
+    }, 10000);
+  }
+
+  function buildYouTubePlayer() {
     player = new YT.Player('player', {
-      videoId: '{{ stream.youtube_embed_id|escapejs }}',
+      videoId: youtubeVideoId,
       playerVars: {
         autoplay: streamStarted ? 1 : 0,
         mute: streamStarted ? 1 : 0,
@@ -202,6 +239,10 @@
 
   function loadPlayerWhenReady() {
     if (!streamStarted || player) return;
+    if (videoProvider === 'cloudflare_stream' || videoProvider === 'cloudflare_webrtc') {
+      buildPlayer();
+      return;
+    }
     if (!youtubeApiReady || !window.YT || !window.YT.Player) {
       showVideoStatus('A preparar o player do YouTube...', false);
       return;
@@ -239,6 +280,7 @@
   reloadVideoButton.addEventListener('click', function() {
     player = null;
     playerRetryCount = 0;
+    playerContainer.innerHTML = '';
     if (!youtubeApiReady) {
       requestYouTubeApi();
     }
@@ -257,6 +299,7 @@
   });
 
   function requestYouTubeApi() {
+    if (videoProvider !== 'youtube') return;
     if (youtubeApiReady || youtubeApiLoading) return;
     youtubeApiLoading = true;
     const youtubeApiScript = document.createElement('script');

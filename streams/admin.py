@@ -5,9 +5,9 @@ from .models import ChatMessage, LiveStream, Tip
 
 @admin.register(LiveStream)
 class LiveStreamAdmin(admin.ModelAdmin):
-    list_display = ('title', 'artist', 'event_type', 'scheduled_at', 'access_price', 'is_active')
-    list_filter = ('event_type', 'is_active', 'scheduled_at')
-    search_fields = ('title', 'artist__name', 'youtube_video_id')
+    list_display = ('title', 'artist', 'video_provider', 'event_type', 'scheduled_at', 'access_price', 'is_active')
+    list_filter = ('video_provider', 'event_type', 'is_active', 'scheduled_at')
+    search_fields = ('title', 'artist__name', 'cloudflare_video_uid', 'cloudflare_live_input_uid', 'youtube_video_id')
 
 
 admin.site.register(Tip)
