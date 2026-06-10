@@ -33,6 +33,9 @@
       {{ form.as_p }}
       <button class="sl-primary w-full">{% trans "Entrar" %}</button>
     </form>
+    <div class="mt-4 text-center text-sm">
+      <a class="text-[#2596BE] hover:text-white" href="{% url 'accounts:password_reset' %}">Esqueceste a password?</a>
+    </div>
   </div>
 </section>
 {% endblock %}
