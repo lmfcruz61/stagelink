@@ -4,19 +4,20 @@ Este guia serve para artistas, managers ou equipa tecnica transmitirem um espeta
 
 ## 1. O que precisas antes de abrir o OBS
 
-1. Conta Cloudflare com Stream ativo.
-2. Um `Live Input` criado em `Media > Stream > Live inputs`.
-3. Estes dados do Cloudflare:
+1. Uma conta de artista/equipa no StageHub.
+2. Um `Live Input` criado pela StageHub no perfil do artista. O artista nao paga Cloudflare.
+3. Estes dados fornecidos pela equipa StageHub:
    - `RTMPS URL`;
    - `Stream Key`;
    - `Live Input UID`.
-4. Um espetaculo criado no StageHub com:
+4. O perfil do artista no StageHub com o `Live Input UID` guardado pela plataforma.
+5. Um espetaculo criado no StageHub com:
    - plataforma de video `Cloudflare Stream`;
    - tipo de conteudo `Ao vivo`;
-   - `Live Input UID` preenchido;
+   - `ID do stream Cloudflare` preenchido automaticamente a partir do perfil do artista, ou confirmado manualmente;
    - data/hora correta;
    - espetaculo ativo.
-5. Uma ligacao de internet estavel. Sempre que possivel, usar cabo de rede em vez de Wi-Fi.
+6. Uma ligacao de internet estavel. Sempre que possivel, usar cabo de rede em vez de Wi-Fi.
 
 ## 2. Configurar a transmissao no OBS
 
@@ -32,9 +33,9 @@ Importante: nao juntar o RTMPS URL e a Stream Key no mesmo campo. O URL vai no s
 
 ## 3. Configurar o Live Input no Cloudflare
 
-No Cloudflare, abrir o Live Input usado no StageHub:
+Esta parte e feita pela equipa StageHub, nao pelo artista. No Cloudflare, abrir o Live Input usado no StageHub:
 
-1. Ir a `Media > Stream > Live inputs`.
+1. Ir a `Media > Stream > Live inputs`, ou usar o botao `Criar Live Input` no perfil do artista no StageHub.
 2. Abrir o Live Input do evento.
 3. Em `Settings`, manter `Live Playback and Recording` ativo.
 4. Ativar `Low-Latency HLS Support`, se estiver disponivel.

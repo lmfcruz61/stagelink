@@ -4,16 +4,16 @@
 <section class="mx-auto max-w-3xl">
   <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar espetaculo{% else %}Novo espetaculo{% endif %}</h1>
   <div class="mb-5 rounded border border-[#5230EF] bg-[#5230EF]/15 p-4 text-sm text-zinc-200">
-    Para eventos pagos, usa Cloudflare Stream. Ao vivo/estreia: cola o Live Input UID. Gravado/replay: cola o Video UID. O YouTube fica apenas como modo legado para testes antigos.
+    Eventos pagos usam Cloudflare Stream e podem receber gorjetas. Eventos gratuitos usam YouTube legado, sem gorjetas. A conta Cloudflare e os custos pertencem a StageHub, nao ao artista.
   </div>
 
   <details class="mb-5 rounded-xl border border-zinc-800 bg-zinc-900/90 p-5" open>
     <summary class="cursor-pointer text-lg font-semibold text-zinc-100">Guia passo a passo para criar o espetáculo</summary>
     <ol class="mt-4 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Prepara o Cloudflare.</strong><br>Cria ou abre o Live Input em `Media > Stream > Live inputs` e copia o Live Input UID.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Prepara o Cloudflare uma vez.</strong><br>No perfil do artista, cria um Live Input na conta StageHub. O artista nao paga Cloudflare.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>2. Configura o OBS.</strong><br>Cola o RTMPS URL no servidor e a Stream Key na chave de transmissão.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Define o tipo.</strong><br>Usa `Ao vivo` para transmissão em direto, `Estreia` para evento preparado, `Vídeo gravado` para VOD e `Replay` para pós-evento.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Cola o ID certo.</strong><br>Ao vivo/estreia usam Live Input UID. Vídeo gravado/replay usam Video UID.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Define o tipo.</strong><br>Pagos podem ser Cloudflare ao vivo/estreia/replay. Gratuitos ficam em YouTube gravado/replay e nao têm gorjetas.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Confirma o ID certo.</strong><br>Ao vivo/estreia podem usar o Live Input UID guardado no artista. Vídeo gravado/replay usam Video UID.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>5. Agenda e guarda.</strong><br>Define data, preço, duração estimada e capa 16:9. Guarda o espetáculo ainda inativo.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>6. Testa antes de divulgar.</strong><br>Entra na sala como artista/admin, confirma player, áudio, chat, contador e pagamento.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>7. Ativa o stream.</strong><br>Quando estiver tudo pronto, usa o botão verde `Ativar stream` nesta página.</li>
@@ -49,7 +49,7 @@
         <span>Artista</span>
         <select name="artist" required>
           {% for artist in artists %}
-            <option value="{{ artist.id }}">{{ artist.name }}{% if artist.organization %} - {{ artist.organization.name }}{% endif %}</option>
+            <option value="{{ artist.id }}" data-cloudflare-live-input="{{ artist.cloudflare_live_input_uid }}">{{ artist.name }}{% if artist.organization %} - {{ artist.organization.name }}{% endif %}</option>
           {% endfor %}
         </select>
       </label>
@@ -164,6 +164,8 @@
 <script>
   const eventTypeInput = document.querySelector('#id_event_type');
   const accessPriceInput = document.querySelector('#id_access_price');
+  const artistInput = document.querySelector('select[name="artist"]');
+  const cloudflareStreamInput = document.querySelector('#id_cloudflare_stream_id');
   const youtubeLegacyField = document.querySelector('#youtube-legacy-field');
   const cloudflareHelp = document.querySelector('#cloudflare-stream-help');
   const liveHelp = 'Para eventos ao vivo. Cola o Live Input ID de Cloudflare Stream > Live Inputs.';
@@ -178,6 +180,15 @@
     cloudflareHelp.textContent = isLiveInputType() ? liveHelp : videoHelp;
   }
 
+  function fillArtistLiveInput() {
+    if (!artistInput || !cloudflareStreamInput || !isLiveInputType() || cloudflareStreamInput.value.trim()) return;
+    const selected = artistInput.options[artistInput.selectedIndex];
+    const artistLiveInput = selected?.dataset.cloudflareLiveInput || '';
+    if (artistLiveInput) {
+      cloudflareStreamInput.value = artistLiveInput;
+    }
+  }
+
   function updateYouTubeVisibility() {
     if (!youtubeLegacyField) return;
     const price = Number.parseFloat((accessPriceInput?.value || '0').replace(',', '.')) || 0;
@@ -187,11 +198,13 @@
 
   function updateVideoFields() {
     updateCloudflareHelp();
+    fillArtistLiveInput();
     updateYouTubeVisibility();
   }
 
   eventTypeInput?.addEventListener('change', updateVideoFields);
   accessPriceInput?.addEventListener('input', updateVideoFields);
+  artistInput?.addEventListener('change', updateVideoFields);
   updateVideoFields();
 </script>
 {% endblock %}

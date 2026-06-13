@@ -1,4 +1,4 @@
-from django.contrib import messages
+﻿from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Case, IntegerField, Prefetch, Q, Sum, Value, When
@@ -17,6 +17,7 @@ from accounts.forms import (
 from accounts.models import Artist, ArtistPhoto, Organization, OrganizationMember
 from payments.models import Subscription
 
+from .cloudflare import CloudflareStreamError, create_live_input_for_artist
 from .forms import LiveStreamForm
 from .models import LiveStream
 
@@ -156,7 +157,7 @@ def favorite_artist_toggle(request, artist_id):
 
     fan = getattr(request.user, 'fan_profile', None)
     if not fan:
-        messages.error(request, 'Apenas contas de público podem guardar artistas favoritos.')
+        messages.error(request, 'Apenas contas de pÃºblico podem guardar artistas favoritos.')
         return redirect('streams:artist_detail', artist_id=artist_id)
 
     artist = get_object_or_404(Artist, pk=artist_id)
@@ -236,7 +237,7 @@ def stream_room(request, stream_id):
 @login_required
 def dashboard(request):
     if not can_access_dashboard(request.user):
-        messages.info(request, 'A tua conta de público nao tem dashboard de gestao. Usa a homepage para seguir artistas, entrar em espetáculos e gerir o teu perfil.')
+        messages.info(request, 'A tua conta de pÃºblico nao tem dashboard de gestao. Usa a homepage para seguir artistas, entrar em espetÃ¡culos e gerir o teu perfil.')
         return redirect('streams:home')
 
     artists = editable_artists_for(request.user).order_by('name')
@@ -246,7 +247,7 @@ def dashboard(request):
     can_manage_orgs = can_manage_organizations(request.user)
 
     if not artist:
-        messages.info(request, 'Cria uma equipa ou um perfil de artista para comecar a gerir espetáculos.')
+        messages.info(request, 'Cria uma equipa ou um perfil de artista para comecar a gerir espetÃ¡culos.')
         return render(request, 'dashboard/index.html', {
             'artist': None,
             'artists': artists,
@@ -387,6 +388,26 @@ def artist_profile_edit(request):
             messages.success(request, 'Perfil atualizado.')
             return redirect(f"{reverse('streams:artist_profile_edit')}?artist={artist.id}")
 
+        if action == 'create_cloudflare_live_input':
+            if artist.cloudflare_live_input_uid:
+                messages.info(request, 'Este artista ja tem um Live Input Cloudflare configurado.')
+                return redirect(f"{reverse('streams:artist_profile_edit')}?artist={artist.id}")
+            try:
+                live_input = create_live_input_for_artist(artist)
+            except CloudflareStreamError as error:
+                messages.error(request, str(error))
+                return redirect(f"{reverse('streams:artist_profile_edit')}?artist={artist.id}")
+            artist.cloudflare_live_input_uid = live_input['uid']
+            artist.cloudflare_rtmps_url = live_input['rtmps_url']
+            artist.cloudflare_stream_key = live_input['stream_key']
+            artist.save(update_fields=[
+                'cloudflare_live_input_uid',
+                'cloudflare_rtmps_url',
+                'cloudflare_stream_key',
+            ])
+            messages.success(request, 'Live Input Cloudflare criado na conta StageHub e guardado no artista.')
+            return redirect(f"{reverse('streams:artist_profile_edit')}?artist={artist.id}")
+
         if action == 'add_photo' and gallery_form.is_valid():
             caption = gallery_form.cleaned_data.get('caption', '')
             for image in gallery_form.cleaned_data['images']:
@@ -423,7 +444,7 @@ def artist_photo_delete(request, photo_id):
 def stream_create(request):
     artists = editable_artists_for(request.user).order_by('name')
     if not artists.exists():
-        messages.error(request, 'Precisas de um artista ou equipa para criar espetáculos.')
+        messages.error(request, 'Precisas de um artista ou equipa para criar espetÃ¡culos.')
         return redirect('streams:home')
 
     if request.method == 'POST':
@@ -433,7 +454,7 @@ def stream_create(request):
             live_stream = form.save(commit=False)
             live_stream.artist = artist
             live_stream.save()
-            messages.success(request, 'Espetáculo criado com sucesso.')
+            messages.success(request, 'EspetÃ¡culo criado com sucesso.')
             return redirect(f"{reverse('streams:dashboard')}?artist={artist.id}")
     else:
         form = LiveStreamForm()
@@ -445,17 +466,17 @@ def stream_create(request):
 def stream_update(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     if not can_manage_artist(request.user, stream.artist):
-        messages.error(request, 'Nao tens permissao para gerir este espetáculo.')
+        messages.error(request, 'Nao tens permissao para gerir este espetÃ¡culo.')
         return redirect('streams:dashboard')
 
     if request.method == 'POST':
-        form = LiveStreamForm(request.POST, request.FILES, instance=stream)
+        form = LiveStreamForm(request.POST, request.FILES, instance=stream, artist=stream.artist)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Espetáculo atualizado.')
+            messages.success(request, 'EspetÃ¡culo atualizado.')
             return redirect(f"{reverse('streams:dashboard')}?artist={stream.artist_id}")
     else:
-        form = LiveStreamForm(instance=stream)
+        form = LiveStreamForm(instance=stream, artist=stream.artist)
     return render(request, 'dashboard/stream_form.html', {'form': form, 'stream': stream})
 
 
@@ -479,13 +500,14 @@ def stream_toggle_active(request, stream_id):
 def stream_delete(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     if not can_manage_artist(request.user, stream.artist):
-        messages.error(request, 'Nao tens permissao para apagar este espetáculo.')
+        messages.error(request, 'Nao tens permissao para apagar este espetÃ¡culo.')
         return redirect('streams:dashboard')
 
     artist_id = stream.artist_id
     if request.method == 'POST':
         stream.delete()
-        messages.success(request, 'Espetáculo apagado.')
+        messages.success(request, 'EspetÃ¡culo apagado.')
         return redirect(f"{reverse('streams:dashboard')}?artist={artist_id}")
 
     return redirect(f"{reverse('streams:stream_update', args=[stream.id])}")
+

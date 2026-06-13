@@ -15,7 +15,13 @@ from .models import (
 )
 
 admin.site.register(Profile)
-admin.site.register(Artist)
+@admin.register(Artist)
+class ArtistAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user', 'organization', 'cloudflare_live_input_uid')
+    search_fields = ('name', 'user__username', 'organization__name', 'cloudflare_live_input_uid')
+    readonly_fields = ('cloudflare_rtmps_url', 'cloudflare_stream_key')
+
+
 admin.site.register(ArtistPhoto)
 admin.site.register(Fan)
 admin.site.register(Organization)

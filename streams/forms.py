@@ -56,6 +56,7 @@ class LiveStreamForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        self.artist = kwargs.pop('artist', None)
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
             event_type = self.instance.event_type
@@ -63,6 +64,8 @@ class LiveStreamForm(forms.ModelForm):
                 self.fields['cloudflare_stream_id'].initial = self.instance.cloudflare_live_input_uid
             else:
                 self.fields['cloudflare_stream_id'].initial = self.instance.cloudflare_video_uid
+        elif self.artist and self.artist.cloudflare_live_input_uid:
+            self.fields['cloudflare_stream_id'].initial = self.artist.cloudflare_live_input_uid
 
     def clean(self):
         cleaned_data = super().clean()
@@ -71,12 +74,39 @@ class LiveStreamForm(forms.ModelForm):
         cloudflare_stream_id = (cleaned_data.get('cloudflare_stream_id') or '').strip()
         cloudflare_playback_url = (cleaned_data.get('cloudflare_playback_url') or '').strip()
         youtube_video_id = (cleaned_data.get('youtube_video_id') or '').strip()
+        if (
+            not cloudflare_stream_id
+            and self.artist
+            and event_type in {LiveStream.LIVE, LiveStream.PREMIERE}
+            and self.artist.cloudflare_live_input_uid
+        ):
+            cloudflare_stream_id = self.artist.cloudflare_live_input_uid
+            cleaned_data['cloudflare_stream_id'] = cloudflare_stream_id
 
         if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE:
             if not cloudflare_stream_id and not cloudflare_playback_url:
                 self.add_error(
                     'cloudflare_stream_id',
                     'Indica o ID do stream Cloudflare ou uma URL de embed Cloudflare.',
+                )
+
+        access_price = cleaned_data.get('access_price')
+        if access_price is not None:
+            if access_price <= 0:
+                if provider != LiveStream.VIDEO_PROVIDER_YOUTUBE:
+                    self.add_error(
+                        'video_provider',
+                        'Espetaculos gratuitos devem usar YouTube legado. Cloudflare fica reservado para eventos pagos.',
+                    )
+                if event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:
+                    self.add_error(
+                        'event_type',
+                        'Espetaculos gratuitos devem ser video gravado ou replay no YouTube.',
+                    )
+            elif provider == LiveStream.VIDEO_PROVIDER_YOUTUBE:
+                self.add_error(
+                    'video_provider',
+                    'Espetaculos pagos devem usar Cloudflare Stream.',
                 )
 
         if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE_WEBRTC and not cloudflare_playback_url:

@@ -77,6 +77,13 @@ class Artist(models.Model):
     spotify_link = models.URLField(blank=True)
     website_link = models.URLField(blank=True)
     location = models.CharField(max_length=120, blank=True)
+    cloudflare_live_input_uid = models.CharField(
+        max_length=120,
+        blank=True,
+        help_text='Live Input UID principal do artista no Cloudflare Stream.',
+    )
+    cloudflare_rtmps_url = models.URLField(blank=True)
+    cloudflare_stream_key = models.CharField(max_length=240, blank=True)
 
     def __str__(self):
         return self.name

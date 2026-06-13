@@ -187,6 +187,10 @@ def buy_ticket(request, stream_id):
 @login_required
 def create_tip(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
+    if stream.access_price <= 0:
+        messages.error(request, 'Espetaculos gratuitos nao recebem gorjetas na plataforma.')
+        return redirect('streams:room', stream_id=stream.id)
+
     fan = getattr(request.user, 'fan_profile', None)
     if fan is None:
         messages.error(request, 'Só contas de público podem enviar gorjetas.')
