@@ -1,13 +1,49 @@
 {% extends 'base.html' %}
-{% block title %}Espetáculo - StageHub{% endblock %}
+{% block title %}Espetaculo - StageHub{% endblock %}
 {% block content %}
 <section class="mx-auto max-w-3xl">
-  <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar espetáculo{% else %}Novo espetáculo{% endif %}</h1>
+  <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar espetaculo{% else %}Novo espetaculo{% endif %}</h1>
   <div class="mb-5 rounded border border-[#5230EF] bg-[#5230EF]/15 p-4 text-sm text-zinc-200">
-    Para eventos pagos, usa Cloudflare Stream. Ao vivo: cola o Live Input UID. Gravado/estreia/replay: cola o Video UID. O YouTube fica apenas como modo legado para testes antigos.
+    Para eventos pagos, usa Cloudflare Stream. Ao vivo/estreia: cola o Live Input UID. Gravado/replay: cola o Video UID. O YouTube fica apenas como modo legado para testes antigos.
   </div>
+
+  <details class="mb-5 rounded-xl border border-zinc-800 bg-zinc-900/90 p-5" open>
+    <summary class="cursor-pointer text-lg font-semibold text-zinc-100">Guia passo a passo para criar o espetáculo</summary>
+    <ol class="mt-4 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Prepara o Cloudflare.</strong><br>Cria ou abre o Live Input em `Media > Stream > Live inputs` e copia o Live Input UID.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>2. Configura o OBS.</strong><br>Cola o RTMPS URL no servidor e a Stream Key na chave de transmissão.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Define o tipo.</strong><br>Usa `Ao vivo` para transmissão em direto, `Estreia` para evento preparado, `Vídeo gravado` para VOD e `Replay` para pós-evento.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Cola o ID certo.</strong><br>Ao vivo/estreia usam Live Input UID. Vídeo gravado/replay usam Video UID.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>5. Agenda e guarda.</strong><br>Define data, preço, duração estimada e capa 16:9. Guarda o espetáculo ainda inativo.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>6. Testa antes de divulgar.</strong><br>Entra na sala como artista/admin, confirma player, áudio, chat, contador e pagamento.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>7. Ativa o stream.</strong><br>Quando estiver tudo pronto, usa o botão verde `Ativar stream` nesta página.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>8. Partilha o evento.</strong><br>No dashboard, usa `Copiar link` para divulgar a página pública do espetáculo.</li>
+    </ol>
+  </details>
+
+  {% if stream %}
+    <form method="post" action="{% url 'streams:stream_toggle_active' stream.id %}" class="mb-5 rounded-xl border {% if stream.is_active %}border-red-800 bg-red-950/20{% else %}border-[#10B981] bg-[#10B981]/15{% endif %} p-5">
+      {% csrf_token %}
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-zinc-400">Estado atual</p>
+          <p class="text-lg font-semibold">{% if stream.is_active %}Stream ativo{% else %}Stream inativo{% endif %}</p>
+        </div>
+        {% if stream.is_active %}
+          <button class="rounded-full border border-red-600 bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-500" type="submit">&#9209; Desativar stream</button>
+        {% else %}
+          <button class="rounded-full border border-[#10B981] bg-[#10B981] px-5 py-3 font-semibold text-zinc-950 hover:bg-emerald-300" type="submit">&#9654; Ativar stream</button>
+        {% endif %}
+      </div>
+    </form>
+  {% endif %}
+
   <form method="post" enctype="multipart/form-data" class="sl-card space-y-4 p-6">
     {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="rounded border border-red-800 bg-red-950/30 p-3 text-sm text-red-100">{{ form.non_field_errors }}</div>
+    {% endif %}
+
     {% if not stream %}
       <label>
         <span>Artista</span>
@@ -22,7 +58,86 @@
         Artista: <span class="font-semibold text-zinc-100">{{ stream.artist.name }}</span>
       </div>
     {% endif %}
-    {{ form.as_p }}
+
+    <label>
+      <span>{{ form.title.label }}</span>
+      {{ form.title }}
+      {% for error in form.title.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+    </label>
+
+    <label>
+      <span>{{ form.description.label }}</span>
+      {{ form.description }}
+      {% for error in form.description.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+    </label>
+
+    <label>
+      <span>{{ form.cover_image.label }}</span>
+      {{ form.cover_image }}
+      <span class="mt-1 block text-sm text-zinc-500">{{ form.cover_image.help_text }}</span>
+      {% for error in form.cover_image.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+    </label>
+
+    <div class="grid gap-4 md:grid-cols-2">
+      <label>
+        <span>{{ form.video_provider.label }}</span>
+        {{ form.video_provider }}
+        {% for error in form.video_provider.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </label>
+      <label>
+        <span>{{ form.event_type.label }}</span>
+        {{ form.event_type }}
+        {% for error in form.event_type.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </label>
+    </div>
+
+    <label>
+      <span>{{ form.cloudflare_stream_id.label }}</span>
+      {{ form.cloudflare_stream_id }}
+      <span id="cloudflare-stream-help" class="mt-1 block text-sm text-zinc-500">{{ form.cloudflare_stream_id.help_text }}</span>
+      {% for error in form.cloudflare_stream_id.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+    </label>
+
+    <div class="grid gap-4 md:grid-cols-3">
+      <label>
+        <span>{{ form.access_price.label }}</span>
+        {{ form.access_price }}
+        {% for error in form.access_price.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </label>
+      <label>
+        <span>{{ form.scheduled_at.label }}</span>
+        {{ form.scheduled_at }}
+        {% for error in form.scheduled_at.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </label>
+      <label>
+        <span>{{ form.duration_minutes.label }}</span>
+        {{ form.duration_minutes }}
+        <span class="mt-1 block text-sm text-zinc-500">{{ form.duration_minutes.help_text }}</span>
+        {% for error in form.duration_minutes.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </label>
+    </div>
+
+    <div id="youtube-legacy-field">
+      <label>
+        <span>{{ form.youtube_video_id.label }}</span>
+        {{ form.youtube_video_id }}
+        <span class="mt-1 block text-sm text-zinc-500">{{ form.youtube_video_id.help_text }}</span>
+        {% for error in form.youtube_video_id.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </label>
+    </div>
+
+    <details class="rounded border border-zinc-800 bg-zinc-950 p-4">
+      <summary class="cursor-pointer font-semibold text-zinc-100">Opções avançadas</summary>
+      <div class="mt-4">
+        <label>
+          <span>{{ form.cloudflare_playback_url.label }}</span>
+          {{ form.cloudflare_playback_url }}
+          <span class="mt-1 block text-sm text-zinc-500">{{ form.cloudflare_playback_url.help_text }}</span>
+          {% for error in form.cloudflare_playback_url.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+        </label>
+      </div>
+    </details>
+
     {% if stream and stream.cover_image %}
       <div>
         <p class="mb-2 text-sm text-zinc-400">Capa atual</p>
@@ -37,12 +152,46 @@
     </div>
   </form>
   {% if stream %}
-    <form method="post" action="{% url 'streams:stream_delete' stream.id %}" class="mt-6 rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('Apagar este espetáculo? Esta acao nao pode ser desfeita.');">
+    <form method="post" action="{% url 'streams:stream_delete' stream.id %}" class="mt-6 rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('Apagar este espetaculo? Esta acao nao pode ser desfeita.');">
       {% csrf_token %}
-      <h2 class="text-lg font-semibold text-red-200">Apagar espetáculo</h2>
-      <p class="mt-2 text-sm text-red-100/80">Remove este espetáculo, incluindo mensagens de chat associadas a ele.</p>
+      <h2 class="text-lg font-semibold text-red-200">Apagar espetaculo</h2>
+      <p class="mt-2 text-sm text-red-100/80">Remove este espetaculo, incluindo mensagens de chat associadas a ele.</p>
       <button class="mt-4 rounded-full border border-red-700 bg-red-950/60 px-4 py-3 font-semibold text-red-100 hover:border-red-500">Apagar definitivamente</button>
     </form>
   {% endif %}
 </section>
+
+<script>
+  const eventTypeInput = document.querySelector('#id_event_type');
+  const accessPriceInput = document.querySelector('#id_access_price');
+  const youtubeLegacyField = document.querySelector('#youtube-legacy-field');
+  const cloudflareHelp = document.querySelector('#cloudflare-stream-help');
+  const liveHelp = 'Para eventos ao vivo. Cola o Live Input ID de Cloudflare Stream > Live Inputs.';
+  const videoHelp = 'Para vídeo gravado ou replay. Cola o UID de Cloudflare Stream > Videos.';
+
+  function isLiveInputType() {
+    return ['live', 'premiere'].includes(eventTypeInput?.value);
+  }
+
+  function updateCloudflareHelp() {
+    if (!cloudflareHelp) return;
+    cloudflareHelp.textContent = isLiveInputType() ? liveHelp : videoHelp;
+  }
+
+  function updateYouTubeVisibility() {
+    if (!youtubeLegacyField) return;
+    const price = Number.parseFloat((accessPriceInput?.value || '0').replace(',', '.')) || 0;
+    const show = price <= 0 && !isLiveInputType();
+    youtubeLegacyField.classList.toggle('hidden', !show);
+  }
+
+  function updateVideoFields() {
+    updateCloudflareHelp();
+    updateYouTubeVisibility();
+  }
+
+  eventTypeInput?.addEventListener('change', updateVideoFields);
+  accessPriceInput?.addEventListener('input', updateVideoFields);
+  updateVideoFields();
+</script>
 {% endblock %}

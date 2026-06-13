@@ -460,6 +460,22 @@ def stream_update(request, stream_id):
 
 
 @login_required
+def stream_toggle_active(request, stream_id):
+    stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
+    if not can_manage_artist(request.user, stream.artist):
+        messages.error(request, 'Nao tens permissao para gerir este espetaculo.')
+        return redirect('streams:dashboard')
+    if request.method == 'POST':
+        stream.is_active = not stream.is_active
+        stream.save(update_fields=['is_active'])
+        if stream.is_active:
+            messages.success(request, 'Stream ativado.')
+        else:
+            messages.success(request, 'Stream desativado.')
+    return redirect('streams:stream_update', stream_id=stream.id)
+
+
+@login_required
 def stream_delete(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     if not can_manage_artist(request.user, stream.artist):

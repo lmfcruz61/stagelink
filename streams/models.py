@@ -43,6 +43,11 @@ class LiveStream(models.Model):
     event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default=LIVE)
     access_price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     scheduled_at = models.DateTimeField()
+    duration_minutes = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        help_text='Duração estimada em minutos (opcional)',
+    )
     is_active = models.BooleanField(default=False)
 
     class Meta:

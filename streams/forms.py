@@ -14,17 +14,11 @@ class LiveStreamForm(forms.ModelForm):
         label='Data e hora',
         widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
     )
-    cloudflare_video_uid = forms.CharField(
-        label='Cloudflare Video UID',
+    cloudflare_stream_id = forms.CharField(
+        label='ID do stream Cloudflare',
         max_length=120,
         required=False,
-        help_text='Para video gravado, estreia ou replay. Cola o UID de Cloudflare Stream > Videos.',
-    )
-    cloudflare_live_input_uid = forms.CharField(
-        label='Cloudflare Live Input UID',
-        max_length=120,
-        required=False,
-        help_text='Para evento ao vivo. Cola o Live Input ID de Cloudflare Stream > Live inputs.',
+        help_text='Para eventos ao vivo. Cola o Live Input ID de Cloudflare Stream > Live Inputs.',
     )
     cloudflare_playback_url = forms.URLField(
         label='URL de embed/playback Cloudflare',
@@ -45,14 +39,12 @@ class LiveStreamForm(forms.ModelForm):
             'description',
             'cover_image',
             'video_provider',
-            'cloudflare_video_uid',
-            'cloudflare_live_input_uid',
             'cloudflare_playback_url',
             'youtube_video_id',
             'event_type',
             'access_price',
             'scheduled_at',
-            'is_active',
+            'duration_minutes',
         )
         labels = {
             'title': 'Titulo',
@@ -60,28 +52,31 @@ class LiveStreamForm(forms.ModelForm):
             'video_provider': 'Plataforma de video',
             'event_type': 'Tipo de conteudo',
             'access_price': 'Preco do bilhete',
-            'is_active': 'Espetaculo ativo',
+            'duration_minutes': 'Duração estimada',
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            event_type = self.instance.event_type
+            if event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:
+                self.fields['cloudflare_stream_id'].initial = self.instance.cloudflare_live_input_uid
+            else:
+                self.fields['cloudflare_stream_id'].initial = self.instance.cloudflare_video_uid
 
     def clean(self):
         cleaned_data = super().clean()
         provider = cleaned_data.get('video_provider')
         event_type = cleaned_data.get('event_type')
-        cloudflare_video_uid = (cleaned_data.get('cloudflare_video_uid') or '').strip()
-        cloudflare_live_input_uid = (cleaned_data.get('cloudflare_live_input_uid') or '').strip()
+        cloudflare_stream_id = (cleaned_data.get('cloudflare_stream_id') or '').strip()
         cloudflare_playback_url = (cleaned_data.get('cloudflare_playback_url') or '').strip()
         youtube_video_id = (cleaned_data.get('youtube_video_id') or '').strip()
 
         if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE:
-            if event_type == LiveStream.LIVE and not cloudflare_live_input_uid and not cloudflare_playback_url:
+            if not cloudflare_stream_id and not cloudflare_playback_url:
                 self.add_error(
-                    'cloudflare_live_input_uid',
-                    'Para evento ao vivo, indica o Live Input UID ou uma URL de embed Cloudflare.',
-                )
-            if event_type != LiveStream.LIVE and not cloudflare_video_uid and not cloudflare_playback_url:
-                self.add_error(
-                    'cloudflare_video_uid',
-                    'Para video gravado, estreia ou replay, indica o Video UID ou uma URL de embed Cloudflare.',
+                    'cloudflare_stream_id',
+                    'Indica o ID do stream Cloudflare ou uma URL de embed Cloudflare.',
                 )
 
         if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE_WEBRTC and not cloudflare_playback_url:
@@ -94,6 +89,20 @@ class LiveStreamForm(forms.ModelForm):
             self.add_error('youtube_video_id', 'Indica o ID/link do YouTube para usar o modo legado.')
 
         return cleaned_data
+
+    def save(self, commit=True):
+        live_stream = super().save(commit=False)
+        cloudflare_stream_id = (self.cleaned_data.get('cloudflare_stream_id') or '').strip()
+        if live_stream.event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:
+            live_stream.cloudflare_live_input_uid = cloudflare_stream_id
+            live_stream.cloudflare_video_uid = ''
+        else:
+            live_stream.cloudflare_video_uid = cloudflare_stream_id
+            live_stream.cloudflare_live_input_uid = ''
+        if commit:
+            live_stream.save()
+            self.save_m2m()
+        return live_stream
 
     def clean_youtube_video_id(self):
         value = (self.cleaned_data.get('youtube_video_id') or '').strip()
