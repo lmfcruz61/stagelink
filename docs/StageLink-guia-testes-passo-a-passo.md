@@ -10,7 +10,8 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 4. No admin, confirmar que o topo diz `Administracao do site`, mostra o nome do site e usa o logotipo configurado em `Aparencia do site`.
 5. No admin, configurar `Aparencia do site`: nome, logotipo, imagem de fundo e overlay.
 6. Confirmar variaveis do Fly.io: `SECRET_KEY`, `DATABASE_URL`, chaves Stripe, Redis/Upstash quando for usado chat multi-instancia.
-7. Confirmar que o Cloudflare Stream tem Live Input/Video UID e playback disponivel.
+7. Confirmar variaveis Cloudflare no Fly.io: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN` e `CLOUDFLARE_API_TOKEN`.
+8. Confirmar que o Cloudflare Stream tem pelo menos um Live Input para teste ao vivo ou um Video UID para teste gravado/replay.
 
 ## 2. Teste como admin
 
@@ -31,7 +32,7 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 4. Abrir o `Guia rapido`.
 5. Editar pagina publica: nome artistico, frase, cidade, bio, foto principal, capa e links.
 6. Adicionar varias fotos a galeria.
-7. Criar espetÃ¡culo com titulo, capa 16:9, tipo de conteudo, data futura, preco e Cloudflare Live Input UID ou Video UID.
+7. Criar espetaculo com titulo, capa 16:9, tipo de conteudo, data futura, preco e Cloudflare Live Input UID ou Video UID.
 8. Para evento realmente em direto, escolher `Ao vivo`; para video preparado, escolher `Estreia` ou `Video gravado`; para conteudo passado ainda disponivel, escolher `Replay`.
 9. Ativar o espetÃ¡culo.
 10. Abrir a pagina publica do artista e confirmar:
@@ -98,11 +99,18 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 
 ## 7. Teste de Cloudflare Stream
 
-1. Usar video publico ou nao listado.
-2. Confirmar que o Live Input esta ligado ou que o video Cloudflare esta pronto para playback.
-3. Testar video valido.
-4. Testar video privado ou bloqueado para confirmar mensagem/limite esperado.
-5. Testar em desktop e mobile.
+1. No Cloudflare, abrir `Media > Stream > Live inputs`.
+2. Criar ou abrir um Live Input de teste.
+3. Copiar o `Live Input UID` para o espetaculo no StageHub.
+4. No OBS, configurar `Servico: Personalizado`, `Servidor: RTMPS URL` e `Chave: Stream Key`.
+5. Adicionar uma fonte no OBS, por exemplo webcam, captura de ecra ou ficheiro de video local.
+6. Iniciar transmissao no OBS e confirmar no Cloudflare que o estado deixa de estar `Disconnected`.
+7. Abrir a sala StageHub e confirmar que o player Cloudflare aparece.
+8. Confirmar que o atraso existe no modo RTMPS/HLS e que este modo serve para MVP/concerto assistido, mas nao para interacao de latencia muito baixa.
+9. Para video gravado, usar `Media > Stream > Videos`, copiar o `Video UID` e criar evento `Video gravado`, `Estreia` ou `Replay`.
+10. Testar em desktop e mobile.
+
+Nota: YouTube fica apenas como modo legado para eventos antigos ou testes internos. Eventos pagos devem usar Cloudflare Stream.
 
 ## 8. Teste de sala ao vivo, chat e presenca
 

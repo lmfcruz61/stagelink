@@ -156,14 +156,16 @@ class LiveStream(models.Model):
 
     @property
     def cloudflare_embed_url(self):
-        # Para o MVP usamos o Stream Player. A URL manual permite colar a URL do separador Embed.
+        params = 'autoplay=true&lowLatency=true&preload=true'
         if self.cloudflare_playback_url:
-            return self.cloudflare_playback_url
+            base = self.cloudflare_playback_url.rstrip('?&')
+            separator = '&' if '?' in base else '?'
+            return f'{base}{separator}{params}'
         subdomain = getattr(settings, 'CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN', '').strip()
         identifier = self.cloudflare_identifier
         if not subdomain or not identifier:
             return ''
-        return f'https://{subdomain}.cloudflarestream.com/{identifier}/iframe'
+        return f'https://{subdomain}.cloudflarestream.com/{identifier}/iframe?{params}'
 
     def access_decision(self, user):
         # Centraliza a regra de acesso usada pelas views e pelo WebSocket.
