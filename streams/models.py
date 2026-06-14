@@ -167,11 +167,24 @@ class LiveStream(models.Model):
             base = self.cloudflare_playback_url.rstrip('?&')
             separator = '&' if '?' in base else '?'
             return f'{base}{separator}{params}'
-        subdomain = getattr(settings, 'CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN', '').strip()
+        host = self.cloudflare_stream_host
         identifier = self.cloudflare_identifier
-        if not subdomain or not identifier:
+        if not host or not identifier:
             return ''
-        return f'https://{subdomain}.cloudflarestream.com/{identifier}/iframe?{params}'
+        return f'https://{host}/{identifier}/iframe?{params}'
+
+    @property
+    def cloudflare_stream_host(self):
+        value = getattr(settings, 'CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN', '').strip().strip('/')
+        if not value:
+            return ''
+        parsed = urlparse(value if '://' in value else f'https://{value}')
+        host = (parsed.netloc or parsed.path).split('/')[0].strip()
+        if not host:
+            return ''
+        if host.endswith('.cloudflarestream.com'):
+            return host
+        return f'{host}.cloudflarestream.com'
 
     @property
     def is_recent_recorded_content(self):
