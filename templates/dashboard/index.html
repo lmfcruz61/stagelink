@@ -119,10 +119,22 @@
       {% for stream in streams %}
         <article class="sl-card p-4">
           <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <a class="font-semibold hover:text-[#2596BE]" href="{% url 'streams:stream_update' stream.id %}">{{ stream.title }}</a>
-              <p class="mt-1 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
-              <p class="mt-1 text-sm text-zinc-400">{{ stream.access_price }} EUR &middot; {% if stream.is_active %}ativo{% else %}inativo{% endif %}</p>
+            <div class="flex min-w-0 gap-4">
+              <a href="{% url 'streams:stream_update' stream.id %}" class="block h-24 w-40 shrink-0 overflow-hidden rounded border border-zinc-800 bg-zinc-950">
+                {% if stream.cover_image %}
+                  <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="h-full w-full object-cover">
+                {% elif stream.artist.photo %}
+                  <img src="{{ stream.artist.photo.url }}" alt="{{ stream.artist.name }}" class="h-full w-full object-cover">
+                {% else %}
+                  <div class="flex h-full w-full items-center justify-center px-3 text-center text-sm font-semibold text-zinc-300">{{ stream.title }}</div>
+                {% endif %}
+              </a>
+              <div class="min-w-0">
+                <a class="font-semibold hover:text-[#2596BE]" href="{% url 'streams:stream_update' stream.id %}">{{ stream.title }}</a>
+                <p class="mt-1 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
+                <p class="mt-1 text-sm text-zinc-400">{{ stream.access_price }} EUR &middot; {% if stream.is_active %}ativo{% else %}inativo{% endif %}</p>
+                <p class="mt-1 text-xs text-zinc-500">{{ stream.display_status.text }}</p>
+              </div>
             </div>
             <div class="flex flex-wrap gap-2">
               <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:stream_update' stream.id %}">Editar</a>

@@ -78,6 +78,57 @@
       </div>
       <a class="sl-secondary w-fit" href="{% url 'streams:home' %}">Limpar pesquisa</a>
     </div>
+    <div class="mt-5 grid gap-5 lg:grid-cols-2">
+      <div>
+        <h3 class="mb-3 font-semibold">Espetáculos encontrados</h3>
+        <div class="space-y-3">
+          {% for stream in concert_streams %}
+            <a href="{% url 'streams:event_detail' stream.id %}" class="flex gap-3 rounded border border-zinc-800 bg-zinc-950 p-3 hover:border-[#5230EF]">
+              <div class="h-20 w-32 shrink-0 overflow-hidden rounded bg-zinc-900">
+                {% if stream.cover_image %}
+                  <img src="{{ stream.cover_image.url }}" alt="{{ stream.title }}" class="h-full w-full object-cover">
+                {% elif stream.artist.photo %}
+                  <img src="{{ stream.artist.photo.url }}" alt="{{ stream.artist.name }}" class="h-full w-full object-cover">
+                {% else %}
+                  <div class="flex h-full w-full items-center justify-center px-2 text-center text-xs font-semibold text-zinc-400">{{ stream.title }}</div>
+                {% endif %}
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-semibold text-[#2596BE]">{{ stream.artist.name }}</p>
+                <h4 class="mt-1 line-clamp-1 font-semibold text-zinc-100">{{ stream.title }}</h4>
+                <p class="mt-1 text-xs text-zinc-400">{{ stream.display_status.label }} &middot; {{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
+                <p class="mt-1 text-xs text-zinc-500">{{ stream.access_price }} EUR</p>
+              </div>
+            </a>
+          {% empty %}
+            <p class="rounded border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-400">Nenhum espetáculo encontrado.</p>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <h3 class="mb-3 font-semibold">Artistas encontrados</h3>
+        <div class="space-y-3">
+          {% for artist in artists %}
+            <a href="{% url 'streams:artist_detail' artist.id %}" class="flex gap-3 rounded border border-zinc-800 bg-zinc-950 p-3 hover:border-[#5230EF]">
+              <div class="h-20 w-20 shrink-0 overflow-hidden rounded bg-zinc-900">
+                {% if artist.photo %}
+                  <img src="{{ artist.photo.url }}" alt="{{ artist.name }}" class="h-full w-full object-cover">
+                {% else %}
+                  <div class="flex h-full w-full items-center justify-center text-2xl font-semibold text-zinc-300">{{ artist.name|first }}</div>
+                {% endif %}
+              </div>
+              <div class="min-w-0">
+                <h4 class="line-clamp-1 font-semibold text-zinc-100">{{ artist.name }}</h4>
+                {% if artist.location %}<p class="mt-1 text-xs text-[#2596BE]">{{ artist.location }}</p>{% endif %}
+                <p class="mt-1 line-clamp-2 text-sm text-zinc-400">{{ artist.headline|default:artist.bio|default:"Perfil de artista StageHub" }}</p>
+              </div>
+            </a>
+          {% empty %}
+            <p class="rounded border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-400">Nenhum artista encontrado.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
   </section>
 {% endif %}
 

@@ -170,10 +170,12 @@ def artist_detail(request, artist_id):
     if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
         is_favorite = request.user.fan_profile.favorite_artists.filter(pk=artist.pk).exists()
     artist_url = artist_public_url(request, artist)
+    can_manage_current_artist = request.user.is_authenticated and can_manage_artist(request.user, artist)
 
     return render(request, 'streams/artist_detail.html', {
         'artist': artist,
         'artist_url': artist_url,
+        'can_manage_current_artist': can_manage_current_artist,
         'gallery_photos': artist.gallery_photos.all(),
         'featured_stream': upcoming_streams.first(),
         'is_favorite': is_favorite,
@@ -522,19 +524,29 @@ def stream_create(request):
         messages.error(request, 'Precisas de um artista ou equipa para criar espetÃ¡culos.')
         return redirect('streams:home')
 
+    selected_artist_id = request.GET.get('artist') or request.POST.get('artist')
+    selected_artist = None
+    if selected_artist_id:
+        selected_artist = get_object_or_404(artists, pk=selected_artist_id)
+
     if request.method == 'POST':
-        form = LiveStreamForm(request.POST, request.FILES)
-        artist = get_object_or_404(artists, pk=request.POST.get('artist'))
+        artist = selected_artist or get_object_or_404(artists, pk=request.POST.get('artist'))
+        form = LiveStreamForm(request.POST, request.FILES, artist=artist)
         if form.is_valid():
             live_stream = form.save(commit=False)
             live_stream.artist = artist
             live_stream.save()
             messages.success(request, 'EspetÃ¡culo criado com sucesso.')
             return redirect(f"{reverse('streams:dashboard')}?artist={artist.id}")
+        messages.error(request, 'Nao foi possivel criar o espetaculo. Confirma os campos assinalados.')
     else:
-        form = LiveStreamForm()
+        form = LiveStreamForm(artist=selected_artist)
 
-    return render(request, 'dashboard/stream_form.html', {'form': form, 'artists': artists})
+    return render(request, 'dashboard/stream_form.html', {
+        'artists': artists,
+        'form': form,
+        'selected_artist_id': selected_artist.id if selected_artist else None,
+    })
 
 
 @login_required
@@ -550,6 +562,7 @@ def stream_update(request, stream_id):
             form.save()
             messages.success(request, 'EspetÃ¡culo atualizado.')
             return redirect(f"{reverse('streams:dashboard')}?artist={stream.artist_id}")
+        messages.error(request, 'Nao foi possivel atualizar o espetaculo. Confirma os campos assinalados.')
     else:
         form = LiveStreamForm(instance=stream, artist=stream.artist)
     return render(request, 'dashboard/stream_form.html', {'form': form, 'stream': stream})
