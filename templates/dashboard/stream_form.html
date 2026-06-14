@@ -98,6 +98,15 @@
       {% for error in form.cloudflare_stream_id.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
     </label>
 
+    <label id="direct-upload-field" class="flex items-start gap-3 rounded border border-zinc-800 bg-zinc-950 p-3">
+      {{ form.create_upload_url }}
+      <span>
+        <span class="block font-semibold text-zinc-100">{{ form.create_upload_url.label }}</span>
+        <span class="mt-1 block text-sm text-zinc-500">{{ form.create_upload_url.help_text }}</span>
+        {% for error in form.create_upload_url.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </span>
+    </label>
+
     <div class="grid gap-4 md:grid-cols-3">
       <label>
         <span>{{ form.access_price.label }}</span>
@@ -151,6 +160,33 @@
       {% endif %}
     </div>
   </form>
+  {% if stream and stream.has_pending_direct_upload %}
+    <section class="mt-6 rounded-xl border border-[#5230EF] bg-[#5230EF]/15 p-5">
+      <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Upload do video</h2>
+          <p class="mt-1 text-sm text-zinc-300">Envia o ficheiro de video diretamente para Cloudflare Stream. Depois do envio, ativa o video quando estiver pronto para publicar.</p>
+          {% if stream.cloudflare_upload_expires_at %}
+            <p class="mt-2 text-xs text-zinc-400">Link valido ate {{ stream.cloudflare_upload_expires_at|date:"d/m/Y H:i" }}.</p>
+          {% endif %}
+        </div>
+        <span id="upload-state" class="sl-chip border-[#5230EF] text-[#2596BE]">A aguardar ficheiro</span>
+      </div>
+      <div class="mt-5 grid gap-3">
+        <input id="recorded-video-file" type="file" accept="video/*">
+        <div class="h-3 overflow-hidden rounded-full bg-zinc-900">
+          <div id="upload-progress" class="h-full w-0 bg-[#10B981] transition-all"></div>
+        </div>
+        <p id="upload-feedback" class="text-sm text-zinc-300"></p>
+        <button id="recorded-video-upload-button" type="button" class="sl-primary justify-self-start">Enviar video</button>
+      </div>
+    </section>
+  {% elif stream and stream.cloudflare_upload_status == stream.UPLOAD_UPLOADED %}
+    <section class="mt-6 rounded-xl border border-[#10B981] bg-[#10B981]/15 p-5">
+      <h2 class="text-lg font-semibold">Upload recebido</h2>
+      <p class="mt-1 text-sm text-zinc-300">O ficheiro foi enviado para Cloudflare. Quando o processamento terminar, usa "Ver sala" para testar e ativa o evento para publicar.</p>
+    </section>
+  {% endif %}
   {% if stream %}
     <form method="post" action="{% url 'streams:stream_delete' stream.id %}" class="mt-6 rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('Apagar este evento? Esta acao nao pode ser desfeita.');">
       {% csrf_token %}
@@ -166,6 +202,7 @@
   const accessPriceInput = document.querySelector('#id_access_price');
   const artistInput = document.querySelector('select[name="artist"]');
   const cloudflareStreamInput = document.querySelector('#id_cloudflare_stream_id');
+  const directUploadField = document.querySelector('#direct-upload-field');
   const youtubeLegacyField = document.querySelector('#youtube-legacy-field');
   const cloudflareHelp = document.querySelector('#cloudflare-stream-help');
   const liveHelp = 'Para eventos ao vivo. Cola o Live Input ID de Cloudflare Stream > Live Inputs.';
@@ -196,10 +233,17 @@
     youtubeLegacyField.classList.toggle('hidden', !show);
   }
 
+  function updateDirectUploadVisibility() {
+    if (!directUploadField) return;
+    const show = ['recorded', 'replay'].includes(eventTypeInput?.value);
+    directUploadField.classList.toggle('hidden', !show);
+  }
+
   function updateVideoFields() {
     updateCloudflareHelp();
     fillArtistLiveInput();
     updateYouTubeVisibility();
+    updateDirectUploadVisibility();
   }
 
   eventTypeInput?.addEventListener('change', updateVideoFields);
@@ -207,4 +251,68 @@
   artistInput?.addEventListener('change', updateVideoFields);
   updateVideoFields();
 </script>
+{% if stream and stream.has_pending_direct_upload %}
+  <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
+  <script>
+    const uploadButton = document.querySelector('#recorded-video-upload-button');
+    const uploadFileInput = document.querySelector('#recorded-video-file');
+    const uploadProgress = document.querySelector('#upload-progress');
+    const uploadFeedback = document.querySelector('#upload-feedback');
+    const uploadState = document.querySelector('#upload-state');
+
+    function setUploadFeedback(message) {
+      uploadFeedback.textContent = message;
+    }
+
+    uploadButton?.addEventListener('click', function() {
+      const file = uploadFileInput.files[0];
+      if (!file) {
+        setUploadFeedback('Escolhe primeiro um ficheiro de video.');
+        return;
+      }
+      if (!window.tus) {
+        setUploadFeedback('Nao foi possivel carregar o uploader. Recarrega a pagina e tenta novamente.');
+        return;
+      }
+
+      uploadButton.disabled = true;
+      uploadState.textContent = 'Upload em curso';
+      setUploadFeedback('A enviar...');
+
+      const upload = new tus.Upload(file, {
+        endpoint: '{{ stream.cloudflare_upload_url|escapejs }}',
+        chunkSize: 50 * 1024 * 1024,
+        retryDelays: [0, 1000, 3000, 5000],
+        metadata: {
+          filename: file.name,
+          filetype: file.type
+        },
+        onError: function(error) {
+          uploadButton.disabled = false;
+          uploadState.textContent = 'Erro no upload';
+          setUploadFeedback(error.message || 'Upload interrompido.');
+        },
+        onProgress: function(bytesUploaded, bytesTotal) {
+          const percentage = Math.round((bytesUploaded / bytesTotal) * 100);
+          uploadProgress.style.width = `${percentage}%`;
+          setUploadFeedback(`${percentage}% enviado`);
+        },
+        onSuccess: async function() {
+          uploadProgress.style.width = '100%';
+          uploadState.textContent = 'Upload recebido';
+          setUploadFeedback('Upload concluido. A guardar estado...');
+          await fetch('{% url "streams:stream_mark_upload_complete" stream.id %}', {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          });
+          window.location.reload();
+        }
+      });
+      upload.start();
+    });
+  </script>
+{% endif %}
 {% endblock %}

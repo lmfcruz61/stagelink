@@ -32,6 +32,11 @@ class LiveStreamForm(forms.ModelForm):
         required=False,
         help_text='Apenas para eventos antigos/testes. Nao usar para eventos pagos.',
     )
+    create_upload_url = forms.BooleanField(
+        label='Preparar upload de video para Cloudflare',
+        required=False,
+        help_text='Para video gravado/replay: cria um link seguro para enviar o ficheiro direto para Cloudflare.',
+    )
 
     class Meta:
         model = LiveStream
@@ -60,6 +65,10 @@ class LiveStreamForm(forms.ModelForm):
         self.artist = kwargs.pop('artist', None)
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
+            self.fields['create_upload_url'].initial = self.instance.has_pending_direct_upload
+        elif self.initial.get('event_type') in {LiveStream.RECORDED, LiveStream.REPLAY}:
+            self.fields['create_upload_url'].initial = True
+        if self.instance and self.instance.pk:
             event_type = self.instance.event_type
             if event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:
                 self.fields['cloudflare_stream_id'].initial = self.instance.cloudflare_live_input_uid
@@ -75,6 +84,7 @@ class LiveStreamForm(forms.ModelForm):
             'access_price',
             'cloudflare_playback_url',
             'cloudflare_stream_id',
+            'create_upload_url',
             'event_type',
             'video_provider',
             'youtube_video_id',
@@ -88,6 +98,7 @@ class LiveStreamForm(forms.ModelForm):
         cloudflare_stream_id = (cleaned_data.get('cloudflare_stream_id') or '').strip()
         cloudflare_playback_url = (cleaned_data.get('cloudflare_playback_url') or '').strip()
         youtube_video_id = (cleaned_data.get('youtube_video_id') or '').strip()
+        create_upload_url = cleaned_data.get('create_upload_url')
         if cloudflare_stream_id.lower().startswith(('rtmp://', 'rtmps://')):
             self.add_error(
                 'cloudflare_stream_id',
@@ -111,10 +122,11 @@ class LiveStreamForm(forms.ModelForm):
             return cleaned_data
 
         if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE:
-            if not cloudflare_stream_id and not cloudflare_playback_url:
+            accepts_direct_upload = event_type in {LiveStream.RECORDED, LiveStream.REPLAY} and create_upload_url
+            if not cloudflare_stream_id and not cloudflare_playback_url and not accepts_direct_upload:
                 self.add_error(
                     'cloudflare_stream_id',
-                    'Indica o ID do stream Cloudflare ou uma URL de embed Cloudflare.',
+                    'Indica o ID do stream Cloudflare, uma URL de embed Cloudflare ou prepara um upload direto.',
                 )
 
         access_price = cleaned_data.get('access_price')

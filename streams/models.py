@@ -31,6 +31,14 @@ class LiveStream(models.Model):
         (RECORDED, 'Vídeo gravado'),
         (REPLAY, 'Replay'),
     )
+    UPLOAD_NOT_REQUESTED = 'not_requested'
+    UPLOAD_PENDING = 'pending'
+    UPLOAD_UPLOADED = 'uploaded'
+    UPLOAD_STATUS_CHOICES = (
+        (UPLOAD_NOT_REQUESTED, 'Sem upload direto'),
+        (UPLOAD_PENDING, 'Upload pendente'),
+        (UPLOAD_UPLOADED, 'Upload enviado'),
+    )
 
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='streams')
     title = models.CharField(max_length=180)
@@ -40,6 +48,14 @@ class LiveStream(models.Model):
     cloudflare_video_uid = models.CharField(max_length=120, blank=True)
     cloudflare_live_input_uid = models.CharField(max_length=120, blank=True)
     cloudflare_playback_url = models.URLField(blank=True)
+    cloudflare_upload_url = models.URLField(max_length=1000, blank=True)
+    cloudflare_upload_expires_at = models.DateTimeField(blank=True, null=True)
+    cloudflare_upload_status = models.CharField(
+        max_length=20,
+        choices=UPLOAD_STATUS_CHOICES,
+        default=UPLOAD_NOT_REQUESTED,
+    )
+    uploaded_at = models.DateTimeField(blank=True, null=True)
     youtube_video_id = models.CharField(max_length=200, blank=True)
     event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default=LIVE)
     access_price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
@@ -159,6 +175,18 @@ class LiveStream(models.Model):
             self.VIDEO_PROVIDER_CLOUDFLARE,
             self.VIDEO_PROVIDER_CLOUDFLARE_WEBRTC,
         }
+
+    @property
+    def is_recorded_video(self):
+        return self.event_type == self.RECORDED
+
+    @property
+    def has_pending_direct_upload(self):
+        return (
+            self.is_recorded_video
+            and self.cloudflare_upload_status == self.UPLOAD_PENDING
+            and bool(self.cloudflare_upload_url)
+        )
 
     @property
     def cloudflare_identifier(self):

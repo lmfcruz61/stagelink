@@ -1,11 +1,16 @@
+from datetime import timezone as datetime_timezone
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.db.models import Case, IntegerField, Prefetch, Q, Sum, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+from django.views.decorators.http import require_POST
 
 from accounts.forms import (
     ArtistGalleryUploadForm,
@@ -19,7 +24,7 @@ from accounts.models import Artist, ArtistPhoto, Organization, OrganizationMembe
 from payments.models import StreamTicketPurchase, Subscription
 from payments.pricing import ticket_checkout_pricing
 
-from .cloudflare import CloudflareStreamError, create_live_input_for_artist
+from .cloudflare import CloudflareStreamError, create_direct_upload_for_stream, create_live_input_for_artist
 from .forms import LiveStreamForm
 from .models import LiveStream
 
@@ -173,15 +178,25 @@ def home(request):
 
 def artist_detail(request, artist_id):
     artist = get_object_or_404(Artist.objects.prefetch_related('gallery_photos'), pk=artist_id)
-    streams = artist.streams.all()
     now = timezone.now()
+    can_manage_current_artist = request.user.is_authenticated and can_manage_artist(request.user, artist)
+    streams = artist.streams.all()
+    if not can_manage_current_artist:
+        streams = streams.filter(Q(is_active=True) | Q(scheduled_at__gte=now))
     upcoming_streams = streams.filter(scheduled_at__gte=now).order_by('scheduled_at')
-    past_streams = streams.filter(scheduled_at__lt=now).order_by('-scheduled_at')
+    video_library_streams = streams.filter(
+        event_type__in=(LiveStream.RECORDED, LiveStream.REPLAY),
+        scheduled_at__lt=now,
+    ).order_by('-scheduled_at')
+    past_streams = streams.filter(
+        scheduled_at__lt=now,
+    ).exclude(
+        event_type__in=(LiveStream.RECORDED, LiveStream.REPLAY),
+    ).order_by('-scheduled_at')
     is_favorite = False
     if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
         is_favorite = request.user.fan_profile.favorite_artists.filter(pk=artist.pk).exists()
     artist_url = artist_public_url(request, artist)
-    can_manage_current_artist = request.user.is_authenticated and can_manage_artist(request.user, artist)
 
     return render(request, 'streams/artist_detail.html', {
         'artist': artist,
@@ -194,6 +209,7 @@ def artist_detail(request, artist_id):
         'share_text': f'Descobre {artist.name} na StageHub.',
         'share_url': artist_url,
         'upcoming_streams': upcoming_streams,
+        'video_library_streams': video_library_streams,
         'past_streams': past_streams,
     })
 
@@ -286,6 +302,25 @@ def can_access_dashboard(user):
     if Artist.objects.filter(user=user).exists():
         return True
     return OrganizationMember.objects.filter(user=user).exists()
+
+
+def prepare_cloudflare_direct_upload(stream):
+    upload = create_direct_upload_for_stream(stream)
+    stream.cloudflare_video_uid = upload['uid']
+    stream.cloudflare_live_input_uid = ''
+    stream.cloudflare_upload_url = upload['upload_url']
+    stream.cloudflare_upload_status = LiveStream.UPLOAD_PENDING
+    expires_at = parse_datetime(upload.get('expires') or '')
+    if expires_at and timezone.is_naive(expires_at):
+        expires_at = timezone.make_aware(expires_at, timezone=datetime_timezone.utc)
+    stream.cloudflare_upload_expires_at = expires_at
+    stream.save(update_fields=[
+        'cloudflare_video_uid',
+        'cloudflare_live_input_uid',
+        'cloudflare_upload_url',
+        'cloudflare_upload_status',
+        'cloudflare_upload_expires_at',
+    ])
 
 
 def can_manage_organizations(user):
@@ -547,11 +582,27 @@ def stream_create(request):
             live_stream = form.save(commit=False)
             live_stream.artist = artist
             live_stream.save()
+            if form.cleaned_data.get('create_upload_url') and live_stream.event_type in {LiveStream.RECORDED, LiveStream.REPLAY}:
+                try:
+                    prepare_cloudflare_direct_upload(live_stream)
+                    messages.success(request, 'Video criado. Envia agora o ficheiro para a Cloudflare.')
+                    return redirect('streams:stream_update', stream_id=live_stream.id)
+                except CloudflareStreamError as error:
+                    messages.error(request, str(error))
+                    return redirect('streams:stream_update', stream_id=live_stream.id)
             messages.success(request, 'Evento criado com sucesso.')
             return redirect(f"{reverse('streams:dashboard')}?artist={artist.id}")
         messages.error(request, 'Nao foi possivel criar o evento. Confirma os campos assinalados.')
     else:
-        form = LiveStreamForm(artist=selected_artist)
+        initial = {}
+        if request.GET.get('type') == 'recorded':
+            initial = {
+                'event_type': LiveStream.RECORDED,
+                'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+                'scheduled_at': timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M'),
+                'create_upload_url': True,
+            }
+        form = LiveStreamForm(artist=selected_artist, initial=initial)
 
     return render(request, 'dashboard/stream_form.html', {
         'artists': artists,
@@ -570,7 +621,19 @@ def stream_update(request, stream_id):
     if request.method == 'POST':
         form = LiveStreamForm(request.POST, request.FILES, instance=stream, artist=stream.artist)
         if form.is_valid():
-            form.save()
+            updated_stream = form.save()
+            if (
+                form.cleaned_data.get('create_upload_url')
+                and updated_stream.event_type in {LiveStream.RECORDED, LiveStream.REPLAY}
+                and not updated_stream.has_pending_direct_upload
+            ):
+                try:
+                    prepare_cloudflare_direct_upload(updated_stream)
+                    messages.success(request, 'Link de upload Cloudflare criado. Envia o ficheiro abaixo.')
+                    return redirect('streams:stream_update', stream_id=updated_stream.id)
+                except CloudflareStreamError as error:
+                    messages.error(request, str(error))
+                    return redirect('streams:stream_update', stream_id=updated_stream.id)
             messages.success(request, 'Evento atualizado.')
             return redirect(f"{reverse('streams:dashboard')}?artist={stream.artist_id}")
         messages.error(request, 'Nao foi possivel atualizar o evento. Confirma os campos assinalados.')
@@ -593,6 +656,21 @@ def stream_toggle_active(request, stream_id):
         else:
             messages.success(request, 'Stream desativado.')
     return redirect('streams:stream_update', stream_id=stream.id)
+
+
+@login_required
+@require_POST
+def stream_mark_upload_complete(request, stream_id):
+    stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
+    if not can_manage_artist(request.user, stream.artist):
+        return JsonResponse({'ok': False, 'error': 'permission_denied'}, status=403)
+    if not stream.is_recorded_video:
+        return JsonResponse({'ok': False, 'error': 'not_recorded_video'}, status=400)
+
+    stream.cloudflare_upload_status = LiveStream.UPLOAD_UPLOADED
+    stream.uploaded_at = timezone.now()
+    stream.save(update_fields=['cloudflare_upload_status', 'uploaded_at'])
+    return JsonResponse({'ok': True})
 
 
 @login_required

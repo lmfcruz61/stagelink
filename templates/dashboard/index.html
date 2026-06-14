@@ -16,6 +16,7 @@
     {% endif %}
     {% if artist %}
       <a class="sl-secondary" href="{% url 'streams:artist_profile_edit' %}?artist={{ artist.id }}">Editar pagina</a>
+      <a class="sl-secondary" href="{% url 'streams:stream_create' %}?artist={{ artist.id }}&type=recorded">Novo video</a>
       <a class="sl-primary" href="{% url 'streams:stream_create' %}">Novo evento</a>
     {% endif %}
   </div>
@@ -134,6 +135,9 @@
                 <p class="mt-1 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
                 <p class="mt-1 text-sm text-zinc-400">{{ stream.access_price }} EUR &middot; {% if stream.is_active %}ativo{% else %}inativo{% endif %}</p>
                 <p class="mt-1 text-xs text-zinc-500">{{ stream.display_status.text }}</p>
+                {% if stream.event_type == stream.RECORDED %}
+                  <p class="mt-1 text-xs text-zinc-500">Upload: {{ stream.get_cloudflare_upload_status_display }}</p>
+                {% endif %}
               </div>
             </div>
             <div class="flex flex-wrap gap-2">

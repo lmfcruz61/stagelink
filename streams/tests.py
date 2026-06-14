@@ -1,5 +1,7 @@
 from datetime import timedelta
 from decimal import Decimal
+import json
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.test import override_settings
@@ -10,6 +12,7 @@ from accounts.models import Artist, Fan
 from payments.models import StreamTicketPurchase
 
 from .forms import LiveStreamForm
+from .cloudflare import create_direct_upload_for_stream
 from .models import LiveStream
 
 
@@ -65,6 +68,27 @@ class LiveStreamFormTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         updated = form.save()
         self.assertEqual(updated.title, 'Nome novo')
+
+    def test_recorded_cloudflare_direct_upload_does_not_require_video_uid(self):
+        scheduled_at = timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M')
+        form = LiveStreamForm(
+            data={
+                'title': 'Video gravado',
+                'description': '',
+                'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+                'cloudflare_stream_id': '',
+                'cloudflare_playback_url': '',
+                'youtube_video_id': '',
+                'event_type': LiveStream.RECORDED,
+                'access_price': '5.00',
+                'scheduled_at': scheduled_at,
+                'duration_minutes': '60',
+                'create_upload_url': 'on',
+            },
+            artist=self.artist,
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
 
 
 class LiveStreamAccessAndEmbedTests(TestCase):
@@ -200,3 +224,60 @@ class LiveStreamAccessAndEmbedTests(TestCase):
 
         self.assertContains(response, 'Evento comprado passado')
         self.assertContains(response, 'Entrar na sala')
+
+    def test_pending_direct_upload_requires_recorded_video_and_upload_url(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Video por enviar',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_video_uid='video-uid-123',
+            cloudflare_upload_url='https://upload.videodelivery.net/tus/abc',
+            cloudflare_upload_status=LiveStream.UPLOAD_PENDING,
+            event_type=LiveStream.RECORDED,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.now(),
+        )
+
+        self.assertTrue(stream.has_pending_direct_upload)
+
+
+class CloudflareDirectUploadTests(TestCase):
+    def setUp(self):
+        self.artist_user = User.objects.create_user(username='artist3')
+        self.artist = Artist.objects.create(user=self.artist_user, name='Artista 3')
+        self.stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Video novo',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            event_type=LiveStream.RECORDED,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.now(),
+            duration_minutes=45,
+        )
+
+    @override_settings(CLOUDFLARE_ACCOUNT_ID='account', CLOUDFLARE_API_TOKEN='token')
+    @patch('streams.cloudflare.urlopen')
+    def test_create_direct_upload_for_stream_returns_uid_and_upload_url(self, mock_urlopen):
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, traceback):
+                return False
+
+            def read(self):
+                return json.dumps({
+                    'success': True,
+                    'result': {
+                        'uid': 'video-uid',
+                        'uploadURL': 'https://upload.videodelivery.net/tus/upload',
+                        'expires': '2026-06-14T20:00:00Z',
+                    },
+                }).encode('utf-8')
+
+        mock_urlopen.return_value = FakeResponse()
+
+        upload = create_direct_upload_for_stream(self.stream)
+
+        self.assertEqual(upload['uid'], 'video-uid')
+        self.assertEqual(upload['upload_url'], 'https://upload.videodelivery.net/tus/upload')
