@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Case, IntegerField, Prefetch, Q, Sum, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
+from django.templatetags.static import static
 from django.urls import reverse
 from django.utils import timezone
 
@@ -21,6 +22,55 @@ from payments.pricing import ticket_checkout_pricing
 from .cloudflare import CloudflareStreamError, create_live_input_for_artist
 from .forms import LiveStreamForm
 from .models import LiveStream
+
+
+def absolute_static(request, path):
+    return request.build_absolute_uri(static(path))
+
+
+def absolute_image_url(request, image):
+    if image:
+        return request.build_absolute_uri(image.url)
+    return absolute_static(request, 'img/stagehub-og-placeholder.svg')
+
+
+def event_public_url(request, stream):
+    return request.build_absolute_uri(reverse('streams:event_detail', args=[stream.id]))
+
+
+def event_og_context(request, stream, url=None):
+    event_url = url or event_public_url(request, stream)
+    price = f'{stream.access_price} EUR' if stream.access_price > 0 else 'Gratuito'
+    description = (
+        f'{stream.artist.name} apresenta {stream.title} em '
+        f'{timezone.localtime(stream.scheduled_at).strftime("%d/%m/%Y %H:%M")}. '
+        f'Preço: {price}.'
+    )
+    image = stream.cover_image or stream.artist.photo
+    return {
+        'description': description,
+        'image': absolute_image_url(request, image),
+        'title': f'{stream.title} - {stream.artist.name} | StageHub',
+        'type': 'website',
+        'url': event_url,
+    }
+
+
+def artist_public_url(request, artist):
+    return request.build_absolute_uri(reverse('streams:artist_detail', args=[artist.id]))
+
+
+def artist_og_context(request, artist, url=None):
+    artist_url = url or artist_public_url(request, artist)
+    description = artist.headline or artist.bio or f'Conhece {artist.name} na StageHub.'
+    image = artist.hero_image or artist.photo
+    return {
+        'description': description[:260],
+        'image': absolute_image_url(request, image),
+        'title': f'{artist.name} | StageHub',
+        'type': 'profile',
+        'url': artist_url,
+    }
 
 
 def home(request):
@@ -119,12 +169,17 @@ def artist_detail(request, artist_id):
     is_favorite = False
     if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
         is_favorite = request.user.fan_profile.favorite_artists.filter(pk=artist.pk).exists()
+    artist_url = artist_public_url(request, artist)
 
     return render(request, 'streams/artist_detail.html', {
         'artist': artist,
+        'artist_url': artist_url,
         'gallery_photos': artist.gallery_photos.all(),
         'featured_stream': upcoming_streams.first(),
         'is_favorite': is_favorite,
+        'og': artist_og_context(request, artist, artist_url),
+        'share_text': f'Descobre {artist.name} na StageHub.',
+        'share_url': artist_url,
         'upcoming_streams': upcoming_streams,
         'past_streams': past_streams,
     })
@@ -134,6 +189,7 @@ def stream_detail(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     now = timezone.now()
     event_path = reverse('streams:event_detail', args=[stream.id])
+    event_url = request.build_absolute_uri(event_path)
     access = None
     has_access = False
     ticket_pricing = None
@@ -147,10 +203,13 @@ def stream_detail(request, stream_id):
     return render(request, 'streams/event_detail.html', {
         'access': access,
         'event_path': event_path,
-        'event_url': request.build_absolute_uri(event_path),
+        'event_url': event_url,
         'has_access': has_access,
+        'og': event_og_context(request, stream, event_url),
         'scheduled_at_iso': stream.scheduled_at.isoformat(),
         'server_now_iso': now.isoformat(),
+        'share_text': f'Junta-te a mim em {stream.title} na StageHub.',
+        'share_url': event_url,
         'stream': stream,
         'ticket_pricing': ticket_pricing,
     })
@@ -236,10 +295,15 @@ def stream_room(request, stream_id):
         messages.warning(request, 'Precisas de bilhete, acesso gratuito ou arquivo recente por subscricao para entrar nesta sala.')
         return render(request, 'streams/access_required.html', {'stream': stream})
     now = timezone.now()
+    event_url = event_public_url(request, stream)
     return render(request, 'streams/room.html', {
+        'event_url': event_url,
         'is_stream_started': stream.scheduled_at <= now,
+        'og': event_og_context(request, stream, event_url),
         'scheduled_at_iso': stream.scheduled_at.isoformat(),
         'server_now_iso': now.isoformat(),
+        'share_text': f'Estou a ver {stream.title} na StageHub. Junta-te a mim.',
+        'share_url': event_url,
         'stream': stream,
         'video_locked': video_locked,
     })

@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% block title %}{{ stream.title }} - StageHub{% endblock %}
+{% block meta %}
+  {% include 'partials/og_tags.html' with og=og %}
+{% endblock %}
 {% block content %}
 <section class="grid gap-6 xl:grid-cols-[1fr_390px]">
   <div class="min-w-0">
@@ -42,6 +45,12 @@
       <div class="min-w-0">
         <a href="{% url 'streams:artist_detail' stream.artist.id %}" class="text-sm font-semibold text-[#2596BE] hover:text-[#2596BE]">{{ stream.artist.name }}</a>
         <h1 class="mt-2 text-3xl font-semibold tracking-tight">{{ stream.title }}</h1>
+        {% if is_stream_started %}
+          <div class="mt-4">
+            <p class="mb-2 text-sm text-zinc-400">Convida amigos para se juntarem a esta sala.</p>
+            {% include 'partials/share_buttons.html' with share_url=share_url share_text=share_text %}
+          </div>
+        {% endif %}
         <div class="mt-3 flex flex-wrap gap-2 text-sm text-zinc-300">
           <span id="state-chip" class="sl-chip border-[#5230EF] text-[#2596BE]">{{ stream.display_status.text }}</span>
           <span class="sl-chip"><span id="viewer-count">0</span> a ver</span>

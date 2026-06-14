@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Bilhete confirmado - StageHub{% endblock %}
+{% block meta %}
+  {% include 'partials/og_tags.html' with og=og %}
+{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <div class="sl-card p-6 md:p-8">
+    <p class="text-sm font-semibold text-[#2596BE]">{{ stream.artist.name }}</p>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight">Bilhete confirmado</h1>
+    <p class="mt-3 text-zinc-300">O teu acesso a <strong>{{ stream.title }}</strong> está pronto.</p>
+
+    <div class="mt-6 grid gap-3 rounded border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-300">
+      <div>
+        <span class="block text-zinc-500">Evento</span>
+        <span class="mt-1 block font-semibold text-zinc-100">{{ stream.title }}</span>
+      </div>
+      <div>
+        <span class="block text-zinc-500">Data e hora</span>
+        <span class="mt-1 block font-semibold text-zinc-100">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</span>
+      </div>
+      <div>
+        <span class="block text-zinc-500">Valor pago</span>
+        <span class="mt-1 block font-semibold text-zinc-100">{{ purchase_value }} EUR</span>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <p class="mb-3 text-sm text-zinc-400">Partilha com amigos:</p>
+      {% include 'partials/share_buttons.html' with share_url=share_url share_text=share_text %}
+    </div>
+
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a class="sl-primary" href="{% url 'streams:room' stream.id %}">Entrar na sala</a>
+      <a class="sl-secondary" href="{{ event_url }}">Ver página do evento</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_body %}
+  {% if facebook_pixel_id %}
+    <script>
+      if (window.fbq) {
+        fbq('track', 'Purchase', {
+          content_name: '{{ stream.title|escapejs }}',
+          content_type: 'event_ticket',
+          currency: 'EUR',
+          value: '{{ purchase_value|escapejs }}'
+        });
+      }
+    </script>
+  {% endif %}
+{% endblock %}

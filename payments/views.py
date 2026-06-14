@@ -9,6 +9,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import render
+from django.templatetags.static import static
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -30,6 +32,51 @@ def _absolute_url_with_query(request, name, query):
     query_string = urlencode(query)
     query_string = query_string.replace('%7BCHECKOUT_SESSION_ID%7D', '{CHECKOUT_SESSION_ID}')
     return f"{request.build_absolute_uri(reverse(name))}?{query_string}"
+
+
+def _absolute_static(request, path):
+    return request.build_absolute_uri(static(path))
+
+
+def _absolute_image_url(request, image):
+    if image:
+        return request.build_absolute_uri(image.url)
+    return _absolute_static(request, 'img/stagehub-og-placeholder.svg')
+
+
+def _event_public_url(request, stream):
+    return request.build_absolute_uri(reverse('streams:event_detail', args=[stream.id]))
+
+
+def _event_og_context(request, stream, url=None):
+    event_url = url or _event_public_url(request, stream)
+    price = f'{stream.access_price} EUR' if stream.access_price > 0 else 'Gratuito'
+    description = (
+        f'{stream.artist.name} apresenta {stream.title} em '
+        f'{timezone.localtime(stream.scheduled_at).strftime("%d/%m/%Y %H:%M")}. '
+        f'Preço: {price}.'
+    )
+    image = stream.cover_image or stream.artist.photo
+    return {
+        'description': description,
+        'image': _absolute_image_url(request, image),
+        'title': f'{stream.title} - {stream.artist.name} | StageHub',
+        'type': 'website',
+        'url': event_url,
+    }
+
+
+def _render_ticket_success(request, stream, metadata):
+    event_url = _event_public_url(request, stream)
+    purchase_value = metadata.get('final_price') or str(stream.access_price)
+    return render(request, 'payments/checkout_success.html', {
+        'event_url': event_url,
+        'og': _event_og_context(request, stream, event_url),
+        'purchase_value': purchase_value,
+        'share_text': f'Acabei de comprar bilhete para {stream.title}! Junta-te a mim no StageHub.',
+        'share_url': event_url,
+        'stream': stream,
+    })
 
 
 def _amount_to_cents(amount):
@@ -297,6 +344,8 @@ def checkout_success(request):
                     if checkout_type == 'ticket':
                         if completed:
                             messages.success(request, 'Bilhete confirmado. Ja podes entrar no espetaculo.')
+                            stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
+                            return _render_ticket_success(request, stream, pending_session.get('metadata', {}) or {})
                         else:
                             messages.warning(request, 'O pagamento ainda nao foi confirmado pelo Stripe.')
                         return redirect('streams:room', stream_id=stream_id)
@@ -314,6 +363,8 @@ def checkout_success(request):
         stream_id = metadata.get('stream_id')
         if completed:
             messages.success(request, 'Bilhete confirmado. Ja podes entrar no espetaculo.')
+            stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
+            return _render_ticket_success(request, stream, metadata)
         else:
             messages.warning(request, 'O pagamento ainda nao foi confirmado pelo Stripe.')
         return redirect('streams:room', stream_id=stream_id)

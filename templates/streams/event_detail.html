@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% block title %}{{ stream.title }} - StageHub{% endblock %}
+{% block meta %}
+  {% include 'partials/og_tags.html' with og=og %}
+{% endblock %}
 {% block content %}
 <section class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_420px] lg:items-start">
   <div class="space-y-5">
@@ -27,6 +30,9 @@
   <aside class="sl-card p-6 lg:sticky lg:top-28">
     <a href="{% url 'streams:artist_detail' stream.artist.id %}" class="text-sm font-semibold text-[#2596BE] hover:text-[#2596BE]">{{ stream.artist.name }}</a>
     <h1 class="mt-2 text-3xl font-semibold tracking-tight">{{ stream.title }}</h1>
+    <div class="mt-4">
+      {% include 'partials/share_buttons.html' with share_url=share_url share_text=share_text %}
+    </div>
 
     <div class="mt-5 grid gap-3 text-sm text-zinc-300">
       <div class="rounded border border-zinc-800 bg-zinc-950 p-3">
@@ -118,4 +124,19 @@
     copyEventFeedback.classList.remove('hidden');
   });
 </script>
+{% endblock %}
+
+{% block extra_body %}
+  {% if facebook_pixel_id %}
+    <script>
+      if (window.fbq) {
+        fbq('track', 'ViewContent', {
+          content_name: '{{ stream.title|escapejs }}',
+          content_type: 'event',
+          currency: 'EUR',
+          value: '{{ stream.access_price }}'
+        });
+      }
+    </script>
+  {% endif %}
 {% endblock %}

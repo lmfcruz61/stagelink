@@ -1,0 +1,50 @@
+<div class="stagehub-share flex flex-wrap items-center gap-2" data-share-text="{{ share_text|default:'' }}">
+  <a
+    class="sl-secondary px-3 py-2 text-sm"
+    href="https://www.facebook.com/sharer/sharer.php?u={{ share_url|urlencode }}"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Facebook
+  </a>
+  <button
+    type="button"
+    class="stagehub-share-copy sl-secondary px-3 py-2 text-sm"
+    data-copy-url="{{ share_url }}"
+  >
+    Instagram
+  </button>
+  <button
+    type="button"
+    class="stagehub-share-copy sl-secondary px-3 py-2 text-sm"
+    data-copy-url="{{ share_url }}"
+  >
+    TikTok
+  </button>
+  <span class="share-feedback text-sm font-semibold text-[#2596BE]" aria-live="polite">Link copiado!</span>
+</div>
+
+<script>
+  document.querySelectorAll('.stagehub-share').forEach(function(wrapper) {
+    if (wrapper.dataset.shareReady === 'true') return;
+    wrapper.dataset.shareReady = 'true';
+    const feedback = wrapper.querySelector('.share-feedback');
+    const shareText = wrapper.dataset.shareText || '';
+    wrapper.querySelectorAll('.stagehub-share-copy').forEach(function(button) {
+      button.addEventListener('click', async function() {
+        const copyUrl = button.dataset.copyUrl;
+        const value = shareText ? `${shareText} ${copyUrl}` : copyUrl;
+        try {
+          await navigator.clipboard.writeText(value);
+          feedback.textContent = 'Link copiado!';
+        } catch (error) {
+          feedback.textContent = value;
+        }
+        feedback.classList.add('is-visible');
+        window.setTimeout(function() {
+          feedback.classList.remove('is-visible');
+        }, 1800);
+      });
+    });
+  });
+</script>
