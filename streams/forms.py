@@ -12,7 +12,8 @@ class LiveStreamForm(forms.ModelForm):
     )
     scheduled_at = forms.DateTimeField(
         label='Data e hora',
-        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        input_formats=['%Y-%m-%dT%H:%M', '%Y-%m-%dT%H:%M:%S'],
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
     )
     cloudflare_stream_id = forms.CharField(
         label='ID do stream Cloudflare',
@@ -67,6 +68,19 @@ class LiveStreamForm(forms.ModelForm):
         elif self.artist and self.artist.cloudflare_live_input_uid:
             self.fields['cloudflare_stream_id'].initial = self.artist.cloudflare_live_input_uid
 
+    def should_validate_video_rules(self):
+        if not self.instance or not self.instance.pk:
+            return True
+        video_fields = {
+            'access_price',
+            'cloudflare_playback_url',
+            'cloudflare_stream_id',
+            'event_type',
+            'video_provider',
+            'youtube_video_id',
+        }
+        return bool(video_fields.intersection(self.changed_data))
+
     def clean(self):
         cleaned_data = super().clean()
         provider = cleaned_data.get('video_provider')
@@ -82,6 +96,9 @@ class LiveStreamForm(forms.ModelForm):
         ):
             cloudflare_stream_id = self.artist.cloudflare_live_input_uid
             cleaned_data['cloudflare_stream_id'] = cloudflare_stream_id
+
+        if not self.should_validate_video_rules():
+            return cleaned_data
 
         if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE:
             if not cloudflare_stream_id and not cloudflare_playback_url:
