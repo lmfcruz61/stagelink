@@ -97,7 +97,11 @@ class LiveStream(models.Model):
 
     @property
     def post_start_display_status(self):
-        if self.event_type == self.LIVE and self.is_active:
+        if self.event_type == self.LIVE:
+            if self.is_active:
+                return self._status_payload('live')
+            return self._status_payload('replay')
+        if self.event_type == self.PREMIERE and self.is_active:
             return self._status_payload('live')
         if self.event_type == self.PREMIERE:
             return self._status_payload('premiere')
@@ -158,6 +162,8 @@ class LiveStream(models.Model):
 
     @property
     def cloudflare_identifier(self):
+        if self.event_type in {self.LIVE, self.PREMIERE}:
+            return (self.cloudflare_live_input_uid or self.cloudflare_video_uid).strip()
         return (self.cloudflare_video_uid or self.cloudflare_live_input_uid).strip()
 
     @property

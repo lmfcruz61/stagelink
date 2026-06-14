@@ -104,6 +104,24 @@ class LiveStreamAccessAndEmbedTests(TestCase):
             'https://customer-test.cloudflarestream.com/live-input-123/iframe?autoplay=true&lowLatency=true&preload=true',
         )
 
+    @override_settings(CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN='customer-test')
+    def test_live_cloudflare_embed_prefers_live_input_uid(self):
+        stream = self.create_paid_stream()
+        stream.cloudflare_video_uid = 'old-video-uid'
+        stream.cloudflare_live_input_uid = 'current-live-input'
+
+        self.assertEqual(
+            stream.cloudflare_embed_url,
+            'https://customer-test.cloudflarestream.com/current-live-input/iframe?autoplay=true&lowLatency=true&preload=true',
+        )
+
+    def test_active_premiere_after_start_is_shown_as_live(self):
+        stream = self.create_paid_stream()
+        stream.event_type = LiveStream.PREMIERE
+        stream.is_active = True
+
+        self.assertEqual(stream.display_status['code'], 'live')
+
     def test_paid_ticket_allows_entry_after_scheduled_time(self):
         stream = self.create_paid_stream()
         StreamTicketPurchase.objects.create(
