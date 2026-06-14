@@ -199,10 +199,9 @@
     playerContainer.appendChild(iframe);
     player = iframe;
     playerLoadTimer = setTimeout(function() {
-      if (!playerReady) {
-        showVideoStatus(videoSlowMessage);
-      }
-    }, 20000);
+      playerReady = true;
+      hideVideoStatus();
+    }, 1500);
   }
 
   function buildYouTubePlayer() {
