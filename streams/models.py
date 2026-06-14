@@ -163,19 +163,55 @@ class LiveStream(models.Model):
     @property
     def cloudflare_identifier(self):
         if self.event_type in {self.LIVE, self.PREMIERE}:
-            return (self.cloudflare_live_input_uid or self.cloudflare_video_uid).strip()
-        return (self.cloudflare_video_uid or self.cloudflare_live_input_uid).strip()
+            value = self.cloudflare_live_input_uid or self.cloudflare_video_uid
+        else:
+            value = self.cloudflare_video_uid or self.cloudflare_live_input_uid
+        return self.extract_cloudflare_identifier(value)
 
     @property
     def cloudflare_embed_url(self):
         params = 'autoplay=true&lowLatency=true&preload=true'
         if self.cloudflare_playback_url:
-            base = self.cloudflare_playback_url.rstrip('?&')
-            separator = '&' if '?' in base else '?'
-            return f'{base}{separator}{params}'
+            normalized_url = self.normalize_cloudflare_embed_url(self.cloudflare_playback_url, params)
+            if normalized_url:
+                return normalized_url
+            return self.add_cloudflare_player_params(self.cloudflare_playback_url, params)
         host = self.cloudflare_stream_host
         identifier = self.cloudflare_identifier
         if not host or not identifier:
+            return ''
+        return f'https://{host}/{identifier}/iframe?{params}'
+
+    @classmethod
+    def extract_cloudflare_identifier(cls, value):
+        value = (value or '').strip()
+        if not value:
+            return ''
+        parsed = urlparse(value if '://' in value else f'https://{value}')
+        if parsed.scheme in {'rtmp', 'rtmps'}:
+            return ''
+        parts = [part for part in parsed.path.split('/') if part]
+        if parsed.netloc and parts:
+            return parts[0]
+        return value
+
+    @classmethod
+    def add_cloudflare_player_params(cls, url, params):
+        base = (url or '').strip().rstrip('?&')
+        separator = '&' if '?' in base else '?'
+        return f'{base}{separator}{params}'
+
+    @classmethod
+    def normalize_cloudflare_embed_url(cls, value, params):
+        value = (value or '').strip()
+        if not value:
+            return ''
+        parsed = urlparse(value if '://' in value else f'https://{value}')
+        host = (parsed.netloc or '').strip()
+        if not host or 'cloudflarestream.com' not in host:
+            return ''
+        identifier = cls.extract_cloudflare_identifier(value)
+        if not identifier:
             return ''
         return f'https://{host}/{identifier}/iframe?{params}'
 

@@ -211,7 +211,7 @@ def buy_ticket(request, stream_id):
         if pending_session:
             checkout_type, completed = _complete_checkout_session(pending_session)
             if checkout_type == 'ticket' and completed:
-                messages.success(request, 'Bilhete confirmado. Ja podes entrar no espetaculo.')
+                messages.success(request, 'Bilhete confirmado. Ja podes entrar no evento.')
                 return redirect('streams:room', stream_id=stream.id)
 
     pricing = ticket_checkout_pricing(stream, fan)
@@ -260,7 +260,7 @@ def buy_ticket(request, stream_id):
 def create_tip(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     if stream.access_price <= 0:
-        messages.error(request, 'Espetaculos gratuitos nao recebem gorjetas na plataforma.')
+        messages.error(request, 'Eventos gratuitos nao recebem gorjetas na plataforma.')
         return redirect('streams:room', stream_id=stream.id)
 
     fan = getattr(request.user, 'fan_profile', None)
@@ -343,7 +343,7 @@ def checkout_success(request):
                     checkout_type, completed = _complete_checkout_session(pending_session)
                     if checkout_type == 'ticket':
                         if completed:
-                            messages.success(request, 'Bilhete confirmado. Ja podes entrar no espetaculo.')
+                            messages.success(request, 'Bilhete confirmado. Ja podes entrar no evento.')
                             stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
                             return _render_ticket_success(request, stream, pending_session.get('metadata', {}) or {})
                         else:
@@ -362,7 +362,7 @@ def checkout_success(request):
     if checkout_type == 'ticket':
         stream_id = metadata.get('stream_id')
         if completed:
-            messages.success(request, 'Bilhete confirmado. Ja podes entrar no espetaculo.')
+            messages.success(request, 'Bilhete confirmado. Ja podes entrar no evento.')
             stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
             return _render_ticket_success(request, stream, metadata)
         else:

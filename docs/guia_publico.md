@@ -6,7 +6,7 @@ Este guia explica como apoiar artistas, comprar bilhetes e usar subscrições na
 
 Podes apoiar cada artista de forma independente:
 
-- comprando bilhetes para espetáculos pagos;
+- comprando bilhetes para eventos pagos;
 - subscrevendo mensalmente esse artista;
 - enviando gorjetas quando a sala permitir.
 
@@ -35,7 +35,7 @@ Não inclui entrada gratuita em lives pagas.
 
 ## Compra de bilhetes
 
-Quando um espetáculo é pago, tens de comprar um bilhete para assistir ao vídeo da live. Se fores Subscritor Pro desse artista, o desconto de 50% aparece automaticamente antes do pagamento no Stripe.
+Quando um evento é pago, tens de comprar um bilhete para assistir ao vídeo da live. Se fores Subscritor Pro desse artista, o desconto de 50% aparece automaticamente antes do pagamento no Stripe.
 
 Depois do pagamento confirmado, a sala fica disponível na tua conta.
 

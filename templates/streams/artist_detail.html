@@ -47,11 +47,11 @@
           <a class="sl-primary" href="#subscricoes">Subscrever</a>
         {% endif %}
         {% if featured_stream %}
-          <a class="sl-secondary bg-zinc-950/80" href="{% url 'streams:event_detail' featured_stream.id %}">Proximo espetáculo</a>
+          <a class="sl-secondary bg-zinc-950/80" href="{% url 'streams:event_detail' featured_stream.id %}">Proximo evento</a>
         {% endif %}
         {% if can_manage_current_artist %}
           <a class="sl-secondary bg-zinc-950/80" href="{% url 'streams:artist_profile_edit' %}?artist={{ artist.id }}">Editar pagina</a>
-          <a class="sl-primary" href="{% url 'streams:stream_create' %}?artist={{ artist.id }}">Novo espetaculo</a>
+          <a class="sl-primary" href="{% url 'streams:stream_create' %}?artist={{ artist.id }}">Novo evento</a>
         {% endif %}
       </div>
     </div>
@@ -85,7 +85,7 @@
               <a class="sl-primary" href="{% url 'streams:event_detail' featured_stream.id %}">Ver evento</a>
             {% endif %}
             {% if can_manage_current_artist %}
-              <a class="sl-secondary" href="{% url 'streams:stream_update' featured_stream.id %}">Editar espetaculo</a>
+              <a class="sl-secondary" href="{% url 'streams:stream_update' featured_stream.id %}">Editar evento</a>
             {% endif %}
           </div>
         </div>
@@ -130,7 +130,7 @@
 
 <section class="mb-10">
   <div class="mb-4 flex items-center justify-between">
-    <h2 class="text-2xl font-semibold">Espetáculos agendados</h2>
+    <h2 class="text-2xl font-semibold">Eventos agendados</h2>
   </div>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for stream in upcoming_streams %}
@@ -147,12 +147,12 @@
           <h3 class="font-semibold">{{ stream.title }}</h3>
           <p class="mt-1 text-sm text-zinc-400">{{ stream.display_status.label }} &middot; {{ stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ stream.access_price }} EUR</p>
           {% if can_manage_current_artist %}
-            <span class="mt-3 inline-flex rounded-full border border-[#5230EF] px-3 py-2 text-sm font-semibold text-zinc-100">Editar espetaculo</span>
+            <span class="mt-3 inline-flex rounded-full border border-[#5230EF] px-3 py-2 text-sm font-semibold text-zinc-100">Editar evento</span>
           {% endif %}
         </div>
       </a>
     {% empty %}
-      <p class="text-zinc-400">Sem espetáculos agendados.</p>
+      <p class="text-zinc-400">Sem eventos agendados.</p>
     {% endfor %}
   </div>
 </section>
@@ -174,7 +174,7 @@
 {% endif %}
 
 <section>
-  <h2 class="mb-4 text-2xl font-semibold">Arquivo de espetáculos</h2>
+  <h2 class="mb-4 text-2xl font-semibold">Arquivo de eventos</h2>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for stream in past_streams %}
       <a class="sl-video-card opacity-80 hover:opacity-100" href="{% if can_manage_current_artist %}{% url 'streams:stream_update' stream.id %}{% else %}{% url 'streams:event_detail' stream.id %}{% endif %}">
@@ -190,12 +190,12 @@
           <h3 class="font-semibold">{{ stream.title }}</h3>
           <p class="mt-1 text-sm text-zinc-400">{{ stream.display_status.label }} &middot; {{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
           {% if can_manage_current_artist %}
-            <span class="mt-3 inline-flex rounded-full border border-[#5230EF] px-3 py-2 text-sm font-semibold text-zinc-100">Editar espetaculo</span>
+            <span class="mt-3 inline-flex rounded-full border border-[#5230EF] px-3 py-2 text-sm font-semibold text-zinc-100">Editar evento</span>
           {% endif %}
         </div>
       </a>
     {% empty %}
-      <p class="text-zinc-400">Ainda nao ha espetáculos no arquivo.</p>
+      <p class="text-zinc-400">Ainda nao ha eventos no arquivo.</p>
     {% endfor %}
   </div>
 </section>

@@ -1,6 +1,6 @@
 # StageHub - Guia OBS para transmitir ao vivo
 
-Este guia serve para artistas, managers ou equipa tecnica transmitirem um espetaculo ao vivo para o StageHub usando OBS e Cloudflare Stream.
+Este guia serve para artistas, managers ou equipa tecnica transmitirem um evento ao vivo para o StageHub usando OBS e Cloudflare Stream.
 
 ## 1. O que precisas antes de abrir o OBS
 
@@ -11,12 +11,12 @@ Este guia serve para artistas, managers ou equipa tecnica transmitirem um espeta
    - `Stream Key`;
    - `Live Input UID`.
 4. O perfil do artista no StageHub com o `Live Input UID` guardado pela plataforma.
-5. Um espetaculo criado no StageHub com:
+5. Um evento criado no StageHub com:
    - plataforma de video `Cloudflare Stream`;
    - tipo de conteudo `Ao vivo`;
    - `ID do stream Cloudflare` preenchido automaticamente a partir do perfil do artista, ou confirmado manualmente;
    - data/hora correta;
-   - espetaculo ativo.
+   - evento ativo.
 6. Uma ligacao de internet estavel. Sempre que possivel, usar cabo de rede em vez de Wi-Fi.
 
 ## 2. Configurar a transmissao no OBS
@@ -112,7 +112,7 @@ Estas definicoes reduzem erros de encoder e ajudam em computadores menos potente
 6. Confirmar que existe `Encoding video bitrate`.
 7. Confirmar que existe `Encoding audio bitrate`.
 8. Esperar alguns segundos.
-9. Abrir a sala do espetaculo no StageHub.
+9. Abrir a sala do evento no StageHub.
 10. Confirmar que o player Cloudflare aparece.
 
 Valores esperados para teste:

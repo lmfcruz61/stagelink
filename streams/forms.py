@@ -6,7 +6,7 @@ from .models import LiveStream
 
 class LiveStreamForm(forms.ModelForm):
     cover_image = forms.ImageField(
-        label='Foto de capa do espetaculo',
+        label='Foto de capa do evento',
         required=False,
         help_text='Recomendado: imagem horizontal 16:9, pelo menos 1280x720 px, em JPG ou PNG.',
     )
@@ -88,6 +88,16 @@ class LiveStreamForm(forms.ModelForm):
         cloudflare_stream_id = (cleaned_data.get('cloudflare_stream_id') or '').strip()
         cloudflare_playback_url = (cleaned_data.get('cloudflare_playback_url') or '').strip()
         youtube_video_id = (cleaned_data.get('youtube_video_id') or '').strip()
+        if cloudflare_stream_id.lower().startswith(('rtmp://', 'rtmps://')):
+            self.add_error(
+                'cloudflare_stream_id',
+                'Este campo deve ter o Live Input ID/Video UID, nao o RTMPS URL. O RTMPS URL vai apenas no OBS.',
+            )
+        else:
+            normalized_cloudflare_stream_id = LiveStream.extract_cloudflare_identifier(cloudflare_stream_id)
+            if normalized_cloudflare_stream_id:
+                cloudflare_stream_id = normalized_cloudflare_stream_id
+                cleaned_data['cloudflare_stream_id'] = cloudflare_stream_id
         if (
             not cloudflare_stream_id
             and self.artist
@@ -113,17 +123,17 @@ class LiveStreamForm(forms.ModelForm):
                 if provider != LiveStream.VIDEO_PROVIDER_YOUTUBE:
                     self.add_error(
                         'video_provider',
-                        'Espetaculos gratuitos devem usar YouTube legado. Cloudflare fica reservado para eventos pagos.',
+                        'Eventos gratuitos devem usar YouTube legado. Cloudflare fica reservado para eventos pagos.',
                     )
                 if event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:
                     self.add_error(
                         'event_type',
-                        'Espetaculos gratuitos devem ser video gravado ou replay no YouTube.',
+                        'Eventos gratuitos devem ser video gravado ou replay no YouTube.',
                     )
             elif provider == LiveStream.VIDEO_PROVIDER_YOUTUBE:
                 self.add_error(
                     'video_provider',
-                    'Espetaculos pagos devem usar Cloudflare Stream.',
+                    'Eventos pagos devem usar Cloudflare Stream.',
                 )
 
         if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE_WEBRTC and not cloudflare_playback_url:
@@ -139,7 +149,7 @@ class LiveStreamForm(forms.ModelForm):
 
     def save(self, commit=True):
         live_stream = super().save(commit=False)
-        cloudflare_stream_id = (self.cleaned_data.get('cloudflare_stream_id') or '').strip()
+        cloudflare_stream_id = LiveStream.extract_cloudflare_identifier(self.cleaned_data.get('cloudflare_stream_id'))
         if live_stream.event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:
             live_stream.cloudflare_live_input_uid = cloudflare_stream_id
             live_stream.cloudflare_video_uid = ''

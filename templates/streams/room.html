@@ -8,7 +8,7 @@
 <section class="grid gap-6 xl:grid-cols-[1fr_390px]">
   <div class="min-w-0">
     <div class="overflow-hidden rounded-xl border border-zinc-800 bg-black shadow-2xl shadow-black/40">
-      <div class="aspect-video">
+      <div class="relative aspect-video">
         <div id="countdown-panel" class="{% if is_stream_started %}hidden {% endif %}flex h-full w-full flex-col items-center justify-center gap-4 p-6 text-center">
           <p class="rounded-full border border-zinc-700 bg-zinc-950/80 px-3 py-1 text-sm font-semibold text-zinc-100">&#128197; Agendado</p>
           <div>
@@ -18,12 +18,12 @@
           <p class="max-w-xl text-sm text-zinc-400">Quando chegar a hora marcada, o video tenta carregar automaticamente. O chat continua disponivel enquanto esperas.</p>
         </div>
 
-        <div id="player-panel" class="{% if not is_stream_started %}hidden {% endif %}relative h-full w-full">
+        <div id="player-panel" class="{% if not is_stream_started %}hidden {% endif %}absolute inset-0 h-full w-full">
           <div id="player" class="h-full w-full">
             {% if video_locked %}
               <div class="flex h-full w-full flex-col items-center justify-center gap-3 bg-zinc-950 p-6 text-center">
                 <p class="text-2xl font-semibold">Bilhete necessário para ver o vídeo</p>
-                <p class="max-w-lg text-sm text-zinc-400">A tua subscrição permite participar no chat desta live. Para assistir ao espetáculo, compra o bilhete.</p>
+                <p class="max-w-lg text-sm text-zinc-400">A tua subscrição permite participar no chat desta live. Para assistir ao evento, compra o bilhete.</p>
                 <a class="sl-primary mt-2" href="{% url 'payments:buy_ticket' stream.id %}">Comprar bilhete</a>
               </div>
             {% endif %}
@@ -181,12 +181,12 @@
 
   function buildCloudflarePlayer() {
     if (!cloudflareEmbedUrl) {
-      showVideoStatus('Este espetaculo ainda nao tem URL/UID Cloudflare configurado.');
+      showVideoStatus('Este evento ainda nao tem URL/UID Cloudflare configurado.');
       return;
     }
     const iframe = document.createElement('iframe');
     iframe.src = cloudflareEmbedUrl;
-    iframe.className = 'h-full w-full';
+    iframe.className = 'block h-full w-full border-0';
     iframe.allow = 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;';
     iframe.allowFullscreen = true;
     iframe.setAttribute('title', '{{ stream.title|escapejs }}');

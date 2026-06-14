@@ -96,7 +96,7 @@ class ArtistProfileForm(forms.ModelForm):
             'cloudflare_live_input_uid': 'Live Input UID Cloudflare',
         }
         help_texts = {
-            'cloudflare_live_input_uid': 'Opcional. A StageHub cria um Live Input por artista na conta Cloudflare da plataforma e reutiliza-o nos espetaculos pagos ao vivo.',
+            'cloudflare_live_input_uid': 'Opcional. A StageHub cria um Live Input por artista na conta Cloudflare da plataforma e reutiliza-o nos eventos pagos ao vivo.',
         }
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 6}),

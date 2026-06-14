@@ -115,6 +115,46 @@ class LiveStreamAccessAndEmbedTests(TestCase):
             'https://customer-test.cloudflarestream.com/current-live-input/iframe?autoplay=true&lowLatency=true&preload=true',
         )
 
+    @override_settings(CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN='customer-test')
+    def test_cloudflare_embed_url_extracts_uid_from_manifest_url(self):
+        stream = self.create_paid_stream()
+        stream.cloudflare_live_input_uid = 'https://customer-test.cloudflarestream.com/live-input-123/manifest/video.m3u8'
+
+        self.assertEqual(
+            stream.cloudflare_embed_url,
+            'https://customer-test.cloudflarestream.com/live-input-123/iframe?autoplay=true&lowLatency=true&preload=true',
+        )
+
+    def test_cloudflare_embed_url_normalizes_advanced_iframe_url(self):
+        stream = self.create_paid_stream()
+        stream.cloudflare_playback_url = 'https://customer-test.cloudflarestream.com/live-input-123/iframe'
+
+        self.assertEqual(
+            stream.cloudflare_embed_url,
+            'https://customer-test.cloudflarestream.com/live-input-123/iframe?autoplay=true&lowLatency=true&preload=true',
+        )
+
+    def test_cloudflare_stream_id_rejects_rtmps_url(self):
+        scheduled_at = timezone.localtime(timezone.now() + timedelta(days=1)).strftime('%Y-%m-%dT%H:%M')
+        form = LiveStreamForm(
+            data={
+                'title': 'Live paga',
+                'description': '',
+                'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+                'cloudflare_stream_id': 'rtmps://live.cloudflare.com/live/',
+                'cloudflare_playback_url': '',
+                'youtube_video_id': '',
+                'event_type': LiveStream.LIVE,
+                'access_price': '5.00',
+                'scheduled_at': scheduled_at,
+                'duration_minutes': '',
+            },
+            artist=self.artist,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('cloudflare_stream_id', form.errors)
+
     def test_active_premiere_after_start_is_shown_as_live(self):
         stream = self.create_paid_stream()
         stream.event_type = LiveStream.PREMIERE
@@ -135,3 +175,28 @@ class LiveStreamAccessAndEmbedTests(TestCase):
 
         self.assertTrue(decision['allowed'])
         self.assertEqual(decision['reason'], 'paid_ticket')
+
+    def test_home_shows_purchased_past_inactive_event_to_buyer(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Evento comprado passado',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_live_input_uid='live-input-123',
+            event_type=LiveStream.LIVE,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.now() - timedelta(minutes=10),
+            duration_minutes=5,
+            is_active=False,
+        )
+        StreamTicketPurchase.objects.create(
+            fan=self.fan,
+            stream=stream,
+            stripe_session_id='cs_test_paid_past',
+            paid=True,
+        )
+
+        self.client.force_login(self.fan_user)
+        response = self.client.get('/')
+
+        self.assertContains(response, 'Evento comprado passado')
+        self.assertContains(response, 'Entrar na sala')

@@ -41,7 +41,7 @@ Nenhum escalão dá entrada gratuita em lives pagas. Nenhum escalão dá acesso 
 ## Fluxo de live paga
 
 1. A equipa cria ou seleciona o artista.
-2. Cria o espetáculo com título, capa, descrição, data, preço e tipo de conteúdo.
+2. Cria o evento com título, capa, descrição, data, preço e tipo de conteúdo.
 3. Configura o vídeo no sistema recomendado pela StageHub.
 4. Testa a sala antes de divulgar.
 5. Partilha o link público do evento.
@@ -74,4 +74,4 @@ A equipa deve validar:
 - qualidade da transmissão;
 - dados do evento;
 - política de reembolsos;
-- comunicação com o público antes e depois do espetáculo.
+- comunicação com o público antes e depois do evento.

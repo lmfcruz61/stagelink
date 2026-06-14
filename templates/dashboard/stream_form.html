@@ -1,23 +1,23 @@
 {% extends 'base.html' %}
-{% block title %}Espetaculo - StageHub{% endblock %}
+{% block title %}Evento - StageHub{% endblock %}
 {% block content %}
 <section class="mx-auto max-w-3xl">
-  <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar espetaculo{% else %}Novo espetaculo{% endif %}</h1>
+  <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar evento{% else %}Novo evento{% endif %}</h1>
   <div class="mb-5 rounded border border-[#5230EF] bg-[#5230EF]/15 p-4 text-sm text-zinc-200">
     Eventos pagos usam Cloudflare Stream e podem receber gorjetas. Eventos gratuitos usam YouTube legado, sem gorjetas. A conta Cloudflare e os custos pertencem a StageHub, nao ao artista.
   </div>
 
   <details class="mb-5 rounded-xl border border-zinc-800 bg-zinc-900/90 p-5" open>
-    <summary class="cursor-pointer text-lg font-semibold text-zinc-100">Guia passo a passo para criar o espetáculo</summary>
+    <summary class="cursor-pointer text-lg font-semibold text-zinc-100">Guia passo a passo para criar o evento</summary>
     <ol class="mt-4 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Prepara o Cloudflare uma vez.</strong><br>No perfil do artista, cria um Live Input na conta StageHub. O artista nao paga Cloudflare.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>2. Configura o OBS.</strong><br>Cola o RTMPS URL no servidor e a Stream Key na chave de transmissão.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Define o tipo.</strong><br>Pagos podem ser Cloudflare ao vivo/estreia/replay. Gratuitos ficam em YouTube gravado/replay e nao têm gorjetas.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Confirma o ID certo.</strong><br>Ao vivo/estreia podem usar o Live Input UID guardado no artista. Vídeo gravado/replay usam Video UID.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>5. Agenda e guarda.</strong><br>Define data, preço, duração estimada e capa 16:9. Guarda o espetáculo ainda inativo.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>5. Agenda e guarda.</strong><br>Define data, preço, duração estimada e capa 16:9. Guarda o evento ainda inativo.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>6. Testa antes de divulgar.</strong><br>Entra na sala como artista/admin, confirma player, áudio, chat, contador e pagamento.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>7. Ativa o stream.</strong><br>Quando estiver tudo pronto, usa o botão verde `Ativar stream` nesta página.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>8. Partilha o evento.</strong><br>No dashboard, usa `Copiar link` para divulgar a página pública do espetáculo.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>8. Partilha o evento.</strong><br>No dashboard, usa `Copiar link` para divulgar a página pública do evento.</li>
     </ol>
   </details>
 
@@ -152,10 +152,10 @@
     </div>
   </form>
   {% if stream %}
-    <form method="post" action="{% url 'streams:stream_delete' stream.id %}" class="mt-6 rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('Apagar este espetaculo? Esta acao nao pode ser desfeita.');">
+    <form method="post" action="{% url 'streams:stream_delete' stream.id %}" class="mt-6 rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('Apagar este evento? Esta acao nao pode ser desfeita.');">
       {% csrf_token %}
-      <h2 class="text-lg font-semibold text-red-200">Apagar espetaculo</h2>
-      <p class="mt-2 text-sm text-red-100/80">Remove este espetaculo, incluindo mensagens de chat associadas a ele.</p>
+      <h2 class="text-lg font-semibold text-red-200">Apagar evento</h2>
+      <p class="mt-2 text-sm text-red-100/80">Remove este evento, incluindo mensagens de chat associadas a ele.</p>
       <button class="mt-4 rounded-full border border-red-700 bg-red-950/60 px-4 py-3 font-semibold text-red-100 hover:border-red-500">Apagar definitivamente</button>
     </form>
   {% endif %}

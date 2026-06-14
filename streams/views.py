@@ -1,4 +1,4 @@
-﻿from django.contrib import messages
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Case, IntegerField, Prefetch, Q, Sum, Value, When
@@ -16,7 +16,7 @@ from accounts.forms import (
     OrganizationMemberForm,
 )
 from accounts.models import Artist, ArtistPhoto, Organization, OrganizationMember
-from payments.models import Subscription
+from payments.models import StreamTicketPurchase, Subscription
 from payments.pricing import ticket_checkout_pricing
 
 from .cloudflare import CloudflareStreamError, create_live_input_for_artist
@@ -87,6 +87,16 @@ def home(request):
         messages.warning(request, 'Nao foi possivel subscrever a newsletter. Confirma os dados abaixo.')
 
     visible_streams_filter = Q(is_active=True) | Q(scheduled_at__gte=now)
+    purchased_stream_ids = set()
+    if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
+        purchased_stream_ids = set(
+            StreamTicketPurchase.objects.filter(
+                fan=request.user.fan_profile,
+                paid=True,
+            ).values_list('stream_id', flat=True),
+        )
+        if purchased_stream_ids:
+            visible_streams_filter |= Q(id__in=purchased_stream_ids)
     visible_artist_streams = Prefetch(
         'streams',
         queryset=LiveStream.objects.filter(visible_streams_filter).order_by('-is_active', 'scheduled_at'),
@@ -156,6 +166,7 @@ def home(request):
         'favorite_artists': favorite_artists,
         'favorite_artist_ids': favorite_artist_ids,
         'newsletter_form': newsletter_form,
+        'purchased_stream_ids': purchased_stream_ids,
         'search_query': query,
     })
 
@@ -224,7 +235,7 @@ def favorite_artist_toggle(request, artist_id):
 
     fan = getattr(request.user, 'fan_profile', None)
     if not fan:
-        messages.error(request, 'Apenas contas de pÃºblico podem guardar artistas favoritos.')
+        messages.error(request, 'Apenas contas de público podem guardar artistas favoritos.')
         return redirect('streams:artist_detail', artist_id=artist_id)
 
     artist = get_object_or_404(Artist, pk=artist_id)
@@ -314,7 +325,7 @@ def stream_room(request, stream_id):
 @login_required
 def dashboard(request):
     if not can_access_dashboard(request.user):
-        messages.info(request, 'A tua conta de pÃºblico nao tem dashboard de gestao. Usa a homepage para seguir artistas, entrar em espetÃ¡culos e gerir o teu perfil.')
+        messages.info(request, 'A tua conta de público nao tem dashboard de gestao. Usa a homepage para seguir artistas, entrar em eventos e gerir o teu perfil.')
         return redirect('streams:home')
 
     artists = editable_artists_for(request.user).order_by('name')
@@ -324,7 +335,7 @@ def dashboard(request):
     can_manage_orgs = can_manage_organizations(request.user)
 
     if not artist:
-        messages.info(request, 'Cria uma equipa ou um perfil de artista para comecar a gerir espetÃ¡culos.')
+        messages.info(request, 'Cria uma equipa ou um perfil de artista para comecar a gerir eventos.')
         return render(request, 'dashboard/index.html', {
             'artist': None,
             'artists': artists,
@@ -521,7 +532,7 @@ def artist_photo_delete(request, photo_id):
 def stream_create(request):
     artists = editable_artists_for(request.user).order_by('name')
     if not artists.exists():
-        messages.error(request, 'Precisas de um artista ou equipa para criar espetÃ¡culos.')
+        messages.error(request, 'Precisas de um artista ou equipa para criar eventos.')
         return redirect('streams:home')
 
     selected_artist_id = request.GET.get('artist') or request.POST.get('artist')
@@ -536,9 +547,9 @@ def stream_create(request):
             live_stream = form.save(commit=False)
             live_stream.artist = artist
             live_stream.save()
-            messages.success(request, 'EspetÃ¡culo criado com sucesso.')
+            messages.success(request, 'Evento criado com sucesso.')
             return redirect(f"{reverse('streams:dashboard')}?artist={artist.id}")
-        messages.error(request, 'Nao foi possivel criar o espetaculo. Confirma os campos assinalados.')
+        messages.error(request, 'Nao foi possivel criar o evento. Confirma os campos assinalados.')
     else:
         form = LiveStreamForm(artist=selected_artist)
 
@@ -553,16 +564,16 @@ def stream_create(request):
 def stream_update(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     if not can_manage_artist(request.user, stream.artist):
-        messages.error(request, 'Nao tens permissao para gerir este espetÃ¡culo.')
+        messages.error(request, 'Nao tens permissao para gerir este evento.')
         return redirect('streams:dashboard')
 
     if request.method == 'POST':
         form = LiveStreamForm(request.POST, request.FILES, instance=stream, artist=stream.artist)
         if form.is_valid():
             form.save()
-            messages.success(request, 'EspetÃ¡culo atualizado.')
+            messages.success(request, 'Evento atualizado.')
             return redirect(f"{reverse('streams:dashboard')}?artist={stream.artist_id}")
-        messages.error(request, 'Nao foi possivel atualizar o espetaculo. Confirma os campos assinalados.')
+        messages.error(request, 'Nao foi possivel atualizar o evento. Confirma os campos assinalados.')
     else:
         form = LiveStreamForm(instance=stream, artist=stream.artist)
     return render(request, 'dashboard/stream_form.html', {'form': form, 'stream': stream})
@@ -572,7 +583,7 @@ def stream_update(request, stream_id):
 def stream_toggle_active(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     if not can_manage_artist(request.user, stream.artist):
-        messages.error(request, 'Nao tens permissao para gerir este espetaculo.')
+        messages.error(request, 'Nao tens permissao para gerir este evento.')
         return redirect('streams:dashboard')
     if request.method == 'POST':
         stream.is_active = not stream.is_active
@@ -588,13 +599,13 @@ def stream_toggle_active(request, stream_id):
 def stream_delete(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     if not can_manage_artist(request.user, stream.artist):
-        messages.error(request, 'Nao tens permissao para apagar este espetÃ¡culo.')
+        messages.error(request, 'Nao tens permissao para apagar este evento.')
         return redirect('streams:dashboard')
 
     artist_id = stream.artist_id
     if request.method == 'POST':
         stream.delete()
-        messages.success(request, 'EspetÃ¡culo apagado.')
+        messages.success(request, 'Evento apagado.')
         return redirect(f"{reverse('streams:dashboard')}?artist={artist_id}")
 
     return redirect(f"{reverse('streams:stream_update', args=[stream.id])}")

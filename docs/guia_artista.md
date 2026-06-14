@@ -54,7 +54,7 @@ A StageHub gere a infraestrutura técnica, sala, chat, pagamentos, bilhetes, sub
 A plataforma cobre:
 
 - página pública do artista;
-- criação e gestão de espetáculos;
+- criação e gestão de eventos;
 - venda de bilhetes;
 - subscrições por artista;
 - desconto automático para Subscritor Pro;
