@@ -38,7 +38,7 @@
               <button class="sl-secondary bg-zinc-950/80">Adicionar aos favoritos</button>
             {% endif %}
           </form>
-          <a class="sl-primary" href="{% url 'payments:subscribe_artist' artist.id %}">Subscrever</a>
+          <a class="sl-primary" href="#subscricoes">Subscrever</a>
         {% endif %}
         {% if featured_stream %}
           <a class="sl-secondary bg-zinc-950/80" href="{% url 'streams:event_detail' featured_stream.id %}">Proximo espetáculo</a>
@@ -85,10 +85,21 @@
 
   <aside class="space-y-5">
     <div class="sl-card p-5">
-      <h2 class="text-xl font-semibold">Apoiar artista</h2>
-      <p class="mt-2 text-sm text-zinc-400">Subscreve, compra bilhetes para espetáculos privados e envia gorjetas durante os espetáculos.</p>
+      <h2 id="subscricoes" class="text-xl font-semibold">Apoiar artista</h2>
+      <p class="mt-2 text-sm text-zinc-400">Escolhe um plano mensal por artista. Nenhum plano substitui bilhetes de lives pagas.</p>
       {% if user.is_authenticated and user.fan_profile %}
-        <a class="sl-primary mt-4" href="{% url 'payments:subscribe_artist' artist.id %}">Subscrever mensalmente</a>
+        <div class="mt-4 grid gap-3">
+          <a class="rounded border border-zinc-800 bg-zinc-950 p-4 hover:border-[#5230EF]" href="{% url 'payments:subscribe_artist' artist.id %}?tier=subscriber">
+            <span class="block font-semibold">Subscritor</span>
+            <span class="mt-1 block text-2xl font-semibold">5 EUR/mês</span>
+            <span class="mt-2 block text-sm text-zinc-400">Arquivo gravado dos últimos 30 dias e chat durante lives.</span>
+          </a>
+          <a class="rounded border border-[#5230EF] bg-zinc-950 p-4 hover:border-[#2596BE]" href="{% url 'payments:subscribe_artist' artist.id %}?tier=subscriber_pro">
+            <span class="block font-semibold">Subscritor Pro</span>
+            <span class="mt-1 block text-2xl font-semibold">10 EUR/mês</span>
+            <span class="mt-2 block text-sm text-zinc-400">Inclui arquivo recente, chat em lives e 50% de desconto em bilhetes de lives pagas.</span>
+          </a>
+        </div>
       {% endif %}
     </div>
 

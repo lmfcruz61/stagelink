@@ -16,6 +16,7 @@ from accounts.forms import (
 )
 from accounts.models import Artist, ArtistPhoto, Organization, OrganizationMember
 from payments.models import Subscription
+from payments.pricing import ticket_checkout_pricing
 
 from .cloudflare import CloudflareStreamError, create_live_input_for_artist
 from .forms import LiveStreamForm
@@ -135,9 +136,13 @@ def stream_detail(request, stream_id):
     event_path = reverse('streams:event_detail', args=[stream.id])
     access = None
     has_access = False
+    ticket_pricing = None
     if request.user.is_authenticated:
         access = stream.access_decision(request.user)
         has_access = access['allowed']
+        fan = getattr(request.user, 'fan_profile', None)
+        if fan:
+            ticket_pricing = ticket_checkout_pricing(stream, fan)
 
     return render(request, 'streams/event_detail.html', {
         'access': access,
@@ -147,6 +152,7 @@ def stream_detail(request, stream_id):
         'scheduled_at_iso': stream.scheduled_at.isoformat(),
         'server_now_iso': now.isoformat(),
         'stream': stream,
+        'ticket_pricing': ticket_pricing,
     })
 
 
@@ -222,8 +228,12 @@ def can_manage_organizations(user):
 def stream_room(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     access = stream.log_access_decision(request.user, 'stream_room')
-    if not access['allowed']:
-        messages.warning(request, 'Precisas de uma subscricao ativa ou bilhete para entrar nesta sala.')
+    video_locked = False
+    if not access['allowed'] and stream.user_can_chat(request.user):
+        video_locked = True
+        messages.info(request, 'A tua subscricao permite participar no chat. Para ver esta live paga, compra o bilhete.')
+    elif not access['allowed']:
+        messages.warning(request, 'Precisas de bilhete, acesso gratuito ou arquivo recente por subscricao para entrar nesta sala.')
         return render(request, 'streams/access_required.html', {'stream': stream})
     now = timezone.now()
     return render(request, 'streams/room.html', {
@@ -231,6 +241,7 @@ def stream_room(request, stream_id):
         'scheduled_at_iso': stream.scheduled_at.isoformat(),
         'server_now_iso': now.isoformat(),
         'stream': stream,
+        'video_locked': video_locked,
     })
 
 

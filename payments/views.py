@@ -17,6 +17,7 @@ from accounts.models import Artist, Fan
 from streams.models import LiveStream, Tip
 
 from .models import StreamTicketPurchase, Subscription
+from .pricing import ticket_checkout_pricing
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -33,6 +34,13 @@ def _absolute_url_with_query(request, name, query):
 
 def _amount_to_cents(amount):
     return int((Decimal(amount) * 100).quantize(Decimal('1')))
+
+
+def _subscription_tier_from_request(request):
+    tier = request.GET.get('tier') or request.POST.get('tier') or Subscription.SUBSCRIBER
+    if tier not in dict(Subscription.TIER_CHOICES):
+        return Subscription.SUBSCRIBER
+    return tier
 
 
 def _complete_checkout_session(session):
@@ -73,6 +81,7 @@ def _complete_checkout_session(session):
                 'stripe_subscription_id': session.get('subscription', ''),
                 'stripe_customer_id': session.get('customer', ''),
                 'status': Subscription.ACTIVE,
+                'tier': metadata.get('tier', Subscription.SUBSCRIBER),
                 # Valor inicial conservador; eventos invoice/subscription podem refiná-lo.
                 'current_period_end': timezone.now() + timedelta(days=31),
             },
@@ -94,15 +103,19 @@ def subscribe_artist(request, artist_id):
         messages.error(request, 'Configura STRIPE_SECRET_KEY para ativar subscrições.')
         return redirect('streams:artist_detail', artist_id=artist.id)
 
+    tier = _subscription_tier_from_request(request)
+    tier_label = Subscription.label_for_tier(tier)
+    tier_price = Subscription.price_for_tier(tier)
+
     session = stripe.checkout.Session.create(
         mode='subscription',
         payment_method_types=['card'],
         line_items=[{
             'price_data': {
                 'currency': 'eur',
-                'product_data': {'name': f'Subscrição mensal - {artist.name}'},
+                'product_data': {'name': f'{tier_label} mensal - {artist.name}'},
                 'recurring': {'interval': 'month'},
-                'unit_amount': _amount_to_cents(settings.STRIPE_MONTHLY_PRICE_EUR),
+                'unit_amount': _amount_to_cents(tier_price),
             },
             'quantity': 1,
         }],
@@ -113,7 +126,7 @@ def subscribe_artist(request, artist_id):
         cancel_url=_absolute_url_with_query(request, 'payments:checkout_cancel', {
             'artist_id': artist.id,
         }),
-        metadata={'type': 'subscription', 'fan_id': fan.id, 'artist_id': artist.id},
+        metadata={'type': 'subscription', 'fan_id': fan.id, 'artist_id': artist.id, 'tier': tier},
     )
     return redirect(session.url)
 
@@ -154,14 +167,19 @@ def buy_ticket(request, stream_id):
                 messages.success(request, 'Bilhete confirmado. Ja podes entrar no espetaculo.')
                 return redirect('streams:room', stream_id=stream.id)
 
+    pricing = ticket_checkout_pricing(stream, fan)
+    product_name = f'Bilhete - {stream.title}'
+    if pricing['has_discount']:
+        product_name = f'Bilhete Pro 50% - {stream.title}'
+
     session = stripe.checkout.Session.create(
         mode='payment',
         payment_method_types=['card'],
         line_items=[{
             'price_data': {
                 'currency': 'eur',
-                'product_data': {'name': f'Bilhete - {stream.title}'},
-                'unit_amount': _amount_to_cents(stream.access_price),
+                'product_data': {'name': product_name},
+                'unit_amount': _amount_to_cents(pricing['final_price']),
             },
             'quantity': 1,
         }],
@@ -174,7 +192,14 @@ def buy_ticket(request, stream_id):
             'stream_id': stream.id,
             'artist_id': stream.artist_id,
         }),
-        metadata={'type': 'ticket', 'fan_id': fan.id, 'stream_id': stream.id},
+        metadata={
+            'type': 'ticket',
+            'fan_id': fan.id,
+            'stream_id': stream.id,
+            'original_price': str(pricing['original_price']),
+            'final_price': str(pricing['final_price']),
+            'discount_percent': str(pricing['discount_percent']),
+        },
     )
     StreamTicketPurchase.objects.update_or_create(
         fan=fan,
@@ -362,6 +387,7 @@ def stripe_webhook(request):
                     'stripe_subscription_id': session.get('subscription', ''),
                     'stripe_customer_id': session.get('customer', ''),
                     'status': Subscription.ACTIVE,
+                    'tier': metadata.get('tier', Subscription.SUBSCRIBER),
                     # Valor inicial conservador; eventos invoice/subscription podem refiná-lo.
                     'current_period_end': timezone.now() + timedelta(days=31),
                 },

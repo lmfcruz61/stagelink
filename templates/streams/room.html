@@ -16,7 +16,15 @@
         </div>
 
         <div id="player-panel" class="{% if not is_stream_started %}hidden {% endif %}relative h-full w-full">
-          <div id="player" class="h-full w-full"></div>
+          <div id="player" class="h-full w-full">
+            {% if video_locked %}
+              <div class="flex h-full w-full flex-col items-center justify-center gap-3 bg-zinc-950 p-6 text-center">
+                <p class="text-2xl font-semibold">Bilhete necessário para ver o vídeo</p>
+                <p class="max-w-lg text-sm text-zinc-400">A tua subscrição permite participar no chat desta live. Para assistir ao espetáculo, compra o bilhete.</p>
+                <a class="sl-primary mt-2" href="{% url 'payments:buy_ticket' stream.id %}">Comprar bilhete</a>
+              </div>
+            {% endif %}
+          </div>
           <div class="pointer-events-none absolute left-3 top-14 z-10 max-w-[calc(100%-1.5rem)] rounded-full border border-zinc-700 bg-zinc-950/82 px-3 py-1 text-xs font-semibold text-zinc-100 shadow-lg md:text-sm">
             <span id="player-brand-badge">{{ stream.display_status.text }} &middot; {{ stream.artist.name }}</span>
           </div>
@@ -40,7 +48,7 @@
           <span class="sl-chip">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</span>
           <span class="sl-chip">{{ stream.access_price }} EUR</span>
           {% if stream.event_type == stream.LIVE %}
-            <button id="go-live-button" type="button" class="{% if not is_stream_started %}hidden {% endif %}sl-chip border-red-500 text-red-100 hover:bg-red-950/40">Ir para direto</button>
+            <button id="go-live-button" type="button" class="{% if not is_stream_started or video_locked %}hidden {% endif %}sl-chip border-red-500 text-red-100 hover:bg-red-950/40">Ir para direto</button>
           {% endif %}
         </div>
       </div>
@@ -100,6 +108,7 @@
   const serverNow = new Date('{{ server_now_iso|escapejs }}');
   const browserServerOffset = serverNow.getTime() - Date.now();
   const streamStartedInitially = {{ is_stream_started|yesno:"true,false" }};
+  const videoLocked = {{ video_locked|yesno:"true,false" }};
   const countdownPanel = document.querySelector('#countdown-panel');
   const countdownClock = document.querySelector('#countdown-clock');
   const playerPanel = document.querySelector('#player-panel');
@@ -148,6 +157,7 @@
   }
 
   function buildPlayer() {
+    if (videoLocked) return;
     playerReady = false;
     hideVideoStatus();
     clearTimeout(playerLoadTimer);
@@ -240,6 +250,7 @@
   }
 
   function loadPlayerWhenReady() {
+    if (videoLocked) return;
     if (!streamStarted || player) return;
     if (videoProvider === 'cloudflare_stream' || videoProvider === 'cloudflare_webrtc') {
       buildPlayer();
@@ -253,14 +264,16 @@
   }
 
   function startStreamInterface() {
-    if (streamStarted && player) return;
+    if (streamStarted && (player || videoLocked)) return;
     streamStarted = true;
     countdownPanel.classList.add('hidden');
     playerPanel.classList.remove('hidden');
     stateChip.textContent = postStartLabel;
     playerBrandBadge.textContent = `${postStartLabel} \u00b7 {{ stream.artist.name|escapejs }}`;
     goLiveButton?.classList.remove('hidden');
-    loadPlayerWhenReady();
+    if (!videoLocked) {
+      loadPlayerWhenReady();
+    }
   }
 
   function updateCountdown() {
@@ -280,6 +293,7 @@
   };
 
   reloadVideoButton.addEventListener('click', function() {
+    if (videoLocked) return;
     player = null;
     playerRetryCount = 0;
     playerContainer.innerHTML = '';

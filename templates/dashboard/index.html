@@ -145,7 +145,10 @@
     <h2 class="mb-4 text-xl font-semibold">Subscritores</h2>
     <div class="space-y-2">
       {% for subscription in subscribers %}
-        <div class="sl-card p-3 text-sm">{{ subscription.fan.display_name }}</div>
+        <div class="sl-card p-3 text-sm">
+          <span class="font-semibold">{{ subscription.fan.display_name }}</span>
+          <span class="mt-1 block text-xs text-zinc-400">{{ subscription.get_tier_display }}</span>
+        </div>
       {% empty %}
         <p class="text-zinc-400">Sem subscritores ativos.</p>
       {% endfor %}

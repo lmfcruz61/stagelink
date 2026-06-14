@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from django.conf import settings
 from django.db import models
@@ -172,6 +173,34 @@ class LiveStream(models.Model):
             return ''
         return f'https://{subdomain}.cloudflarestream.com/{identifier}/iframe?{params}'
 
+    @property
+    def is_recent_recorded_content(self):
+        archive_start = timezone.now() - timedelta(days=30)
+        return (
+            self.event_type in {self.PREMIERE, self.RECORDED, self.REPLAY}
+            and self.scheduled_at <= timezone.now()
+            and self.scheduled_at >= archive_start
+        )
+
+    def active_subscription_for_user(self, user):
+        if not user.is_authenticated:
+            return None
+        from payments.models import Subscription
+
+        return Subscription.objects.filter(
+            fan__user=user,
+            artist=self.artist,
+            status=Subscription.ACTIVE,
+            current_period_end__gte=timezone.now(),
+        ).first()
+
+    def user_can_chat(self, user):
+        decision = self.access_decision(user)
+        if decision['allowed']:
+            return True
+        subscription = self.active_subscription_for_user(user)
+        return bool(subscription and self.event_type == self.LIVE and self.is_active)
+
     def access_decision(self, user):
         # Centraliza a regra de acesso usada pelas views e pelo WebSocket.
         base = {
@@ -198,16 +227,9 @@ class LiveStream(models.Model):
         if self.access_price <= 0:
             return {**base, 'allowed': True, 'reason': 'free_event'}
 
-        from payments.models import StreamTicketPurchase, Subscription
+        from payments.models import StreamTicketPurchase
 
-        has_subscription = Subscription.objects.filter(
-            fan__user=user,
-            artist=self.artist,
-            status=Subscription.ACTIVE,
-            current_period_end__gte=timezone.now(),
-        ).exists()
-        if has_subscription:
-            return {**base, 'allowed': True, 'reason': 'active_subscription'}
+        active_subscription = self.active_subscription_for_user(user)
 
         has_paid_ticket = StreamTicketPurchase.objects.filter(
             fan__user=user,
@@ -216,6 +238,12 @@ class LiveStream(models.Model):
         ).exclude(stripe_session_id='').exists()
         if has_paid_ticket:
             return {**base, 'allowed': True, 'reason': 'paid_ticket'}
+
+        if active_subscription and self.is_recent_recorded_content:
+            return {**base, 'allowed': True, 'reason': 'subscription_recent_archive'}
+
+        if active_subscription and self.event_type == self.LIVE and self.is_active:
+            return {**base, 'allowed': False, 'reason': 'subscription_chat_only_live'}
 
         has_stale_free_ticket = StreamTicketPurchase.objects.filter(
             fan__user=user,
