@@ -99,6 +99,7 @@ class LiveStreamForm(forms.ModelForm):
         cloudflare_playback_url = (cleaned_data.get('cloudflare_playback_url') or '').strip()
         youtube_video_id = (cleaned_data.get('youtube_video_id') or '').strip()
         create_upload_url = cleaned_data.get('create_upload_url')
+        duration_minutes = cleaned_data.get('duration_minutes')
         if cloudflare_stream_id.lower().startswith(('rtmp://', 'rtmps://')):
             self.add_error(
                 'cloudflare_stream_id',
@@ -152,6 +153,17 @@ class LiveStreamForm(forms.ModelForm):
             self.add_error(
                 'cloudflare_playback_url',
                 'Para WebRTC, cola a URL de playback WHEP/Embed da Cloudflare. Este modo sera afinado no proximo passo.',
+            )
+
+        if (
+            provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE
+            and event_type in {LiveStream.RECORDED, LiveStream.REPLAY}
+            and duration_minutes
+            and duration_minutes > 60
+        ):
+            self.add_error(
+                'duration_minutes',
+                'Videos gravados/replays na StageHub nao podem ultrapassar 60 minutos.',
             )
 
         if provider == LiveStream.VIDEO_PROVIDER_YOUTUBE and not youtube_video_id:

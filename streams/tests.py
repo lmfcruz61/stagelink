@@ -90,6 +90,28 @@ class LiveStreamFormTests(TestCase):
 
         self.assertTrue(form.is_valid(), form.errors)
 
+    def test_recorded_cloudflare_video_rejects_duration_over_one_hour(self):
+        scheduled_at = timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M')
+        form = LiveStreamForm(
+            data={
+                'title': 'Video longo',
+                'description': '',
+                'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+                'cloudflare_stream_id': '',
+                'cloudflare_playback_url': '',
+                'youtube_video_id': '',
+                'event_type': LiveStream.RECORDED,
+                'access_price': '5.00',
+                'scheduled_at': scheduled_at,
+                'duration_minutes': '61',
+                'create_upload_url': 'on',
+            },
+            artist=self.artist,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('duration_minutes', form.errors)
+
 
 class LiveStreamAccessAndEmbedTests(TestCase):
     def setUp(self):
@@ -281,3 +303,32 @@ class CloudflareDirectUploadTests(TestCase):
 
         self.assertEqual(upload['uid'], 'video-uid')
         self.assertEqual(upload['upload_url'], 'https://upload.videodelivery.net/tus/upload')
+
+    @override_settings(CLOUDFLARE_ACCOUNT_ID='account', CLOUDFLARE_API_TOKEN='token')
+    @patch('streams.cloudflare.urlopen')
+    def test_create_direct_upload_caps_max_duration_at_one_hour(self, mock_urlopen):
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, traceback):
+                return False
+
+            def read(self):
+                return json.dumps({
+                    'success': True,
+                    'result': {
+                        'uid': 'video-uid',
+                        'uploadURL': 'https://upload.videodelivery.net/tus/upload',
+                        'expires': '2026-06-14T20:00:00Z',
+                    },
+                }).encode('utf-8')
+
+        self.stream.duration_minutes = 90
+        mock_urlopen.return_value = FakeResponse()
+
+        create_direct_upload_for_stream(self.stream)
+
+        request = mock_urlopen.call_args.args[0]
+        payload = json.loads(request.data.decode('utf-8'))
+        self.assertEqual(payload['maxDurationSeconds'], 3600)

@@ -56,9 +56,6 @@
           <span class="sl-chip"><span id="viewer-count">0</span> a ver</span>
           <span class="sl-chip">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</span>
           <span class="sl-chip">{{ stream.access_price }} EUR</span>
-          {% if stream.event_type == stream.LIVE %}
-            <button id="go-live-button" type="button" class="{% if not is_stream_started or video_locked %}hidden {% endif %}sl-chip border-red-500 text-red-100 hover:bg-red-950/40">Ir para direto</button>
-          {% endif %}
         </div>
       </div>
 
@@ -125,7 +122,6 @@
   const videoStatus = document.querySelector('#video-status');
   const videoStatusMessage = document.querySelector('#video-status-message');
   const reloadVideoButton = document.querySelector('#reload-video-button');
-  const goLiveButton = document.querySelector('#go-live-button');
   const stateChip = document.querySelector('#state-chip');
   const playerBrandBadge = document.querySelector('#player-brand-badge');
   const postStartLabel = '{{ stream.post_start_display_status.text|escapejs }}';
@@ -278,7 +274,6 @@
     playerPanel.classList.remove('hidden');
     stateChip.textContent = postStartLabel;
     playerBrandBadge.textContent = `${postStartLabel} \u00b7 {{ stream.artist.name|escapejs }}`;
-    goLiveButton?.classList.remove('hidden');
     if (!videoLocked) {
       loadPlayerWhenReady();
     }
@@ -309,17 +304,6 @@
       requestYouTubeApi();
     }
     loadPlayerWhenReady();
-  });
-
-  goLiveButton?.addEventListener('click', function() {
-    if (!player || !playerReady) return;
-    try {
-      const duration = player.getDuration();
-      if (duration && Number.isFinite(duration)) {
-        player.seekTo(duration, true);
-      }
-      player.playVideo();
-    } catch (error) {}
   });
 
   function requestYouTubeApi() {

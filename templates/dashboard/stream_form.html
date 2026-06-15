@@ -166,6 +166,12 @@
         <div>
           <h2 class="text-lg font-semibold">Upload do video</h2>
           <p class="mt-1 text-sm text-zinc-300">Envia o ficheiro de video diretamente para Cloudflare Stream. Depois do envio, ativa o video quando estiver pronto para publicar.</p>
+          {% if stream.cloudflare_video_uid %}
+            <p class="mt-2 rounded border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-300">
+              ID do video Cloudflare:
+              <span class="font-mono text-zinc-100">{{ stream.cloudflare_video_uid }}</span>
+            </p>
+          {% endif %}
           {% if stream.cloudflare_upload_expires_at %}
             <p class="mt-2 text-xs text-zinc-400">Link valido ate {{ stream.cloudflare_upload_expires_at|date:"d/m/Y H:i" }}.</p>
           {% endif %}
@@ -185,6 +191,12 @@
     <section class="mt-6 rounded-xl border border-[#10B981] bg-[#10B981]/15 p-5">
       <h2 class="text-lg font-semibold">Upload recebido</h2>
       <p class="mt-1 text-sm text-zinc-300">O ficheiro foi enviado para Cloudflare. Quando o processamento terminar, usa "Ver sala" para testar e ativa o evento para publicar.</p>
+      {% if stream.cloudflare_video_uid %}
+        <p class="mt-3 rounded border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-300">
+          ID do video Cloudflare:
+          <span class="font-mono text-zinc-100">{{ stream.cloudflare_video_uid }}</span>
+        </p>
+      {% endif %}
     </section>
   {% endif %}
   {% if stream %}
@@ -264,7 +276,24 @@
       uploadFeedback.textContent = message;
     }
 
-    uploadButton?.addEventListener('click', function() {
+    function readVideoDuration(file) {
+      return new Promise(function(resolve, reject) {
+        const video = document.createElement('video');
+        const objectUrl = URL.createObjectURL(file);
+        video.preload = 'metadata';
+        video.onloadedmetadata = function() {
+          URL.revokeObjectURL(objectUrl);
+          resolve(video.duration || 0);
+        };
+        video.onerror = function() {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error('Nao foi possivel ler a duracao do video.'));
+        };
+        video.src = objectUrl;
+      });
+    }
+
+    uploadButton?.addEventListener('click', async function() {
       const file = uploadFileInput.files[0];
       if (!file) {
         setUploadFeedback('Escolhe primeiro um ficheiro de video.');
@@ -272,6 +301,24 @@
       }
       if (!window.tus) {
         setUploadFeedback('Nao foi possivel carregar o uploader. Recarrega a pagina e tenta novamente.');
+        return;
+      }
+
+      uploadButton.disabled = true;
+      uploadState.textContent = 'A verificar duracao';
+      setUploadFeedback('A confirmar que o video tem no maximo 1 hora...');
+      try {
+        const duration = await readVideoDuration(file);
+        if (duration > 3600) {
+          uploadButton.disabled = false;
+          uploadState.textContent = 'Video recusado';
+          setUploadFeedback('Este video tem mais de 1 hora. Para monetizacao na StageHub, envia um ficheiro ate 60 minutos.');
+          return;
+        }
+      } catch (error) {
+        uploadButton.disabled = false;
+        uploadState.textContent = 'Duracao desconhecida';
+        setUploadFeedback('Nao consegui confirmar a duracao deste ficheiro. Exporta novamente o video e tenta outra vez.');
         return;
       }
 

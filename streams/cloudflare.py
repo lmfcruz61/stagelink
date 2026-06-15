@@ -64,9 +64,9 @@ def create_direct_upload_for_stream(stream):
     if not account_id or not api_token:
         raise CloudflareStreamError('Cloudflare nao esta configurado no servidor.')
 
-    max_duration_seconds = 7200
+    max_duration_seconds = 3600
     if stream.duration_minutes:
-        max_duration_seconds = max(60, int(stream.duration_minutes) * 60)
+        max_duration_seconds = max(60, min(3600, int(stream.duration_minutes) * 60))
 
     payload = {
         'maxDurationSeconds': max_duration_seconds,
