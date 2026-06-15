@@ -361,8 +361,12 @@ class Tip(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='tips')
     stream = models.ForeignKey(LiveStream, on_delete=models.CASCADE, related_name='tips')
     amount = models.DecimalField(max_digits=8, decimal_places=2)
+    platform_fee_amount = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    artist_net_amount = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    commission_percent = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     message = models.CharField(max_length=240, blank=True)
     stripe_payment_intent = models.CharField(max_length=120, blank=True)
+    stripe_connected_account_id = models.CharField(max_length=120, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

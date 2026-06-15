@@ -84,9 +84,21 @@ class Artist(models.Model):
     )
     cloudflare_rtmps_url = models.URLField(blank=True)
     cloudflare_stream_key = models.CharField(max_length=240, blank=True)
+    stripe_account_id = models.CharField(
+        max_length=120,
+        blank=True,
+        help_text='ID da conta Stripe Connect do artista.',
+    )
+    stripe_details_submitted = models.BooleanField(default=False)
+    stripe_charges_enabled = models.BooleanField(default=False)
+    stripe_payouts_enabled = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
+
+    @property
+    def stripe_connect_ready(self):
+        return bool(self.stripe_account_id and self.stripe_charges_enabled and self.stripe_payouts_enabled)
 
 
 class ArtistPhoto(models.Model):

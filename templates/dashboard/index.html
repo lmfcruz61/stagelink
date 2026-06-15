@@ -102,6 +102,18 @@
 {% endif %}
 
 {% if artist %}
+{% if not artist.stripe_connect_ready %}
+  <section class="mb-8 rounded-xl border border-amber-500/60 bg-amber-500/10 p-5">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-amber-100">Pagamentos ainda nao ativos</h2>
+        <p class="mt-1 text-sm text-amber-50/80">Liga ou completa o Stripe Connect deste artista para vender bilhetes pagos, gorjetas e subscricoes.</p>
+      </div>
+      <a class="sl-primary" href="{% url 'payments:stripe_connect_start' artist.id %}">Ligar Stripe</a>
+    </div>
+  </section>
+{% endif %}
+
 <section class="mb-8 grid gap-4 md:grid-cols-2">
   <div class="sl-card p-5">
     <p class="text-sm text-zinc-400">Gorjetas recebidas</p>

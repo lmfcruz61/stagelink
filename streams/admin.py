@@ -19,5 +19,11 @@ class LiveStreamAdmin(admin.ModelAdmin):
     search_fields = ('title', 'artist__name', 'cloudflare_video_uid', 'cloudflare_live_input_uid', 'youtube_video_id')
 
 
-admin.site.register(Tip)
+@admin.register(Tip)
+class TipAdmin(admin.ModelAdmin):
+    list_display = ('fan', 'artist', 'stream', 'amount', 'platform_fee_amount', 'artist_net_amount', 'created_at')
+    list_filter = ('artist', 'stream')
+    search_fields = ('fan__display_name', 'fan__user__username', 'artist__name', 'stream__title', 'stripe_payment_intent')
+
+
 admin.site.register(ChatMessage)
