@@ -6,8 +6,8 @@ primary_region = "ams"
 [env]
   DJANGO_SETTINGS_MODULE = "stagelink.settings"
   DEBUG = "False"
-  ALLOWED_HOSTS = ".fly.dev"
-  CSRF_TRUSTED_ORIGINS = "https://*.fly.dev"
+  ALLOWED_HOSTS = ".fly.dev,stagehub.pt,www.stagehub.pt"
+  CSRF_TRUSTED_ORIGINS = "https://*.fly.dev,https://stagehub.pt,https://www.stagehub.pt"
   PORT = "8080"
 
 [deploy]
