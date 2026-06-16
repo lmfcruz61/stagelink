@@ -113,6 +113,20 @@
       {% endif %}
     </div>
 
+    {% if artist.contact_email or artist.contact_phone %}
+      <div class="sl-card p-5">
+        <h2 class="mb-4 text-xl font-semibold">Contactos</h2>
+        <div class="space-y-2 text-sm">
+          {% if artist.contact_email %}
+            <a class="block text-[#2596BE] hover:text-[#2596BE]" href="mailto:{{ artist.contact_email }}">{{ artist.contact_email }}</a>
+          {% endif %}
+          {% if artist.contact_phone %}
+            <a class="block text-[#2596BE] hover:text-[#2596BE]" href="tel:{{ artist.contact_phone }}">{{ artist.contact_phone }}</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
     <div class="sl-card p-5">
       <h2 class="mb-4 text-xl font-semibold">Links</h2>
       <div class="space-y-2 text-sm">

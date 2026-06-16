@@ -361,8 +361,8 @@ def buy_ticket(request, stream_id):
     if access['allowed']:
         return redirect('streams:room', stream_id=stream.id)
 
-    if stream.access_price <= 0:
-        messages.error(request, 'Eventos gratuitos ja nao estao disponiveis na StageHub.')
+    if stream.access_price < Decimal('2.00'):
+        messages.error(request, 'O preco minimo de bilhete na StageHub e 2 EUR.')
         return redirect('streams:event_detail', stream_id=stream.id)
 
     if not settings.STRIPE_SECRET_KEY:

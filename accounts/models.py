@@ -70,6 +70,8 @@ class Artist(models.Model):
     name = models.CharField(max_length=120)
     headline = models.CharField(max_length=180, blank=True)
     bio = models.TextField(blank=True)
+    contact_email = models.EmailField(blank=True)
+    contact_phone = models.CharField(max_length=40, blank=True)
     photo = models.ImageField(upload_to='artists/', blank=True, null=True)
     hero_image = models.ImageField(upload_to='artists/heroes/', blank=True, null=True)
     youtube_link = models.URLField(blank=True)

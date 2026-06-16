@@ -1,0 +1,667 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R] /Count 6 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Length 2277 >>
+stream
+BT
+/F2 18 Tf
+1 0 0 1 50 792 Tm
+(StageHub - Guia do Artista) Tj
+/F1 11 Tf
+1 0 0 1 50 742 Tm
+(Este guia explica, passo a passo, como um artista usa a StageHub para vender) Tj
+/F1 11 Tf
+1 0 0 1 50 727 Tm
+(eventos, receber pagamentos, transmitir ao vivo e publicar videos gravados.) Tj
+/F2 14 Tf
+1 0 0 1 50 682 Tm
+(1. O que e a StageHub) Tj
+/F1 11 Tf
+1 0 0 1 50 650 Tm
+(A StageHub e uma plataforma para artistas criarem eventos pagos, venderem) Tj
+/F1 11 Tf
+1 0 0 1 50 635 Tm
+(bilhetes, receberem subscricoes mensais e aceitar gorjetas do publico.) Tj
+/F1 11 Tf
+1 0 0 1 50 605 Tm
+(Na pratica:) Tj
+/F1 11 Tf
+1 0 0 1 50 575 Tm
+(1. O artista cria ou recebe uma pagina publica.) Tj
+/F1 11 Tf
+1 0 0 1 50 560 Tm
+(2. Liga a sua conta Stripe para receber pagamentos.) Tj
+/F1 11 Tf
+1 0 0 1 50 545 Tm
+(3. Cria eventos pagos.) Tj
+/F1 11 Tf
+1 0 0 1 50 530 Tm
+(4. Transmite ao vivo pelo OBS ou envia videos gravados.) Tj
+/F1 11 Tf
+1 0 0 1 50 515 Tm
+(5. O publico compra acesso, subscreve ou envia gorjetas.) Tj
+/F1 11 Tf
+1 0 0 1 50 500 Tm
+(6. A StageHub retira a comissao da plataforma e o restante fica para o artista.) Tj
+/F2 14 Tf
+1 0 0 1 50 455 Tm
+(2. Conta e pagina do artista) Tj
+/F1 11 Tf
+1 0 0 1 50 423 Tm
+(No dashboard, o artista ou a equipa deve completar a pagina publica:) Tj
+/F1 11 Tf
+1 0 0 1 50 393 Tm
+(1. Nome artistico.) Tj
+/F1 11 Tf
+1 0 0 1 50 378 Tm
+(2. Frase curta de apresentacao.) Tj
+/F1 11 Tf
+1 0 0 1 50 363 Tm
+(3. Cidade/pais.) Tj
+/F1 11 Tf
+1 0 0 1 50 348 Tm
+(4. Biografia.) Tj
+/F1 11 Tf
+1 0 0 1 50 333 Tm
+(5. Foto principal.) Tj
+/F1 11 Tf
+1 0 0 1 50 318 Tm
+(6. Imagem de capa.) Tj
+/F1 11 Tf
+1 0 0 1 50 303 Tm
+(7. Links oficiais, se existirem.) Tj
+/F1 11 Tf
+1 0 0 1 50 288 Tm
+(8. Fotos para a galeria.) Tj
+/F1 11 Tf
+1 0 0 1 50 258 Tm
+(Esta pagina e o espaco publico onde o publico ve os eventos, videos, links e) Tj
+/F1 11 Tf
+1 0 0 1 50 243 Tm
+(planos de subscricao.) Tj
+/F2 14 Tf
+1 0 0 1 50 198 Tm
+(3. Configurar pagamentos com Stripe) Tj
+/F1 11 Tf
+1 0 0 1 50 166 Tm
+(Antes de vender bilhetes, receber subscricoes ou gorjetas, o artista tem de ligar) Tj
+/F1 11 Tf
+1 0 0 1 50 151 Tm
+(pagamentos.) Tj
+/F1 11 Tf
+1 0 0 1 50 121 Tm
+(Passos:) Tj
+/F1 11 Tf
+1 0 0 1 50 91 Tm
+(1. Entrar no dashboard.) Tj
+/F1 11 Tf
+1 0 0 1 50 76 Tm
+(2. Abrir a pagina de edicao do artista.) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 2415 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 50 792 Tm
+(3. Clicar em Ligar Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 777 Tm
+(4. Seguir os passos da Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 762 Tm
+(5. Preencher os dados pedidos pela Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 747 Tm
+(6. Voltar a StageHub.) Tj
+/F1 11 Tf
+1 0 0 1 50 732 Tm
+(7. Confirmar que o estado aparece como ativo para receber pagamentos.) Tj
+/F1 11 Tf
+1 0 0 1 50 702 Tm
+(A StageHub cria o caminho de ligacao com a Stripe. O artista completa a conta com) Tj
+/F1 11 Tf
+1 0 0 1 50 687 Tm
+(os seus dados. Em modo de teste, isto usa a Stripe de teste. Em producao, usa) Tj
+/F1 11 Tf
+1 0 0 1 50 672 Tm
+(dados reais.) Tj
+/F1 11 Tf
+1 0 0 1 50 642 Tm
+(Se a conta Stripe do artista ainda nao estiver ativa, a StageHub bloqueia vendas) Tj
+/F1 11 Tf
+1 0 0 1 50 627 Tm
+(pagas para esse artista.) Tj
+/F2 14 Tf
+1 0 0 1 50 582 Tm
+(4. Como os pagamentos sao divididos) Tj
+/F1 11 Tf
+1 0 0 1 50 550 Tm
+(A StageHub usa Stripe Connect para dividir pagamentos automaticamente.) Tj
+/F1 11 Tf
+1 0 0 1 50 520 Tm
+(Quando alguem paga:) Tj
+/F1 11 Tf
+1 0 0 1 50 490 Tm
+(1. O publico paga na Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 475 Tm
+(2. A StageHub fica com a comissao da plataforma.) Tj
+/F1 11 Tf
+1 0 0 1 50 460 Tm
+(3. O restante fica destinado ao artista na sua conta Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 430 Tm
+(A comissao combinada da StageHub e 20%.) Tj
+/F1 11 Tf
+1 0 0 1 50 400 Tm
+(Exemplos:) Tj
+/F1 11 Tf
+1 0 0 1 50 370 Tm
+(Valor pago   Comissao StageHub   Valor do artista) Tj
+/F1 11 Tf
+1 0 0 1 50 355 Tm
+(2 EUR   0,40 EUR   1,60 EUR) Tj
+/F1 11 Tf
+1 0 0 1 50 340 Tm
+(5 EUR   1,00 EUR   4,00 EUR) Tj
+/F1 11 Tf
+1 0 0 1 50 325 Tm
+(10 EUR   2,00 EUR   8,00 EUR) Tj
+/F1 11 Tf
+1 0 0 1 50 310 Tm
+(20 EUR   4,00 EUR   16,00 EUR) Tj
+/F1 11 Tf
+1 0 0 1 50 280 Tm
+(Os valores podem ter arredondamentos normais da Stripe.) Tj
+/F2 14 Tf
+1 0 0 1 50 235 Tm
+(5. Quando e como o artista recebe) Tj
+/F1 11 Tf
+1 0 0 1 50 203 Tm
+(O pagamento ao artista e gerido pela Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 173 Tm
+(Normalmente:) Tj
+/F1 11 Tf
+1 0 0 1 50 143 Tm
+(1. O dinheiro entra na conta Stripe conectada do artista.) Tj
+/F1 11 Tf
+1 0 0 1 50 128 Tm
+(2. A Stripe valida o pagamento.) Tj
+/F1 11 Tf
+1 0 0 1 50 113 Tm
+(3. A Stripe envia o valor disponivel para a conta bancaria configurada pelo) Tj
+/F1 11 Tf
+1 0 0 1 50 98 Tm
+(   artista.) Tj
+/F1 11 Tf
+1 0 0 1 50 68 Tm
+(O calendario de pagamento depende da Stripe, do pais, do tipo de conta e das) Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 2172 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 50 792 Tm
+(verificacoes da conta.) Tj
+/F1 11 Tf
+1 0 0 1 50 762 Tm
+(A StageHub nao paga manualmente cada evento. A divisao e feita pela Stripe) Tj
+/F1 11 Tf
+1 0 0 1 50 747 Tm
+(automaticamente.) Tj
+/F2 14 Tf
+1 0 0 1 50 702 Tm
+(6. Preco minimo dos eventos) Tj
+/F1 11 Tf
+1 0 0 1 50 670 Tm
+(Na StageHub, todos os eventos publicados sao pagos.) Tj
+/F1 11 Tf
+1 0 0 1 50 640 Tm
+(O preco minimo por bilhete e 2 EUR.) Tj
+/F1 11 Tf
+1 0 0 1 50 610 Tm
+(Este minimo existe para justificar custos de plataforma, video, pagamentos,) Tj
+/F1 11 Tf
+1 0 0 1 50 595 Tm
+(processamento, suporte e rentabilidade do site.) Tj
+/F1 11 Tf
+1 0 0 1 50 565 Tm
+(Recomendacao:) Tj
+/F1 11 Tf
+1 0 0 1 50 535 Tm
+(1. Eventos pequenos/testes: minimo 2 EUR.) Tj
+/F1 11 Tf
+1 0 0 1 50 520 Tm
+(2. Concertos online curtos: 5 EUR a 10 EUR.) Tj
+/F1 11 Tf
+1 0 0 1 50 505 Tm
+(3. Concertos especiais, estreias ou acesso exclusivo: 10 EUR ou mais.) Tj
+/F2 14 Tf
+1 0 0 1 50 460 Tm
+(7. Criar um evento pago) Tj
+/F1 11 Tf
+1 0 0 1 50 428 Tm
+(No dashboard:) Tj
+/F1 11 Tf
+1 0 0 1 50 398 Tm
+(1. Escolher o artista.) Tj
+/F1 11 Tf
+1 0 0 1 50 383 Tm
+(2. Clicar em Novo evento.) Tj
+/F1 11 Tf
+1 0 0 1 50 368 Tm
+(3. Escrever titulo.) Tj
+/F1 11 Tf
+1 0 0 1 50 353 Tm
+(4. Adicionar descricao.) Tj
+/F1 11 Tf
+1 0 0 1 50 338 Tm
+(5. Adicionar capa horizontal.) Tj
+/F1 11 Tf
+1 0 0 1 50 323 Tm
+(6. Escolher tipo de conteudo:) Tj
+/F1 11 Tf
+1 0 0 1 50 308 Tm
+(     - Ao vivo;) Tj
+/F1 11 Tf
+1 0 0 1 50 293 Tm
+(     - Estreia;) Tj
+/F1 11 Tf
+1 0 0 1 50 278 Tm
+(     - Video gravado;) Tj
+/F1 11 Tf
+1 0 0 1 50 263 Tm
+(     - Replay.) Tj
+/F1 11 Tf
+1 0 0 1 50 248 Tm
+(7. Definir preco, sempre igual ou superior a 2 EUR.) Tj
+/F1 11 Tf
+1 0 0 1 50 233 Tm
+(8. Definir data e hora.) Tj
+/F1 11 Tf
+1 0 0 1 50 218 Tm
+(9. Definir duracao estimada.) Tj
+/F1 11 Tf
+1 0 0 1 50 203 Tm
+(10. Guardar.) Tj
+/F1 11 Tf
+1 0 0 1 50 188 Tm
+(11. Testar a sala.) Tj
+/F1 11 Tf
+1 0 0 1 50 173 Tm
+(12. Ativar quando estiver pronto.) Tj
+/F1 11 Tf
+1 0 0 1 50 143 Tm
+(Eventos gratuitos nao estao disponiveis na StageHub.) Tj
+/F2 14 Tf
+1 0 0 1 50 98 Tm
+(8. Transmitir ao vivo com OBS) Tj
+/F1 11 Tf
+1 0 0 1 50 66 Tm
+(Para eventos ao vivo, o artista usa OBS.) Tj
+ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 2299 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 50 777 Tm
+(Preparacao:) Tj
+/F1 11 Tf
+1 0 0 1 50 747 Tm
+(1. No perfil do artista, clicar em Criar canal ao vivo, se ainda nao existir.) Tj
+/F1 11 Tf
+1 0 0 1 50 732 Tm
+(2. Copiar os dados privados:) Tj
+/F1 11 Tf
+1 0 0 1 50 717 Tm
+(     - Servidor OBS;) Tj
+/F1 11 Tf
+1 0 0 1 50 702 Tm
+(     - Chave de transmissao.) Tj
+/F1 11 Tf
+1 0 0 1 50 687 Tm
+(3. Abrir o OBS.) Tj
+/F1 11 Tf
+1 0 0 1 50 672 Tm
+(4. Ir a Definicoes > Transmissao.) Tj
+/F1 11 Tf
+1 0 0 1 50 657 Tm
+(5. Em Servico, escolher Personalizado.) Tj
+/F1 11 Tf
+1 0 0 1 50 642 Tm
+(6. Colar o Servidor OBS no campo Servidor.) Tj
+/F1 11 Tf
+1 0 0 1 50 627 Tm
+(7. Colar a Chave de transmissao no campo Chave de transmissao.) Tj
+/F1 11 Tf
+1 0 0 1 50 612 Tm
+(8. Clicar em Aplicar.) Tj
+/F1 11 Tf
+1 0 0 1 50 597 Tm
+(9. Clicar em OK.) Tj
+/F1 11 Tf
+1 0 0 1 50 567 Tm
+(Importante: o servidor e a chave nao devem ser partilhados publicamente.) Tj
+/F2 14 Tf
+1 0 0 1 50 522 Tm
+(9. Definicoes recomendadas no OBS) Tj
+/F1 11 Tf
+1 0 0 1 50 490 Tm
+(Para reduzir problemas, usar definicoes simples:) Tj
+/F1 11 Tf
+1 0 0 1 50 460 Tm
+(Video:) Tj
+/F1 11 Tf
+1 0 0 1 50 430 Tm
+(1. Resolucao: 1280x720.) Tj
+/F1 11 Tf
+1 0 0 1 50 415 Tm
+(2. FPS: 30.) Tj
+/F1 11 Tf
+1 0 0 1 50 400 Tm
+(3. Bitrate: cerca de 2500 Kbps.) Tj
+/F1 11 Tf
+1 0 0 1 50 370 Tm
+(Audio:) Tj
+/F1 11 Tf
+1 0 0 1 50 340 Tm
+(1. Bitrate: 128 Kbps ou 160 Kbps.) Tj
+/F1 11 Tf
+1 0 0 1 50 325 Tm
+(2. Confirmar que o microfone mexe no misturador de audio.) Tj
+/F1 11 Tf
+1 0 0 1 50 295 Tm
+(Se o computador for fraco, escolher codificador Software \(x264\).) Tj
+/F2 14 Tf
+1 0 0 1 50 250 Tm
+(10. Antes de abrir o evento ao publico) Tj
+/F1 11 Tf
+1 0 0 1 50 218 Tm
+(Antes de divulgar:) Tj
+/F1 11 Tf
+1 0 0 1 50 188 Tm
+(1. Entrar na sala como artista ou equipa.) Tj
+/F1 11 Tf
+1 0 0 1 50 173 Tm
+(2. Confirmar que o video aparece.) Tj
+/F1 11 Tf
+1 0 0 1 50 158 Tm
+(3. Confirmar que o audio funciona.) Tj
+/F1 11 Tf
+1 0 0 1 50 143 Tm
+(4. Confirmar que o chat funciona.) Tj
+/F1 11 Tf
+1 0 0 1 50 128 Tm
+(5. Confirmar que o contador a ver aparece.) Tj
+/F1 11 Tf
+1 0 0 1 50 113 Tm
+(6. Fazer uma compra de teste, se estiver em modo teste.) Tj
+/F1 11 Tf
+1 0 0 1 50 98 Tm
+(7. Confirmar que a conta Stripe do artista esta ativa.) Tj
+/F1 11 Tf
+1 0 0 1 50 83 Tm
+(8. Confirmar que o evento esta com preco correto.) Tj
+ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 2150 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 50 792 Tm
+(So depois disso o link deve ser partilhado.) Tj
+/F2 14 Tf
+1 0 0 1 50 747 Tm
+(11. Videos gravados) Tj
+/F1 11 Tf
+1 0 0 1 50 715 Tm
+(A StageHub tambem permite videos gravados.) Tj
+/F1 11 Tf
+1 0 0 1 50 685 Tm
+(Passos:) Tj
+/F1 11 Tf
+1 0 0 1 50 655 Tm
+(1. No dashboard, escolher o artista.) Tj
+/F1 11 Tf
+1 0 0 1 50 640 Tm
+(2. Clicar em Novo video.) Tj
+/F1 11 Tf
+1 0 0 1 50 625 Tm
+(3. Preencher titulo, descricao, capa, data e preco.) Tj
+/F1 11 Tf
+1 0 0 1 50 610 Tm
+(4. Confirmar que o preco e pelo menos 2 EUR.) Tj
+/F1 11 Tf
+1 0 0 1 50 595 Tm
+(5. Guardar.) Tj
+/F1 11 Tf
+1 0 0 1 50 580 Tm
+(6. Enviar o ficheiro de video na area Upload do video.) Tj
+/F1 11 Tf
+1 0 0 1 50 565 Tm
+(7. Esperar o upload terminar.) Tj
+/F1 11 Tf
+1 0 0 1 50 550 Tm
+(8. Confirmar o estado Upload recebido.) Tj
+/F1 11 Tf
+1 0 0 1 50 535 Tm
+(9. Entrar em Ver sala para testar.) Tj
+/F1 11 Tf
+1 0 0 1 50 520 Tm
+(10. Ativar o video quando estiver pronto.) Tj
+/F2 14 Tf
+1 0 0 1 50 475 Tm
+(12. Limite de duracao dos videos) Tj
+/F1 11 Tf
+1 0 0 1 50 443 Tm
+(Videos gravados e replays nao podem ultrapassar 1 hora.) Tj
+/F1 11 Tf
+1 0 0 1 50 413 Tm
+(Regra:) Tj
+/F1 11 Tf
+1 0 0 1 50 383 Tm
+(1. Maximo: 60 minutos.) Tj
+/F1 11 Tf
+1 0 0 1 50 368 Tm
+(2. Ficheiros acima de 1 hora sao recusados.) Tj
+/F1 11 Tf
+1 0 0 1 50 353 Tm
+(3. A duracao estimada tambem deve ficar ate 60 minutos.) Tj
+/F1 11 Tf
+1 0 0 1 50 323 Tm
+(Este limite ajuda a controlar custos, qualidade da experiencia e rentabilidade da) Tj
+/F1 11 Tf
+1 0 0 1 50 308 Tm
+(plataforma.) Tj
+/F2 14 Tf
+1 0 0 1 50 263 Tm
+(13. Subscricoes) Tj
+/F1 11 Tf
+1 0 0 1 50 231 Tm
+(O publico pode apoiar um artista com subscricao mensal.) Tj
+/F1 11 Tf
+1 0 0 1 50 201 Tm
+(Planos atuais:) Tj
+/F1 11 Tf
+1 0 0 1 50 171 Tm
+(1. Subscritor: 5 EUR por mes.) Tj
+/F1 11 Tf
+1 0 0 1 50 156 Tm
+(2. Subscritor Pro: 10 EUR por mes.) Tj
+/F1 11 Tf
+1 0 0 1 50 126 Tm
+(Beneficios:) Tj
+/F1 11 Tf
+1 0 0 1 50 96 Tm
+(1. Acesso ao arquivo recente dos ultimos 30 dias.) Tj
+/F1 11 Tf
+1 0 0 1 50 81 Tm
+(2. Participacao no chat durante lives.) Tj
+/F1 11 Tf
+1 0 0 1 50 66 Tm
+(3. No plano Pro, desconto em bilhetes de lives pagas, quando aplicavel.) Tj
+ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 1921 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 50 777 Tm
+(As subscricoes tambem passam pela Stripe e seguem a mesma regra de comissao da) Tj
+/F1 11 Tf
+1 0 0 1 50 762 Tm
+(StageHub.) Tj
+/F2 14 Tf
+1 0 0 1 50 717 Tm
+(14. Gorjetas) Tj
+/F1 11 Tf
+1 0 0 1 50 685 Tm
+(Em eventos pagos, o publico pode enviar gorjetas.) Tj
+/F1 11 Tf
+1 0 0 1 50 655 Tm
+(O processo e simples:) Tj
+/F1 11 Tf
+1 0 0 1 50 625 Tm
+(1. Publico escolhe o valor.) Tj
+/F1 11 Tf
+1 0 0 1 50 610 Tm
+(2. Escreve uma mensagem opcional.) Tj
+/F1 11 Tf
+1 0 0 1 50 595 Tm
+(3. Paga pela Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 580 Tm
+(4. A StageHub retira a comissao.) Tj
+/F1 11 Tf
+1 0 0 1 50 565 Tm
+(5. O restante fica para o artista.) Tj
+/F2 14 Tf
+1 0 0 1 50 520 Tm
+(15. Checklist rapido do artista) Tj
+/F1 11 Tf
+1 0 0 1 50 488 Tm
+(Antes do primeiro evento, confirmar:) Tj
+/F1 11 Tf
+1 0 0 1 50 458 Tm
+(1. Pagina publica completa.) Tj
+/F1 11 Tf
+1 0 0 1 50 443 Tm
+(2. Stripe ligado e ativo.) Tj
+/F1 11 Tf
+1 0 0 1 50 428 Tm
+(3. Evento criado com preco minimo de 2 EUR.) Tj
+/F1 11 Tf
+1 0 0 1 50 413 Tm
+(4. Video StageHub configurado.) Tj
+/F1 11 Tf
+1 0 0 1 50 398 Tm
+(5. OBS testado, se for ao vivo.) Tj
+/F1 11 Tf
+1 0 0 1 50 383 Tm
+(6. Video enviado, se for gravado.) Tj
+/F1 11 Tf
+1 0 0 1 50 368 Tm
+(7. Sala testada.) Tj
+/F1 11 Tf
+1 0 0 1 50 353 Tm
+(8. Chat testado.) Tj
+/F1 11 Tf
+1 0 0 1 50 338 Tm
+(9. Link publico copiado.) Tj
+/F1 11 Tf
+1 0 0 1 50 323 Tm
+(10. Evento ativado.) Tj
+/F2 14 Tf
+1 0 0 1 50 278 Tm
+(16. Suporte) Tj
+/F1 11 Tf
+1 0 0 1 50 246 Tm
+(Se algo falhar:) Tj
+/F1 11 Tf
+1 0 0 1 50 216 Tm
+(1. Nao apagar o evento.) Tj
+/F1 11 Tf
+1 0 0 1 50 201 Tm
+(2. Tirar screenshot do erro.) Tj
+/F1 11 Tf
+1 0 0 1 50 186 Tm
+(3. Dizer qual artista, evento e hora do problema.) Tj
+/F1 11 Tf
+1 0 0 1 50 171 Tm
+(4. Contactar a equipa StageHub.) Tj
+/F1 11 Tf
+1 0 0 1 50 141 Tm
+(A equipa StageHub consegue rever configuracao, pagamentos, estado do video e) Tj
+/F1 11 Tf
+1 0 0 1 50 126 Tm
+(acesso ao evento.) Tj
+ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 15 0 R >>
+endobj
+xref
+0 17
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000149 00000 n 
+0000000219 00000 n 
+0000000294 00000 n 
+0000002623 00000 n 
+0000002759 00000 n 
+0000005226 00000 n 
+0000005362 00000 n 
+0000007586 00000 n 
+0000007723 00000 n 
+0000010075 00000 n 
+0000010213 00000 n 
+0000012416 00000 n 
+0000012554 00000 n 
+0000014528 00000 n 
+trailer
+<< /Size 17 /Root 1 0 R >>
+startxref
+14666
+%%EOF
