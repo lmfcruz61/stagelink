@@ -513,7 +513,7 @@ def artist_profile_edit(request):
 
         if action == 'create_cloudflare_live_input':
             if artist.cloudflare_live_input_uid:
-                messages.info(request, 'Este artista ja tem um Live Input Cloudflare configurado.')
+                messages.info(request, 'Este artista ja tem um canal de transmissao ao vivo configurado.')
                 return redirect(f"{reverse('streams:artist_profile_edit')}?artist={artist.id}")
             try:
                 live_input = create_live_input_for_artist(artist)
@@ -528,7 +528,7 @@ def artist_profile_edit(request):
                 'cloudflare_rtmps_url',
                 'cloudflare_stream_key',
             ])
-            messages.success(request, 'Live Input Cloudflare criado na conta StageHub e guardado no artista.')
+            messages.success(request, 'Canal de transmissao ao vivo criado e guardado no artista.')
             return redirect(f"{reverse('streams:artist_profile_edit')}?artist={artist.id}")
 
         if action == 'add_photo' and gallery_form.is_valid():
@@ -585,7 +585,7 @@ def stream_create(request):
             if form.cleaned_data.get('create_upload_url') and live_stream.event_type in {LiveStream.RECORDED, LiveStream.REPLAY}:
                 try:
                     prepare_cloudflare_direct_upload(live_stream)
-                    messages.success(request, 'Video criado. Envia agora o ficheiro para a Cloudflare.')
+                    messages.success(request, 'Video criado. Envia agora o ficheiro para a biblioteca StageHub.')
                     return redirect('streams:stream_update', stream_id=live_stream.id)
                 except CloudflareStreamError as error:
                     messages.error(request, str(error))
@@ -629,7 +629,7 @@ def stream_update(request, stream_id):
             ):
                 try:
                     prepare_cloudflare_direct_upload(updated_stream)
-                    messages.success(request, 'Link de upload Cloudflare criado. Envia o ficheiro abaixo.')
+                    messages.success(request, 'Upload preparado. Envia o ficheiro abaixo.')
                     return redirect('streams:stream_update', stream_id=updated_stream.id)
                 except CloudflareStreamError as error:
                     messages.error(request, str(error))

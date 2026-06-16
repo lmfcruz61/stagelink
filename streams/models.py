@@ -16,8 +16,8 @@ class LiveStream(models.Model):
     VIDEO_PROVIDER_CLOUDFLARE_WEBRTC = 'cloudflare_webrtc'
     VIDEO_PROVIDER_YOUTUBE = 'youtube'
     VIDEO_PROVIDER_CHOICES = (
-        (VIDEO_PROVIDER_CLOUDFLARE, 'Cloudflare Stream'),
-        (VIDEO_PROVIDER_CLOUDFLARE_WEBRTC, 'Cloudflare WebRTC'),
+        (VIDEO_PROVIDER_CLOUDFLARE, 'Video StageHub'),
+        (VIDEO_PROVIDER_CLOUDFLARE_WEBRTC, 'Direto StageHub experimental'),
         (VIDEO_PROVIDER_YOUTUBE, 'YouTube legado'),
     )
 

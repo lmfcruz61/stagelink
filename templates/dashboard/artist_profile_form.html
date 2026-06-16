@@ -33,7 +33,7 @@
   <div class="sl-card p-6">
     <h2 class="mb-5 text-xl font-semibold">Conteudo principal</h2>
     <div class="mb-5 rounded border border-[#5230EF] bg-[#5230EF]/15 p-4 text-sm text-zinc-200">
-      <strong>Cloudflare para lives:</strong> a conta Cloudflare e os custos pertencem a StageHub. Cria um Live Input por artista aqui e envia ao artista apenas o RTMPS URL e a Stream Key para usar no OBS.
+      <strong>Transmissao ao vivo:</strong> a StageHub prepara o canal do artista. Para transmitir, o artista so precisa dos dados de OBS mostrados abaixo.
     </div>
     <div class="mb-5 rounded border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-200">
       <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -64,21 +64,20 @@
     <div class="mb-5 rounded border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-200">
       <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <h3 class="font-semibold">Live Input Cloudflare do artista</h3>
+          <h3 class="font-semibold">Dados de transmissao para OBS</h3>
           {% if artist.cloudflare_live_input_uid %}
-            <p class="mt-2 text-zinc-400">UID: <span class="font-mono text-zinc-100">{{ artist.cloudflare_live_input_uid }}</span></p>
-            <p class="mt-1 text-zinc-400">RTMPS URL: <span class="font-mono text-zinc-100">{{ artist.cloudflare_rtmps_url|default:"Nao disponivel" }}</span></p>
-            <p class="mt-1 text-zinc-400">Stream Key: <span class="font-mono text-zinc-100">{{ artist.cloudflare_stream_key|default:"Nao disponivel" }}</span></p>
+            <p class="mt-2 text-zinc-400">Servidor OBS: <span class="font-mono text-zinc-100">{{ artist.cloudflare_rtmps_url|default:"Nao disponivel" }}</span></p>
+            <p class="mt-1 text-zinc-400">Chave de transmissao: <span class="font-mono text-zinc-100">{{ artist.cloudflare_stream_key|default:"Nao disponivel" }}</span></p>
             <p class="mt-2 text-xs text-zinc-500">Estes dados sao privados da equipa/artista. Nao aparecem na pagina publica.</p>
           {% else %}
-            <p class="mt-2 text-zinc-400">Ainda nao existe Live Input para este artista. Cria um na conta StageHub para transmissao ao vivo por OBS.</p>
+            <p class="mt-2 text-zinc-400">Ainda nao existe canal de transmissao para este artista. Cria um para transmitir ao vivo por OBS.</p>
           {% endif %}
         </div>
         {% if not artist.cloudflare_live_input_uid %}
           <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="create_cloudflare_live_input">
-            <button class="sl-primary whitespace-nowrap" type="submit">Criar Live Input</button>
+            <button class="sl-primary whitespace-nowrap" type="submit">Criar canal ao vivo</button>
           </form>
         {% endif %}
       </div>

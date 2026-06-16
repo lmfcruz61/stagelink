@@ -4,19 +4,19 @@
 <section class="mx-auto max-w-3xl">
   <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar evento{% else %}Novo evento{% endif %}</h1>
   <div class="mb-5 rounded border border-[#5230EF] bg-[#5230EF]/15 p-4 text-sm text-zinc-200">
-    Eventos pagos usam Cloudflare Stream e podem receber gorjetas. Eventos gratuitos usam YouTube legado, sem gorjetas. A conta Cloudflare e os custos pertencem a StageHub, nao ao artista.
+    Eventos pagos usam o video StageHub e podem receber gorjetas. Eventos gratuitos usam YouTube legado, sem gorjetas.
   </div>
 
   <details class="mb-5 rounded-xl border border-zinc-800 bg-zinc-900/90 p-5" open>
     <summary class="cursor-pointer text-lg font-semibold text-zinc-100">Guia passo a passo para criar o evento</summary>
     <ol class="mt-4 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Prepara o Cloudflare uma vez.</strong><br>No perfil do artista, cria um Live Input na conta StageHub. O artista nao paga Cloudflare.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>2. Configura o OBS.</strong><br>Cola o RTMPS URL no servidor e a Stream Key na chave de transmissão.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Define o tipo.</strong><br>Pagos podem ser Cloudflare ao vivo/estreia/replay. Gratuitos ficam em YouTube gravado/replay e nao têm gorjetas.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Confirma o ID certo.</strong><br>Ao vivo/estreia podem usar o Live Input UID guardado no artista. Vídeo gravado/replay usam Video UID.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Prepara o canal uma vez.</strong><br>No perfil do artista, cria os dados de transmissão StageHub para usar no OBS.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>2. Configura o OBS.</strong><br>Cola o servidor e a chave de transmissão nos campos certos do OBS.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Define o tipo.</strong><br>Pagos usam video StageHub. Gratuitos ficam em YouTube gravado/replay e nao têm gorjetas.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Confirma a origem do video.</strong><br>Ao vivo/estreia usam o canal do artista. Video gravado/replay podem receber upload nesta pagina.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>5. Agenda e guarda.</strong><br>Define data, preço, duração estimada e capa 16:9. Guarda o evento ainda inativo.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>6. Testa antes de divulgar.</strong><br>Entra na sala como artista/admin, confirma player, áudio, chat, contador e pagamento.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>7. Ativa o stream.</strong><br>Quando estiver tudo pronto, usa o botão verde `Ativar stream` nesta página.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>7. Publica o evento.</strong><br>Quando estiver tudo pronto, usa o botao verde para ativar o evento nesta pagina.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>8. Partilha o evento.</strong><br>No dashboard, usa `Copiar link` para divulgar a página pública do evento.</li>
     </ol>
   </details>
@@ -139,10 +139,15 @@
       <summary class="cursor-pointer font-semibold text-zinc-100">Opções avançadas</summary>
       <div class="mt-4">
         <label>
-          <span>{{ form.cloudflare_playback_url.label }}</span>
-          {{ form.cloudflare_playback_url }}
-          <span class="mt-1 block text-sm text-zinc-500">{{ form.cloudflare_playback_url.help_text }}</span>
-          {% for error in form.cloudflare_playback_url.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+          {% if user.is_staff or user.is_superuser %}
+            <span>{{ form.cloudflare_playback_url.label }}</span>
+            {{ form.cloudflare_playback_url }}
+            <span class="mt-1 block text-sm text-zinc-500">{{ form.cloudflare_playback_url.help_text }}</span>
+            {% for error in form.cloudflare_playback_url.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+          {% else %}
+            <input type="hidden" name="{{ form.cloudflare_playback_url.name }}" value="{{ form.cloudflare_playback_url.value|default_if_none:'' }}">
+            <p class="text-sm text-zinc-400">Area reservada para a equipa StageHub quando for preciso configurar o player manualmente.</p>
+          {% endif %}
         </label>
       </div>
     </details>
@@ -165,10 +170,10 @@
       <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
           <h2 class="text-lg font-semibold">Upload do video</h2>
-          <p class="mt-1 text-sm text-zinc-300">Envia o ficheiro de video diretamente para Cloudflare Stream. Depois do envio, ativa o video quando estiver pronto para publicar.</p>
+          <p class="mt-1 text-sm text-zinc-300">Envia o ficheiro de video para a biblioteca StageHub. Depois do envio, ativa o video quando estiver pronto para publicar.</p>
           {% if stream.cloudflare_video_uid %}
             <p class="mt-2 rounded border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-300">
-              ID do video Cloudflare:
+              Codigo do video:
               <span class="font-mono text-zinc-100">{{ stream.cloudflare_video_uid }}</span>
             </p>
           {% endif %}
@@ -190,10 +195,10 @@
   {% elif stream and stream.cloudflare_upload_status == stream.UPLOAD_UPLOADED %}
     <section class="mt-6 rounded-xl border border-[#10B981] bg-[#10B981]/15 p-5">
       <h2 class="text-lg font-semibold">Upload recebido</h2>
-      <p class="mt-1 text-sm text-zinc-300">O ficheiro foi enviado para Cloudflare. Quando o processamento terminar, usa "Ver sala" para testar e ativa o evento para publicar.</p>
+      <p class="mt-1 text-sm text-zinc-300">O ficheiro foi recebido pela StageHub. Quando o processamento terminar, usa "Ver sala" para testar e ativa o evento para publicar.</p>
       {% if stream.cloudflare_video_uid %}
         <p class="mt-3 rounded border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-300">
-          ID do video Cloudflare:
+          Codigo do video:
           <span class="font-mono text-zinc-100">{{ stream.cloudflare_video_uid }}</span>
         </p>
       {% endif %}
@@ -217,8 +222,8 @@
   const directUploadField = document.querySelector('#direct-upload-field');
   const youtubeLegacyField = document.querySelector('#youtube-legacy-field');
   const cloudflareHelp = document.querySelector('#cloudflare-stream-help');
-  const liveHelp = 'Para eventos ao vivo. Cola o Live Input ID de Cloudflare Stream > Live Inputs.';
-  const videoHelp = 'Para vídeo gravado ou replay. Cola o UID de Cloudflare Stream > Videos.';
+  const liveHelp = 'Para eventos ao vivo, este campo fica normalmente preenchido com o canal do artista.';
+  const videoHelp = 'Para video gravado ou replay, podes preparar upload e enviar o ficheiro nesta pagina.';
 
   function isLiveInputType() {
     return ['live', 'premiere'].includes(eventTypeInput?.value);

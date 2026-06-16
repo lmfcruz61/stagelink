@@ -16,15 +16,15 @@ class LiveStreamForm(forms.ModelForm):
         widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
     )
     cloudflare_stream_id = forms.CharField(
-        label='ID do stream Cloudflare',
+        label='Ligacao de video StageHub',
         max_length=120,
         required=False,
-        help_text='Para eventos ao vivo. Cola o Live Input ID de Cloudflare Stream > Live Inputs.',
+        help_text='Normalmente fica preenchido automaticamente. Usa apenas se a equipa StageHub te indicar um codigo de video.',
     )
     cloudflare_playback_url = forms.URLField(
-        label='URL de embed/playback Cloudflare',
+        label='Ligacao manual do player',
         required=False,
-        help_text='Opcional. Usa se quiseres colar diretamente a URL do separador Embed da Cloudflare.',
+        help_text='Uso interno da equipa StageHub quando for necessario configurar o player manualmente.',
     )
     youtube_video_id = forms.CharField(
         label='ID ou link do video YouTube legado',
@@ -33,9 +33,9 @@ class LiveStreamForm(forms.ModelForm):
         help_text='Apenas para eventos antigos/testes. Nao usar para eventos pagos.',
     )
     create_upload_url = forms.BooleanField(
-        label='Preparar upload de video para Cloudflare',
+        label='Preparar upload de video',
         required=False,
-        help_text='Para video gravado/replay: cria um link seguro para enviar o ficheiro direto para Cloudflare.',
+        help_text='Para video gravado/replay: prepara a pagina para receber o ficheiro de video.',
     )
 
     class Meta:
@@ -103,7 +103,7 @@ class LiveStreamForm(forms.ModelForm):
         if cloudflare_stream_id.lower().startswith(('rtmp://', 'rtmps://')):
             self.add_error(
                 'cloudflare_stream_id',
-                'Este campo deve ter o Live Input ID/Video UID, nao o RTMPS URL. O RTMPS URL vai apenas no OBS.',
+                'Este campo deve ter apenas o codigo de video indicado pela StageHub, nao o endereco do OBS.',
             )
         else:
             normalized_cloudflare_stream_id = LiveStream.extract_cloudflare_identifier(cloudflare_stream_id)
@@ -127,7 +127,7 @@ class LiveStreamForm(forms.ModelForm):
             if not cloudflare_stream_id and not cloudflare_playback_url and not accepts_direct_upload:
                 self.add_error(
                     'cloudflare_stream_id',
-                    'Indica o ID do stream Cloudflare, uma URL de embed Cloudflare ou prepara um upload direto.',
+                    'Indica o codigo de video StageHub ou prepara um upload direto.',
                 )
 
         access_price = cleaned_data.get('access_price')
@@ -136,7 +136,7 @@ class LiveStreamForm(forms.ModelForm):
                 if provider != LiveStream.VIDEO_PROVIDER_YOUTUBE:
                     self.add_error(
                         'video_provider',
-                        'Eventos gratuitos devem usar YouTube legado. Cloudflare fica reservado para eventos pagos.',
+                        'Eventos gratuitos devem usar YouTube legado. O video StageHub fica reservado para eventos pagos.',
                     )
                 if event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:
                     self.add_error(
@@ -146,13 +146,13 @@ class LiveStreamForm(forms.ModelForm):
             elif provider == LiveStream.VIDEO_PROVIDER_YOUTUBE:
                 self.add_error(
                     'video_provider',
-                    'Eventos pagos devem usar Cloudflare Stream.',
+                    'Eventos pagos devem usar video StageHub.',
                 )
 
         if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE_WEBRTC and not cloudflare_playback_url:
             self.add_error(
                 'cloudflare_playback_url',
-                'Para WebRTC, cola a URL de playback WHEP/Embed da Cloudflare. Este modo sera afinado no proximo passo.',
+                'Este modo ainda esta reservado para configuracao tecnica da equipa StageHub.',
             )
 
         if (
