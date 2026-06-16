@@ -31,7 +31,7 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 6. Adicionar varias fotos a galeria.
 7. No perfil do artista, usar `Criar canal ao vivo` para gerar os dados de transmissao para OBS.
 8. Criar evento com titulo, capa 16:9, tipo de conteudo, data futura e preco.
-9. Para evento pago, usar video StageHub. Para evento gratuito, usar YouTube legado e nao usar gorjetas.
+9. Confirmar que o evento tem preco maior que zero e usa video StageHub.
 10. Para evento realmente em direto, escolher `Ao vivo`; para video preparado, escolher `Estreia` ou `Video gravado`; para conteudo passado ainda disponivel, escolher `Replay`.
 11. Ativar o evento.
 12. Abrir a pagina publica do artista e confirmar capa, foto, bio, links, galeria, evento agendado e evento ativo.
@@ -95,7 +95,7 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 8. Para video gravado, usar `Novo video`, preparar upload e enviar o ficheiro pela pagina do evento.
 9. Testar em desktop e mobile.
 
-Nota: eventos gratuitos usam YouTube legado e nao recebem gorjetas. Eventos pagos usam video StageHub e podem receber gorjetas.
+Nota: a StageHub ja nao publica eventos gratuitos. Todos os eventos devem ter preco e podem receber gorjetas.
 
 ## 8. Teste de sala ao vivo, chat e presenca
 

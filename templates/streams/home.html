@@ -214,7 +214,7 @@
                 <a class="sl-primary px-3 py-2 text-sm" href="{% url 'streams:room' stream.id %}">Entrar na sala</a>
               {% else %}
               <a class="sl-primary px-3 py-2 text-sm" href="{% url 'payments:buy_ticket' stream.id %}">
-                {% if stream.access_price > 0 %}Comprar bilhete{% else %}Entrar grátis{% endif %}
+                Comprar bilhete
               </a>
               {% endif %}
               <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:event_detail' stream.id %}">Ver evento</a>

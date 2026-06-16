@@ -51,14 +51,12 @@
       {% endif %}
       <div class="rounded border border-zinc-800 bg-zinc-950 p-3">
         <span class="block text-zinc-500">Preco</span>
-        {% if stream.access_price > 0 and ticket_pricing.has_discount %}
+        {% if ticket_pricing.has_discount %}
           <span class="mt-1 block text-sm text-zinc-400 line-through">{{ ticket_pricing.original_price }} EUR</span>
           <span class="block font-semibold text-zinc-100">{{ ticket_pricing.final_price }} EUR</span>
           <span class="mt-1 block text-xs font-semibold text-[#2596BE]">Desconto Subscritor Pro: {{ ticket_pricing.discount_percent }}%</span>
         {% else %}
-          <span class="mt-1 block font-semibold text-zinc-100">
-            {% if stream.access_price > 0 %}{{ stream.access_price }} EUR{% else %}Gratuito{% endif %}
-          </span>
+          <span class="mt-1 block font-semibold text-zinc-100">{{ stream.access_price }} EUR</span>
         {% endif %}
       </div>
     </div>
@@ -67,14 +65,12 @@
       {% if user.is_authenticated %}
         {% if has_access %}
           <a class="sl-primary w-full" href="{% url 'streams:room' stream.id %}">Entrar na sala</a>
-        {% elif stream.access_price > 0 %}
-          <a class="sl-primary w-full" href="{% url 'payments:buy_ticket' stream.id %}">Comprar acesso</a>
         {% else %}
-          <a class="sl-primary w-full" href="{% url 'streams:room' stream.id %}">Entrar na sala</a>
+          <a class="sl-primary w-full" href="{% url 'payments:buy_ticket' stream.id %}">Comprar acesso</a>
         {% endif %}
       {% else %}
         <a class="sl-primary w-full" href="{% url 'accounts:login' %}?next={{ event_path|urlencode }}">
-          {% if stream.access_price > 0 %}Comprar acesso{% else %}Entrar na sala{% endif %}
+          Comprar acesso
         </a>
         <a class="sl-secondary w-full" href="{% url 'accounts:register' %}?next={{ event_path|urlencode }}">Criar conta</a>
       {% endif %}

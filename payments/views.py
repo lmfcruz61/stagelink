@@ -50,7 +50,7 @@ def _event_public_url(request, stream):
 
 def _event_og_context(request, stream, url=None):
     event_url = url or _event_public_url(request, stream)
-    price = f'{stream.access_price} EUR' if stream.access_price > 0 else 'Gratuito'
+    price = f'{stream.access_price} EUR'
     description = (
         f'{stream.artist.name} apresenta {stream.title} em '
         f'{timezone.localtime(stream.scheduled_at).strftime("%d/%m/%Y %H:%M")}. '
@@ -362,8 +362,8 @@ def buy_ticket(request, stream_id):
         return redirect('streams:room', stream_id=stream.id)
 
     if stream.access_price <= 0:
-        StreamTicketPurchase.objects.update_or_create(fan=fan, stream=stream, defaults={'paid': True})
-        return redirect('streams:room', stream_id=stream.id)
+        messages.error(request, 'Eventos gratuitos ja nao estao disponiveis na StageHub.')
+        return redirect('streams:event_detail', stream_id=stream.id)
 
     if not settings.STRIPE_SECRET_KEY:
         messages.error(request, 'Configura STRIPE_SECRET_KEY para ativar venda de bilhetes.')
@@ -447,7 +447,7 @@ def buy_ticket(request, stream_id):
 def create_tip(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     if stream.access_price <= 0:
-        messages.error(request, 'Eventos gratuitos nao recebem gorjetas na plataforma.')
+        messages.error(request, 'Este evento nao esta disponivel para gorjetas.')
         return redirect('streams:room', stream_id=stream.id)
 
     fan = getattr(request.user, 'fan_profile', None)

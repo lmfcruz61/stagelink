@@ -77,7 +77,7 @@
           <div class="mt-5 flex flex-wrap gap-3">
             {% if user.is_authenticated and user.fan_profile %}
               <a class="sl-primary" href="{% url 'payments:buy_ticket' featured_stream.id %}">
-                {% if featured_stream.access_price > 0 %}Comprar bilhete{% else %}Entrar gratis{% endif %}
+                Comprar bilhete
               </a>
             {% elif user.is_authenticated %}
               <a class="sl-primary" href="{% url 'streams:event_detail' featured_stream.id %}">Ver evento</a>

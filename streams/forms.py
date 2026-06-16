@@ -27,10 +27,10 @@ class LiveStreamForm(forms.ModelForm):
         help_text='Uso interno da equipa StageHub quando for necessario configurar o player manualmente.',
     )
     youtube_video_id = forms.CharField(
-        label='ID ou link do video YouTube legado',
+        label='Video externo legado',
         max_length=200,
         required=False,
-        help_text='Apenas para eventos antigos/testes. Nao usar para eventos pagos.',
+        help_text='Reservado para eventos antigos. Nao usar em novos eventos.',
     )
     create_upload_url = forms.BooleanField(
         label='Preparar upload de video',
@@ -64,6 +64,9 @@ class LiveStreamForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.artist = kwargs.pop('artist', None)
         super().__init__(*args, **kwargs)
+        self.fields['video_provider'].choices = (
+            (LiveStream.VIDEO_PROVIDER_CLOUDFLARE, 'Video StageHub'),
+        )
         if self.instance and self.instance.pk:
             self.fields['create_upload_url'].initial = self.instance.has_pending_direct_upload
         elif self.initial.get('event_type') in {LiveStream.RECORDED, LiveStream.REPLAY}:
@@ -133,21 +136,21 @@ class LiveStreamForm(forms.ModelForm):
         access_price = cleaned_data.get('access_price')
         if access_price is not None:
             if access_price <= 0:
-                if provider != LiveStream.VIDEO_PROVIDER_YOUTUBE:
-                    self.add_error(
-                        'video_provider',
-                        'Eventos gratuitos devem usar YouTube legado. O video StageHub fica reservado para eventos pagos.',
-                    )
-                if event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:
-                    self.add_error(
-                        'event_type',
-                        'Eventos gratuitos devem ser video gravado ou replay no YouTube.',
-                    )
+                self.add_error(
+                    'access_price',
+                    'A StageHub ja nao permite eventos gratuitos. Define um preco maior que zero.',
+                )
             elif provider == LiveStream.VIDEO_PROVIDER_YOUTUBE:
                 self.add_error(
                     'video_provider',
                     'Eventos pagos devem usar video StageHub.',
                 )
+
+        if provider == LiveStream.VIDEO_PROVIDER_YOUTUBE:
+            self.add_error(
+                'video_provider',
+                'Video externo legado ja nao esta disponivel para novos eventos na StageHub.',
+            )
 
         if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE_WEBRTC and not cloudflare_playback_url:
             self.add_error(

@@ -59,17 +59,15 @@
         </div>
       </div>
 
-      {% if stream.access_price > 0 %}
-        <form method="post" action="{% url 'payments:create_tip' stream.id %}" class="sl-card w-full p-3 lg:w-[360px]">
-          {% csrf_token %}
-          <p class="mb-3 text-sm font-semibold text-zinc-200">Enviar gorjeta</p>
-          <div class="grid gap-2 sm:grid-cols-[96px_1fr]">
-            <input name="amount" type="number" min="1" step="0.50" value="5" class="rounded border border-zinc-700 bg-zinc-950 px-3 py-2">
-            <input name="message" placeholder="{% trans 'Mensagem' %}" class="min-w-0 rounded border border-zinc-700 bg-zinc-950 px-3 py-2">
-          </div>
-          <button class="sl-primary mt-3 w-full">{% trans "Gorjeta" %}</button>
-        </form>
-      {% endif %}
+      <form method="post" action="{% url 'payments:create_tip' stream.id %}" class="sl-card w-full p-3 lg:w-[360px]">
+        {% csrf_token %}
+        <p class="mb-3 text-sm font-semibold text-zinc-200">Enviar gorjeta</p>
+        <div class="grid gap-2 sm:grid-cols-[96px_1fr]">
+          <input name="amount" type="number" min="1" step="0.50" value="5" class="rounded border border-zinc-700 bg-zinc-950 px-3 py-2">
+          <input name="message" placeholder="{% trans 'Mensagem' %}" class="min-w-0 rounded border border-zinc-700 bg-zinc-950 px-3 py-2">
+        </div>
+        <button class="sl-primary mt-3 w-full">{% trans "Gorjeta" %}</button>
+      </form>
     </div>
 
     {% if stream.cover_image %}

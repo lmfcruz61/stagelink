@@ -18,7 +18,6 @@ class LiveStream(models.Model):
     VIDEO_PROVIDER_CHOICES = (
         (VIDEO_PROVIDER_CLOUDFLARE, 'Video StageHub'),
         (VIDEO_PROVIDER_CLOUDFLARE_WEBRTC, 'Direto StageHub experimental'),
-        (VIDEO_PROVIDER_YOUTUBE, 'YouTube legado'),
     )
 
     LIVE = 'live'
@@ -308,7 +307,7 @@ class LiveStream(models.Model):
                 return {**base, 'allowed': True, 'reason': 'organization_manager'}
 
         if self.access_price <= 0:
-            return {**base, 'allowed': True, 'reason': 'free_event'}
+            return {**base, 'allowed': False, 'reason': 'free_events_disabled'}
 
         from payments.models import StreamTicketPurchase
 

@@ -12,7 +12,7 @@
   <div class="sl-card p-6">
     <p class="text-sm text-[#2596BE]">{{ stream.artist.name }}</p>
     <h1 class="mt-2 text-3xl font-semibold">{{ stream.title }}</h1>
-    <p class="mt-3 text-zinc-300">{% trans "Esta sala precisa de bilhete, acesso gratuito ou arquivo recente incluido na subscricao. Lives pagas nao ficam gratuitas com subscricao." %}</p>
+    <p class="mt-3 text-zinc-300">{% trans "Esta sala precisa de bilhete ou arquivo recente incluido na subscricao. Lives pagas nao ficam gratuitas com subscricao." %}</p>
     <div class="mt-6 grid gap-3">
       <a class="sl-primary w-full" href="{% url 'payments:buy_ticket' stream.id %}">{% trans "Comprar bilhete" %}</a>
       <a class="sl-secondary w-full" href="{% url 'streams:artist_detail' stream.artist.id %}#subscricoes">{% trans "Ver planos de subscricao" %}</a>

@@ -39,7 +39,7 @@ Não inclui:
 
 As lives pagas precisam sempre de bilhete. Mesmo um Subscritor Pro deve comprar bilhete, mas recebe 50% de desconto automaticamente no checkout.
 
-As lives gratuitas podem usar YouTube, sem gorjetas pela plataforma. As lives pagas devem usar o sistema de vídeo configurado pela StageHub, para proteger melhor o acesso.
+Eventos gratuitos ja nao estao disponiveis na StageHub. Todos os eventos publicados devem ter bilhete pago e usar o sistema de video configurado pela StageHub.
 
 ## Arquivo e vídeos gravados
 

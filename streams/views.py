@@ -45,7 +45,7 @@ def event_public_url(request, stream):
 
 def event_og_context(request, stream, url=None):
     event_url = url or event_public_url(request, stream)
-    price = f'{stream.access_price} EUR' if stream.access_price > 0 else 'Gratuito'
+    price = f'{stream.access_price} EUR'
     description = (
         f'{stream.artist.name} apresenta {stream.title} em '
         f'{timezone.localtime(stream.scheduled_at).strftime("%d/%m/%Y %H:%M")}. '
@@ -91,7 +91,7 @@ def home(request):
             return redirect('streams:home')
         messages.warning(request, 'Nao foi possivel subscrever a newsletter. Confirma os dados abaixo.')
 
-    visible_streams_filter = Q(is_active=True) | Q(scheduled_at__gte=now)
+    visible_streams_filter = (Q(is_active=True) | Q(scheduled_at__gte=now)) & Q(access_price__gt=0)
     purchased_stream_ids = set()
     if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
         purchased_stream_ids = set(
@@ -182,7 +182,7 @@ def artist_detail(request, artist_id):
     can_manage_current_artist = request.user.is_authenticated and can_manage_artist(request.user, artist)
     streams = artist.streams.all()
     if not can_manage_current_artist:
-        streams = streams.filter(Q(is_active=True) | Q(scheduled_at__gte=now))
+        streams = streams.filter(Q(is_active=True) | Q(scheduled_at__gte=now), access_price__gt=0)
     upcoming_streams = streams.filter(scheduled_at__gte=now).order_by('scheduled_at')
     video_library_streams = streams.filter(
         event_type__in=(LiveStream.RECORDED, LiveStream.REPLAY),
@@ -340,7 +340,7 @@ def stream_room(request, stream_id):
         video_locked = True
         messages.info(request, 'A tua subscricao permite participar no chat. Para ver esta live paga, compra o bilhete.')
     elif not access['allowed']:
-        messages.warning(request, 'Precisas de bilhete, acesso gratuito ou arquivo recente por subscricao para entrar nesta sala.')
+        messages.warning(request, 'Precisas de bilhete ou arquivo recente por subscricao para entrar nesta sala.')
         return render(request, 'streams/access_required.html', {'stream': stream})
     now = timezone.now()
     event_url = event_public_url(request, stream)

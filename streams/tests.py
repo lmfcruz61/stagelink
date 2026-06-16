@@ -112,6 +112,28 @@ class LiveStreamFormTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn('duration_minutes', form.errors)
 
+    def test_free_events_are_rejected(self):
+        scheduled_at = timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M')
+        form = LiveStreamForm(
+            data={
+                'title': 'Evento gratuito',
+                'description': '',
+                'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+                'cloudflare_stream_id': 'video-stagehub-123',
+                'cloudflare_playback_url': '',
+                'youtube_video_id': '',
+                'event_type': LiveStream.RECORDED,
+                'access_price': '0.00',
+                'scheduled_at': scheduled_at,
+                'duration_minutes': '30',
+                'create_upload_url': '',
+            },
+            artist=self.artist,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('access_price', form.errors)
+
 
 class LiveStreamAccessAndEmbedTests(TestCase):
     def setUp(self):

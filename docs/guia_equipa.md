@@ -48,9 +48,9 @@ Nenhum escalão dá entrada gratuita em lives pagas. Nenhum escalão dá acesso 
 6. O público compra bilhete ou usa o desconto Pro quando aplicável.
 7. Na hora marcada, o vídeo e o chat ficam disponíveis conforme as permissões.
 
-## Lives gratuitas
+## Eventos pagos
 
-Lives gratuitas podem ser divulgadas e assistidas sem pagamento. No MVP, lives gratuitas devem usar YouTube e não devem receber gorjetas pela plataforma.
+Eventos gratuitos ja nao estao disponiveis na StageHub. Todos os eventos publicados devem ter bilhete pago e usar o video StageHub.
 
 ## Margens e custos
 

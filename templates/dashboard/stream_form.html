@@ -4,7 +4,7 @@
 <section class="mx-auto max-w-3xl">
   <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar evento{% else %}Novo evento{% endif %}</h1>
   <div class="mb-5 rounded border border-[#5230EF] bg-[#5230EF]/15 p-4 text-sm text-zinc-200">
-    Eventos pagos usam o video StageHub e podem receber gorjetas. Eventos gratuitos usam YouTube legado, sem gorjetas.
+    Todos os eventos publicados na StageHub sao pagos e usam video StageHub. Define sempre um preco de bilhete maior que zero.
   </div>
 
   <details class="mb-5 rounded-xl border border-zinc-800 bg-zinc-900/90 p-5" open>
@@ -12,7 +12,7 @@
     <ol class="mt-4 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Prepara o canal uma vez.</strong><br>No perfil do artista, cria os dados de transmissão StageHub para usar no OBS.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>2. Configura o OBS.</strong><br>Cola o servidor e a chave de transmissão nos campos certos do OBS.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Define o tipo.</strong><br>Pagos usam video StageHub. Gratuitos ficam em YouTube gravado/replay e nao têm gorjetas.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Define o tipo.</strong><br>Escolhe ao vivo, estreia, video gravado ou replay. Todos usam video StageHub.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Confirma a origem do video.</strong><br>Ao vivo/estreia usam o canal do artista. Video gravado/replay podem receber upload nesta pagina.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>5. Agenda e guarda.</strong><br>Define data, preço, duração estimada e capa 16:9. Guarda o evento ainda inativo.</li>
       <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>6. Testa antes de divulgar.</strong><br>Entra na sala como artista/admin, confirma player, áudio, chat, contador e pagamento.</li>
@@ -126,14 +126,7 @@
       </label>
     </div>
 
-    <div id="youtube-legacy-field">
-      <label>
-        <span>{{ form.youtube_video_id.label }}</span>
-        {{ form.youtube_video_id }}
-        <span class="mt-1 block text-sm text-zinc-500">{{ form.youtube_video_id.help_text }}</span>
-        {% for error in form.youtube_video_id.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
-      </label>
-    </div>
+    <input type="hidden" name="{{ form.youtube_video_id.name }}" value="{{ form.youtube_video_id.value|default_if_none:'' }}">
 
     <details class="rounded border border-zinc-800 bg-zinc-950 p-4">
       <summary class="cursor-pointer font-semibold text-zinc-100">Opções avançadas</summary>
@@ -220,7 +213,6 @@
   const artistInput = document.querySelector('select[name="artist"]');
   const cloudflareStreamInput = document.querySelector('#id_cloudflare_stream_id');
   const directUploadField = document.querySelector('#direct-upload-field');
-  const youtubeLegacyField = document.querySelector('#youtube-legacy-field');
   const cloudflareHelp = document.querySelector('#cloudflare-stream-help');
   const liveHelp = 'Para eventos ao vivo, este campo fica normalmente preenchido com o canal do artista.';
   const videoHelp = 'Para video gravado ou replay, podes preparar upload e enviar o ficheiro nesta pagina.';
@@ -243,13 +235,6 @@
     }
   }
 
-  function updateYouTubeVisibility() {
-    if (!youtubeLegacyField) return;
-    const price = Number.parseFloat((accessPriceInput?.value || '0').replace(',', '.')) || 0;
-    const show = price <= 0 && !isLiveInputType();
-    youtubeLegacyField.classList.toggle('hidden', !show);
-  }
-
   function updateDirectUploadVisibility() {
     if (!directUploadField) return;
     const show = ['recorded', 'replay'].includes(eventTypeInput?.value);
@@ -259,7 +244,6 @@
   function updateVideoFields() {
     updateCloudflareHelp();
     fillArtistLiveInput();
-    updateYouTubeVisibility();
     updateDirectUploadVisibility();
   }
 
