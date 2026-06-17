@@ -234,7 +234,53 @@ Resultado esperado:
 2. Publico sem acesso nao ve conteudo pago sem comprar.
 3. Artista consegue editar video.
 
-## 11. Teste de subscricoes em modo teste
+## 11. Teste de galerias de fotos pagas
+
+Entrar como artista ou equipa.
+
+Criar galeria:
+
+1. Abrir dashboard.
+2. Clicar em `Nova galeria`.
+3. Preencher titulo.
+4. Preencher descricao.
+5. Adicionar capa publica discreta.
+6. Definir preco igual ou superior a 2 EUR.
+7. Marcar conteudo sensivel/adulto, se aplicavel.
+8. Guardar.
+9. Adicionar fotos privadas.
+10. Confirmar limite de 30 fotos por galeria.
+11. Confirmar limite de 5 MB por foto.
+12. Confirmar limite de 150 MB por envio.
+13. Confirmar formatos JPG, PNG ou WebP.
+14. Enviar para validacao.
+
+Testar moderacao:
+
+1. Entrar no admin Django.
+2. Abrir galerias pendentes.
+3. Aprovar uma galeria.
+4. Rejeitar uma galeria de teste com motivo.
+5. Confirmar que galerias pendentes/rejeitadas nao aparecem ao publico.
+6. Confirmar que galerias aprovadas e ativas aparecem na pagina do artista.
+
+Testar acesso:
+
+1. Abrir galeria como publico sem compra.
+2. Confirmar que so aparece capa publica, titulo, preco e numero de fotos.
+3. Confirmar que fotos privadas nao aparecem.
+4. Comprar acesso em modo teste.
+5. Confirmar que as fotos privadas aparecem depois da compra.
+
+Resultado esperado:
+
+1. Publico nao pagante nao ve fotos privadas.
+2. Comprador ve fotos privadas.
+3. Galerias sensiveis mostram aviso.
+4. Galerias so vendem depois de aprovadas.
+5. Limites de tamanho impedem uploads demasiado pesados.
+
+## 12. Teste de subscricoes em modo teste
 
 Ainda com Stripe em modo teste:
 
@@ -255,7 +301,7 @@ Resultado esperado:
 
 Nota: este teste ainda nao valida dinheiro real. Valida fluxo, permissoes e experiencia.
 
-## 12. Teste de bilhete em modo teste
+## 13. Teste de bilhete em modo teste
 
 Ainda com Stripe em modo teste:
 
@@ -275,7 +321,7 @@ Resultado esperado:
 3. Compra fica guardada.
 4. Nao e preciso comprar duas vezes.
 
-## 13. Teste de gorjeta em modo teste
+## 14. Teste de gorjeta em modo teste
 
 Ainda com Stripe em modo teste:
 
@@ -292,7 +338,7 @@ Resultado esperado:
 2. Valor fica registado.
 3. Artista/equipa consegue ver impacto no dashboard, se aplicavel.
 
-## 14. Teste Stripe Connect em modo teste
+## 15. Teste Stripe Connect em modo teste
 
 Antes de live, validar Connect em teste:
 
@@ -322,7 +368,7 @@ Exemplo:
 2. StageHub: 2 EUR.
 3. Artista: 8 EUR.
 
-## 15. Testes que devem ficar para o fim
+## 16. Testes que devem ficar para o fim
 
 So fazer depois de tudo acima estar aprovado:
 
@@ -345,7 +391,7 @@ Recomendacao para primeiro pagamento real:
 6. Confirmar taxa/comissao.
 7. Confirmar estado da conta conectada do artista.
 
-## 16. Checklist antes de mudar para Stripe live
+## 17. Checklist antes de mudar para Stripe live
 
 So avancar se tudo estiver marcado:
 
@@ -362,15 +408,18 @@ So avancar se tudo estiver marcado:
 11. Video gravado testado.
 12. Limite de 1 hora testado.
 13. Biblioteca de videos testada.
-14. Subscricao teste funciona.
-15. Bilhete teste funciona.
-16. Gorjeta teste funciona.
-17. Stripe Connect teste funciona.
-18. Comissao de 20% confirmada em teste.
-19. Pagina mobile aceitavel.
-20. Guias PDF prontos para artista e publico.
+14. Galerias pagas testadas.
+15. Limites de 30 fotos, 5 MB por foto e 150 MB por envio testados.
+16. Moderacao de galerias testada.
+17. Subscricao teste funciona.
+18. Bilhete teste funciona.
+19. Gorjeta teste funciona.
+20. Stripe Connect teste funciona.
+21. Comissao de 20% confirmada em teste.
+22. Pagina mobile aceitavel.
+23. Guias PDF prontos para artista e publico.
 
-## 17. O que mudar quando chegar a hora de live
+## 18. O que mudar quando chegar a hora de live
 
 Quando tudo estiver aprovado:
 
@@ -384,7 +433,7 @@ Quando tudo estiver aprovado:
 
 Importante: contas conectadas reais sao criadas/completadas pelo artista ou pela equipa responsavel pelo artista, nao por uma conta falsa de teste.
 
-## 18. Decisao final
+## 19. Decisao final
 
 So considerar a StageHub pronta para pagamentos live quando:
 

@@ -113,7 +113,24 @@ Passos:
 
 Os videos gravados na StageHub têm duracao maxima de 1 hora.
 
-## 9. Subscricoes mensais
+## 9. Ver galerias de fotos
+
+Alguns artistas e fotografos podem publicar galerias de fotos pagas.
+
+Antes da compra, o publico ve apenas:
+
+1. Capa publica discreta.
+2. Titulo.
+3. Descricao.
+4. Preco.
+5. Numero de fotos.
+6. Aviso de conteudo sensivel/adulto, se aplicavel.
+
+As fotos privadas so aparecem depois de comprares acesso com a tua conta.
+
+Se a galeria estiver marcada como conteudo sensivel/adulto, confirma antes de comprar que queres aceder a esse tipo de conteudo.
+
+## 10. Subscricoes mensais
 
 Podes apoiar artistas com uma subscricao mensal.
 
@@ -130,7 +147,7 @@ Beneficios:
 
 Importante: uma subscricao nao substitui automaticamente todos os bilhetes pagos. Alguns eventos continuam a precisar de bilhete proprio.
 
-## 10. Gorjetas
+## 11. Gorjetas
 
 Durante eventos pagos, podes apoiar o artista com uma gorjeta.
 
@@ -144,7 +161,7 @@ Passos:
 
 As gorjetas sao uma forma direta de apoiar o artista.
 
-## 11. Reembolsos e problemas de pagamento
+## 12. Reembolsos e problemas de pagamento
 
 Se tiveres um problema:
 
@@ -156,7 +173,7 @@ Se tiveres um problema:
 
 Pedidos de reembolso podem depender do caso, do evento e das regras definidas pela plataforma ou pelo artista.
 
-## 12. Problemas de video ou som
+## 13. Problemas de video ou som
 
 Se o video ou som nao funcionar:
 
@@ -169,7 +186,7 @@ Se o video ou som nao funcionar:
 
 Se o problema continuar, tira screenshot e contacta o suporte.
 
-## 13. Boas praticas
+## 14. Boas praticas
 
 Antes de um evento:
 
@@ -185,7 +202,7 @@ Durante o evento:
 2. Nao partilhes acessos indevidamente.
 3. Usa o chat de forma construtiva.
 
-## 14. Checklist rapido
+## 15. Checklist rapido
 
 Antes de assistir, confirma:
 
@@ -197,7 +214,7 @@ Antes de assistir, confirma:
 6. Som do dispositivo ligado.
 7. Internet estavel.
 
-## 15. Suporte
+## 16. Suporte
 
 Para pedir ajuda, envia:
 

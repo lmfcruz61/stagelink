@@ -4,6 +4,7 @@ import json
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
@@ -11,7 +12,7 @@ from django.utils import timezone
 from accounts.models import Artist, Fan
 from payments.models import PhotoGalleryPurchase, StreamTicketPurchase
 
-from .forms import LiveStreamForm, PhotoGalleryForm
+from .forms import LiveStreamForm, PhotoGalleryForm, PhotoGalleryImageUploadForm
 from .cloudflare import create_direct_upload_for_stream
 from .models import LiveStream, PhotoGallery, PhotoGalleryImage
 
@@ -350,6 +351,21 @@ class PhotoGalleryAccessTests(TestCase):
 
         self.assertFalse(form.is_valid())
         self.assertIn('access_price', form.errors)
+
+    def test_photo_gallery_upload_rejects_images_over_five_mb(self):
+        gallery = self.create_gallery()
+        image = SimpleUploadedFile(
+            'foto.jpg',
+            b'x' * ((5 * 1024 * 1024) + 1),
+            content_type='image/jpeg',
+        )
+        form = PhotoGalleryImageUploadForm(
+            files={'images': image},
+            gallery=gallery,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('Cada foto pode ter no maximo 5 MB.', form.errors['images'])
 
     def test_pending_gallery_does_not_show_to_public_on_artist_page(self):
         self.create_gallery(moderation_status=PhotoGallery.PENDING)

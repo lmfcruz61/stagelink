@@ -55,7 +55,7 @@
       {% if gallery %}
         <section class="sl-card p-6">
           <h2 class="text-xl font-semibold">Fotos privadas</h2>
-          <p class="mt-1 text-sm text-zinc-400">Estas fotos so devem aparecer depois de compra/acesso. Maximo 30 fotos.</p>
+          <p class="mt-1 text-sm text-zinc-400">Estas fotos so devem aparecer depois de compra/acesso. Maximo 30 fotos, 5 MB por foto e 150 MB por envio.</p>
           <form method="post" enctype="multipart/form-data" class="mt-5 space-y-4">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_images">

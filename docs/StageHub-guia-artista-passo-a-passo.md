@@ -232,7 +232,35 @@ O processo e simples:
 4. A StageHub retira a comissao.
 5. O restante fica para o artista.
 
-## 15. Checklist rapido do artista
+## 15. Galerias de fotos pagas
+
+A StageHub tambem permite galerias de fotos pagas para fotografos, artistas e conteudo exclusivo.
+
+Regras principais:
+
+1. A galeria tem uma capa publica discreta.
+2. As fotos privadas so aparecem depois de compra/acesso.
+3. O preco minimo e 2 EUR.
+4. Cada galeria pode ter no maximo 30 fotos.
+5. Cada foto pode ter no maximo 5 MB.
+6. Cada envio pode ter no maximo 150 MB no total.
+7. Formatos aceites: JPG, PNG e WebP.
+8. Galerias sensiveis/adultas devem ser marcadas como conteudo sensivel.
+9. A galeria tem de ser enviada para validacao StageHub.
+10. So galerias aprovadas e ativas aparecem ao publico.
+
+Passos:
+
+1. No dashboard, clicar em `Nova galeria`.
+2. Preencher titulo, descricao, capa publica e preco.
+3. Marcar conteudo sensivel/adulto, se aplicavel.
+4. Guardar a galeria.
+5. Adicionar fotos privadas.
+6. Enviar para validacao.
+7. Aguardar aprovacao StageHub.
+8. Ativar quando estiver pronta para venda.
+
+## 16. Checklist rapido do artista
 
 Antes do primeiro evento, confirmar:
 
@@ -242,12 +270,13 @@ Antes do primeiro evento, confirmar:
 4. Video StageHub configurado.
 5. OBS testado, se for ao vivo.
 6. Video enviado, se for gravado.
-7. Sala testada.
-8. Chat testado.
-9. Link publico copiado.
-10. Evento ativado.
+7. Galeria paga validada, se houver fotos exclusivas.
+8. Sala testada.
+9. Chat testado.
+10. Link publico copiado.
+11. Evento ativado.
 
-## 16. Suporte
+## 17. Suporte
 
 Se algo falhar:
 

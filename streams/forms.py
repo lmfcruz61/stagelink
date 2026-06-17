@@ -267,10 +267,11 @@ class PhotoGalleryImageUploadForm(forms.Form):
         label='Fotos privadas da galeria',
         required=True,
         widget=MultipleFileInput(attrs={'multiple': True, 'accept': 'image/jpeg,image/png,image/webp'}),
-        help_text='Maximo 30 fotos por galeria. Cada foto pode ter ate 10 MB.',
+        help_text='Maximo 30 fotos por galeria, 5 MB por foto e 150 MB no total.',
     )
 
-    MAX_IMAGE_SIZE = 10 * 1024 * 1024
+    MAX_IMAGE_SIZE = 5 * 1024 * 1024
+    MAX_TOTAL_SIZE = 150 * 1024 * 1024
     ALLOWED_CONTENT_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
 
     def __init__(self, *args, gallery=None, **kwargs):
@@ -282,10 +283,12 @@ class PhotoGalleryImageUploadForm(forms.Form):
         existing_count = self.gallery.images.count() if self.gallery else 0
         if existing_count + len(images) > PhotoGallery.MAX_IMAGES:
             raise forms.ValidationError(f'Cada galeria pode ter no maximo {PhotoGallery.MAX_IMAGES} fotos.')
+        if sum(image.size for image in images) > self.MAX_TOTAL_SIZE:
+            raise forms.ValidationError('Cada envio pode ter no maximo 150 MB no total.')
         for image in images:
             content_type = getattr(image, 'content_type', '')
             if content_type not in self.ALLOWED_CONTENT_TYPES:
                 raise forms.ValidationError('Usa apenas imagens JPG, PNG ou WebP.')
             if image.size > self.MAX_IMAGE_SIZE:
-                raise forms.ValidationError('Cada foto pode ter no maximo 10 MB.')
+                raise forms.ValidationError('Cada foto pode ter no maximo 5 MB.')
         return images

@@ -3,7 +3,7 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R] /Count 9 >>
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R] /Count 10 >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
@@ -572,7 +572,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 13 0 R >>
 endobj
 15 0 obj
-<< /Length 2275 >>
+<< /Length 2586 >>
 stream
 BT
 /F1 11 Tf
@@ -586,97 +586,106 @@ BT
 (3. Artista consegue editar video.) Tj
 /F2 14 Tf
 1 0 0 1 50 702 Tm
-(11. Teste de subscricoes em modo teste) Tj
+(11. Teste de galerias de fotos pagas) Tj
 /F1 11 Tf
 1 0 0 1 50 670 Tm
-(Ainda com Stripe em modo teste:) Tj
+(Entrar como artista ou equipa.) Tj
 /F1 11 Tf
 1 0 0 1 50 640 Tm
-(1. Entrar como publico.) Tj
-/F1 11 Tf
-1 0 0 1 50 625 Tm
-(2. Abrir pagina do artista.) Tj
+(Criar galeria:) Tj
 /F1 11 Tf
 1 0 0 1 50 610 Tm
-(3. Escolher plano Subscritor.) Tj
+(1. Abrir dashboard.) Tj
 /F1 11 Tf
 1 0 0 1 50 595 Tm
-(4. Fazer pagamento com cartao de teste Stripe.) Tj
+(2. Clicar em Nova galeria.) Tj
 /F1 11 Tf
 1 0 0 1 50 580 Tm
-(5. Confirmar retorno ao site.) Tj
+(3. Preencher titulo.) Tj
 /F1 11 Tf
 1 0 0 1 50 565 Tm
-(6. Confirmar mensagem de subscricao.) Tj
+(4. Preencher descricao.) Tj
 /F1 11 Tf
 1 0 0 1 50 550 Tm
-(7. Repetir com Subscritor Pro, se necessario.) Tj
+(5. Adicionar capa publica discreta.) Tj
+/F1 11 Tf
+1 0 0 1 50 535 Tm
+(6. Definir preco igual ou superior a 2 EUR.) Tj
 /F1 11 Tf
 1 0 0 1 50 520 Tm
-(Resultado esperado:) Tj
+(7. Marcar conteudo sensivel/adulto, se aplicavel.) Tj
+/F1 11 Tf
+1 0 0 1 50 505 Tm
+(8. Guardar.) Tj
 /F1 11 Tf
 1 0 0 1 50 490 Tm
-(1. Checkout de teste abre.) Tj
+(9. Adicionar fotos privadas.) Tj
 /F1 11 Tf
 1 0 0 1 50 475 Tm
-(2. Pagamento de teste confirma.) Tj
+(10. Confirmar limite de 30 fotos por galeria.) Tj
 /F1 11 Tf
 1 0 0 1 50 460 Tm
-(3. Subscricao aparece como ativa.) Tj
+(11. Confirmar limite de 5 MB por foto.) Tj
 /F1 11 Tf
 1 0 0 1 50 445 Tm
-(4. Beneficios aparecem conforme esperado.) Tj
+(12. Confirmar limite de 150 MB por envio.) Tj
+/F1 11 Tf
+1 0 0 1 50 430 Tm
+(13. Confirmar formatos JPG, PNG ou WebP.) Tj
 /F1 11 Tf
 1 0 0 1 50 415 Tm
-(Nota: este teste ainda nao valida dinheiro real. Valida fluxo, permissoes e) Tj
+(14. Enviar para validacao.) Tj
 /F1 11 Tf
-1 0 0 1 50 400 Tm
-(experiencia.) Tj
-/F2 14 Tf
+1 0 0 1 50 385 Tm
+(Testar moderacao:) Tj
+/F1 11 Tf
 1 0 0 1 50 355 Tm
-(12. Teste de bilhete em modo teste) Tj
+(1. Entrar no admin Django.) Tj
 /F1 11 Tf
-1 0 0 1 50 323 Tm
-(Ainda com Stripe em modo teste:) Tj
+1 0 0 1 50 340 Tm
+(2. Abrir galerias pendentes.) Tj
 /F1 11 Tf
-1 0 0 1 50 293 Tm
-(1. Entrar como publico.) Tj
+1 0 0 1 50 325 Tm
+(3. Aprovar uma galeria.) Tj
 /F1 11 Tf
-1 0 0 1 50 278 Tm
-(2. Abrir evento pago.) Tj
+1 0 0 1 50 310 Tm
+(4. Rejeitar uma galeria de teste com motivo.) Tj
 /F1 11 Tf
-1 0 0 1 50 263 Tm
-(3. Clicar em Comprar bilhete.) Tj
+1 0 0 1 50 295 Tm
+(5. Confirmar que galerias pendentes/rejeitadas nao aparecem ao publico.) Tj
 /F1 11 Tf
-1 0 0 1 50 248 Tm
-(4. Pagar com cartao de teste Stripe.) Tj
+1 0 0 1 50 280 Tm
+(6. Confirmar que galerias aprovadas e ativas aparecem na pagina do artista.) Tj
 /F1 11 Tf
-1 0 0 1 50 233 Tm
-(5. Voltar ao site.) Tj
+1 0 0 1 50 250 Tm
+(Testar acesso:) Tj
 /F1 11 Tf
-1 0 0 1 50 218 Tm
-(6. Confirmar acesso a sala.) Tj
+1 0 0 1 50 220 Tm
+(1. Abrir galeria como publico sem compra.) Tj
 /F1 11 Tf
-1 0 0 1 50 203 Tm
-(7. Confirmar que o bilhete fica associado a conta.) Tj
+1 0 0 1 50 205 Tm
+(2. Confirmar que so aparece capa publica, titulo, preco e numero de fotos.) Tj
 /F1 11 Tf
-1 0 0 1 50 188 Tm
-(8. Fazer logout/login e confirmar que o acesso continua.) Tj
+1 0 0 1 50 190 Tm
+(3. Confirmar que fotos privadas nao aparecem.) Tj
 /F1 11 Tf
-1 0 0 1 50 158 Tm
+1 0 0 1 50 175 Tm
+(4. Comprar acesso em modo teste.) Tj
+/F1 11 Tf
+1 0 0 1 50 160 Tm
+(5. Confirmar que as fotos privadas aparecem depois da compra.) Tj
+/F1 11 Tf
+1 0 0 1 50 130 Tm
 (Resultado esperado:) Tj
 /F1 11 Tf
-1 0 0 1 50 128 Tm
-(1. Compra de teste conclui.) Tj
+1 0 0 1 50 100 Tm
+(1. Publico nao pagante nao ve fotos privadas.) Tj
 /F1 11 Tf
-1 0 0 1 50 113 Tm
-(2. Publico entra na sala.) Tj
+1 0 0 1 50 85 Tm
+(2. Comprador ve fotos privadas.) Tj
 /F1 11 Tf
-1 0 0 1 50 98 Tm
-(3. Compra fica guardada.) Tj
-/F1 11 Tf
-1 0 0 1 50 83 Tm
-(4. Nao e preciso comprar duas vezes.) Tj
+1 0 0 1 50 70 Tm
+(3. Galerias sensiveis mostram aviso.) Tj
 ET
 endstream
 endobj
@@ -684,108 +693,111 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 15 0 R >>
 endobj
 17 0 obj
-<< /Length 2120 >>
+<< /Length 2289 >>
 stream
 BT
-/F2 14 Tf
+/F1 11 Tf
+1 0 0 1 50 792 Tm
+(4. Galerias so vendem depois de aprovadas.) Tj
+/F1 11 Tf
 1 0 0 1 50 777 Tm
-(13. Teste de gorjeta em modo teste) Tj
-/F1 11 Tf
-1 0 0 1 50 745 Tm
-(Ainda com Stripe em modo teste:) Tj
-/F1 11 Tf
-1 0 0 1 50 715 Tm
-(1. Entrar como publico com acesso ao evento.) Tj
+(5. Limites de tamanho impedem uploads demasiado pesados.) Tj
+/F2 14 Tf
+1 0 0 1 50 732 Tm
+(12. Teste de subscricoes em modo teste) Tj
 /F1 11 Tf
 1 0 0 1 50 700 Tm
-(2. Abrir sala.) Tj
-/F1 11 Tf
-1 0 0 1 50 685 Tm
-(3. Enviar gorjeta.) Tj
+(Ainda com Stripe em modo teste:) Tj
 /F1 11 Tf
 1 0 0 1 50 670 Tm
-(4. Usar cartao de teste Stripe.) Tj
+(1. Entrar como publico.) Tj
 /F1 11 Tf
 1 0 0 1 50 655 Tm
-(5. Confirmar retorno ao evento.) Tj
+(2. Abrir pagina do artista.) Tj
 /F1 11 Tf
 1 0 0 1 50 640 Tm
-(6. Confirmar mensagem de sucesso.) Tj
+(3. Escolher plano Subscritor.) Tj
+/F1 11 Tf
+1 0 0 1 50 625 Tm
+(4. Fazer pagamento com cartao de teste Stripe.) Tj
 /F1 11 Tf
 1 0 0 1 50 610 Tm
-(Resultado esperado:) Tj
+(5. Confirmar retorno ao site.) Tj
+/F1 11 Tf
+1 0 0 1 50 595 Tm
+(6. Confirmar mensagem de subscricao.) Tj
 /F1 11 Tf
 1 0 0 1 50 580 Tm
-(1. Gorjeta de teste confirma.) Tj
-/F1 11 Tf
-1 0 0 1 50 565 Tm
-(2. Valor fica registado.) Tj
+(7. Repetir com Subscritor Pro, se necessario.) Tj
 /F1 11 Tf
 1 0 0 1 50 550 Tm
-(3. Artista/equipa consegue ver impacto no dashboard, se aplicavel.) Tj
-/F2 14 Tf
-1 0 0 1 50 505 Tm
-(14. Teste Stripe Connect em modo teste) Tj
-/F1 11 Tf
-1 0 0 1 50 473 Tm
-(Antes de live, validar Connect em teste:) Tj
-/F1 11 Tf
-1 0 0 1 50 443 Tm
-(1. Entrar como artista/equipa.) Tj
-/F1 11 Tf
-1 0 0 1 50 428 Tm
-(2. Abrir Editar pagina.) Tj
-/F1 11 Tf
-1 0 0 1 50 413 Tm
-(3. Clicar em Ligar Stripe.) Tj
-/F1 11 Tf
-1 0 0 1 50 398 Tm
-(4. Completar onboarding de teste.) Tj
-/F1 11 Tf
-1 0 0 1 50 383 Tm
-(5. Confirmar estado ativo para pagamentos.) Tj
-/F1 11 Tf
-1 0 0 1 50 368 Tm
-(6. Fazer uma compra de bilhete em teste.) Tj
-/F1 11 Tf
-1 0 0 1 50 353 Tm
-(7. Confirmar no dashboard Stripe teste que ha divisao/comissao.) Tj
-/F1 11 Tf
-1 0 0 1 50 323 Tm
 (Resultado esperado:) Tj
 /F1 11 Tf
+1 0 0 1 50 520 Tm
+(1. Checkout de teste abre.) Tj
+/F1 11 Tf
+1 0 0 1 50 505 Tm
+(2. Pagamento de teste confirma.) Tj
+/F1 11 Tf
+1 0 0 1 50 490 Tm
+(3. Subscricao aparece como ativa.) Tj
+/F1 11 Tf
+1 0 0 1 50 475 Tm
+(4. Beneficios aparecem conforme esperado.) Tj
+/F1 11 Tf
+1 0 0 1 50 445 Tm
+(Nota: este teste ainda nao valida dinheiro real. Valida fluxo, permissoes e) Tj
+/F1 11 Tf
+1 0 0 1 50 430 Tm
+(experiencia.) Tj
+/F2 14 Tf
+1 0 0 1 50 385 Tm
+(13. Teste de bilhete em modo teste) Tj
+/F1 11 Tf
+1 0 0 1 50 353 Tm
+(Ainda com Stripe em modo teste:) Tj
+/F1 11 Tf
+1 0 0 1 50 323 Tm
+(1. Entrar como publico.) Tj
+/F1 11 Tf
+1 0 0 1 50 308 Tm
+(2. Abrir evento pago.) Tj
+/F1 11 Tf
 1 0 0 1 50 293 Tm
-(1. Conta conectada de teste fica criada.) Tj
+(3. Clicar em Comprar bilhete.) Tj
 /F1 11 Tf
 1 0 0 1 50 278 Tm
-(2. Artista fica pronto para cobrancas em teste.) Tj
+(4. Pagar com cartao de teste Stripe.) Tj
 /F1 11 Tf
 1 0 0 1 50 263 Tm
-(3. Checkout usa Connect.) Tj
+(5. Voltar ao site.) Tj
 /F1 11 Tf
 1 0 0 1 50 248 Tm
-(4. Comissao StageHub aparece corretamente.) Tj
+(6. Confirmar acesso a sala.) Tj
+/F1 11 Tf
+1 0 0 1 50 233 Tm
+(7. Confirmar que o bilhete fica associado a conta.) Tj
 /F1 11 Tf
 1 0 0 1 50 218 Tm
-(Comissao atual:) Tj
+(8. Fazer logout/login e confirmar que o acesso continua.) Tj
 /F1 11 Tf
 1 0 0 1 50 188 Tm
-(1. StageHub: 20%.) Tj
+(Resultado esperado:) Tj
 /F1 11 Tf
-1 0 0 1 50 173 Tm
-(2. Artista: 80%.) Tj
+1 0 0 1 50 158 Tm
+(1. Compra de teste conclui.) Tj
 /F1 11 Tf
 1 0 0 1 50 143 Tm
-(Exemplo:) Tj
+(2. Publico entra na sala.) Tj
+/F1 11 Tf
+1 0 0 1 50 128 Tm
+(3. Compra fica guardada.) Tj
 /F1 11 Tf
 1 0 0 1 50 113 Tm
-(1. Bilhete de 10 EUR.) Tj
-/F1 11 Tf
-1 0 0 1 50 98 Tm
-(2. StageHub: 2 EUR.) Tj
-/F1 11 Tf
-1 0 0 1 50 83 Tm
-(3. Artista: 8 EUR.) Tj
+(4. Nao e preciso comprar duas vezes.) Tj
+/F2 14 Tf
+1 0 0 1 50 68 Tm
+(14. Teste de gorjeta em modo teste) Tj
 ET
 endstream
 endobj
@@ -793,129 +805,108 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 17 0 R >>
 endobj
 19 0 obj
-<< /Length 2704 >>
+<< /Length 2124 >>
 stream
 BT
-/F2 14 Tf
+/F1 11 Tf
 1 0 0 1 50 777 Tm
-(15. Testes que devem ficar para o fim) Tj
+(Ainda com Stripe em modo teste:) Tj
 /F1 11 Tf
-1 0 0 1 50 745 Tm
-(So fazer depois de tudo acima estar aprovado:) Tj
+1 0 0 1 50 747 Tm
+(1. Entrar como publico com acesso ao evento.) Tj
 /F1 11 Tf
-1 0 0 1 50 715 Tm
-(1. Mudar Stripe para live.) Tj
+1 0 0 1 50 732 Tm
+(2. Abrir sala.) Tj
 /F1 11 Tf
-1 0 0 1 50 700 Tm
-(2. Configurar chaves live no Fly.) Tj
+1 0 0 1 50 717 Tm
+(3. Enviar gorjeta.) Tj
 /F1 11 Tf
-1 0 0 1 50 685 Tm
-(3. Confirmar webhook live, se estiver configurado.) Tj
+1 0 0 1 50 702 Tm
+(4. Usar cartao de teste Stripe.) Tj
 /F1 11 Tf
-1 0 0 1 50 670 Tm
-(4. Ligar conta real do artista.) Tj
+1 0 0 1 50 687 Tm
+(5. Confirmar retorno ao evento.) Tj
 /F1 11 Tf
-1 0 0 1 50 655 Tm
-(5. Fazer compra real de valor baixo.) Tj
+1 0 0 1 50 672 Tm
+(6. Confirmar mensagem de sucesso.) Tj
 /F1 11 Tf
-1 0 0 1 50 640 Tm
-(6. Confirmar pagamento real no Stripe.) Tj
+1 0 0 1 50 642 Tm
+(Resultado esperado:) Tj
 /F1 11 Tf
-1 0 0 1 50 625 Tm
-(7. Confirmar divisao real entre StageHub e artista.) Tj
+1 0 0 1 50 612 Tm
+(1. Gorjeta de teste confirma.) Tj
 /F1 11 Tf
-1 0 0 1 50 610 Tm
-(8. Confirmar reembolso real, se decidires testar.) Tj
+1 0 0 1 50 597 Tm
+(2. Valor fica registado.) Tj
 /F1 11 Tf
-1 0 0 1 50 580 Tm
-(Recomendacao para primeiro pagamento real:) Tj
-/F1 11 Tf
-1 0 0 1 50 550 Tm
-(1. Criar evento privado/teste com preco minimo de 2 EUR.) Tj
-/F1 11 Tf
-1 0 0 1 50 535 Tm
-(2. Usar conta de publico controlada.) Tj
-/F1 11 Tf
-1 0 0 1 50 520 Tm
-(3. Comprar 1 bilhete.) Tj
+1 0 0 1 50 582 Tm
+(3. Artista/equipa consegue ver impacto no dashboard, se aplicavel.) Tj
+/F2 14 Tf
+1 0 0 1 50 537 Tm
+(15. Teste Stripe Connect em modo teste) Tj
 /F1 11 Tf
 1 0 0 1 50 505 Tm
-(4. Confirmar acesso.) Tj
-/F1 11 Tf
-1 0 0 1 50 490 Tm
-(5. Confirmar valor no Stripe.) Tj
+(Antes de live, validar Connect em teste:) Tj
 /F1 11 Tf
 1 0 0 1 50 475 Tm
-(6. Confirmar taxa/comissao.) Tj
+(1. Entrar como artista/equipa.) Tj
 /F1 11 Tf
 1 0 0 1 50 460 Tm
-(7. Confirmar estado da conta conectada do artista.) Tj
-/F2 14 Tf
+(2. Abrir Editar pagina.) Tj
+/F1 11 Tf
+1 0 0 1 50 445 Tm
+(3. Clicar em Ligar Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 430 Tm
+(4. Completar onboarding de teste.) Tj
+/F1 11 Tf
 1 0 0 1 50 415 Tm
-(16. Checklist antes de mudar para Stripe live) Tj
+(5. Confirmar estado ativo para pagamentos.) Tj
 /F1 11 Tf
-1 0 0 1 50 383 Tm
-(So avancar se tudo estiver marcado:) Tj
+1 0 0 1 50 400 Tm
+(6. Fazer uma compra de bilhete em teste.) Tj
 /F1 11 Tf
-1 0 0 1 50 353 Tm
-(1. Dominio stagehub.pt funciona.) Tj
+1 0 0 1 50 385 Tm
+(7. Confirmar no dashboard Stripe teste que ha divisao/comissao.) Tj
 /F1 11 Tf
-1 0 0 1 50 338 Tm
-(2. Login funciona.) Tj
+1 0 0 1 50 355 Tm
+(Resultado esperado:) Tj
 /F1 11 Tf
-1 0 0 1 50 323 Tm
-(3. Registo funciona.) Tj
+1 0 0 1 50 325 Tm
+(1. Conta conectada de teste fica criada.) Tj
 /F1 11 Tf
-1 0 0 1 50 308 Tm
-(4. Perfil de artista completo.) Tj
+1 0 0 1 50 310 Tm
+(2. Artista fica pronto para cobrancas em teste.) Tj
 /F1 11 Tf
-1 0 0 1 50 293 Tm
-(5. Contactos publicos funcionam.) Tj
+1 0 0 1 50 295 Tm
+(3. Checkout usa Connect.) Tj
 /F1 11 Tf
-1 0 0 1 50 278 Tm
-(6. Eventos pagos criam corretamente.) Tj
+1 0 0 1 50 280 Tm
+(4. Comissao StageHub aparece corretamente.) Tj
 /F1 11 Tf
-1 0 0 1 50 263 Tm
-(7. Eventos abaixo de 2 EUR sao bloqueados.) Tj
+1 0 0 1 50 250 Tm
+(Comissao atual:) Tj
 /F1 11 Tf
-1 0 0 1 50 248 Tm
-(8. OBS testado.) Tj
+1 0 0 1 50 220 Tm
+(1. StageHub: 20%.) Tj
 /F1 11 Tf
-1 0 0 1 50 233 Tm
-(9. Sala ao vivo testada.) Tj
+1 0 0 1 50 205 Tm
+(2. Artista: 80%.) Tj
 /F1 11 Tf
-1 0 0 1 50 218 Tm
-(10. Chat testado.) Tj
+1 0 0 1 50 175 Tm
+(Exemplo:) Tj
 /F1 11 Tf
-1 0 0 1 50 203 Tm
-(11. Video gravado testado.) Tj
+1 0 0 1 50 145 Tm
+(1. Bilhete de 10 EUR.) Tj
 /F1 11 Tf
-1 0 0 1 50 188 Tm
-(12. Limite de 1 hora testado.) Tj
+1 0 0 1 50 130 Tm
+(2. StageHub: 2 EUR.) Tj
 /F1 11 Tf
-1 0 0 1 50 173 Tm
-(13. Biblioteca de videos testada.) Tj
-/F1 11 Tf
-1 0 0 1 50 158 Tm
-(14. Subscricao teste funciona.) Tj
-/F1 11 Tf
-1 0 0 1 50 143 Tm
-(15. Bilhete teste funciona.) Tj
-/F1 11 Tf
-1 0 0 1 50 128 Tm
-(16. Gorjeta teste funciona.) Tj
-/F1 11 Tf
-1 0 0 1 50 113 Tm
-(17. Stripe Connect teste funciona.) Tj
-/F1 11 Tf
-1 0 0 1 50 98 Tm
-(18. Comissao de 20% confirmada em teste.) Tj
-/F1 11 Tf
-1 0 0 1 50 83 Tm
-(19. Pagina mobile aceitavel.) Tj
-/F1 11 Tf
-1 0 0 1 50 68 Tm
-(20. Guias PDF prontos para artista e publico.) Tj
+1 0 0 1 50 115 Tm
+(3. Artista: 8 EUR.) Tj
+/F2 14 Tf
+1 0 0 1 50 70 Tm
+(16. Testes que devem ficar para o fim) Tj
 ET
 endstream
 endobj
@@ -923,105 +914,243 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 19 0 R >>
 endobj
 21 0 obj
-<< /Length 1719 >>
+<< /Length 2786 >>
 stream
 BT
+/F1 11 Tf
+1 0 0 1 50 777 Tm
+(So fazer depois de tudo acima estar aprovado:) Tj
+/F1 11 Tf
+1 0 0 1 50 747 Tm
+(1. Mudar Stripe para live.) Tj
+/F1 11 Tf
+1 0 0 1 50 732 Tm
+(2. Configurar chaves live no Fly.) Tj
+/F1 11 Tf
+1 0 0 1 50 717 Tm
+(3. Confirmar webhook live, se estiver configurado.) Tj
+/F1 11 Tf
+1 0 0 1 50 702 Tm
+(4. Ligar conta real do artista.) Tj
+/F1 11 Tf
+1 0 0 1 50 687 Tm
+(5. Fazer compra real de valor baixo.) Tj
+/F1 11 Tf
+1 0 0 1 50 672 Tm
+(6. Confirmar pagamento real no Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 657 Tm
+(7. Confirmar divisao real entre StageHub e artista.) Tj
+/F1 11 Tf
+1 0 0 1 50 642 Tm
+(8. Confirmar reembolso real, se decidires testar.) Tj
+/F1 11 Tf
+1 0 0 1 50 612 Tm
+(Recomendacao para primeiro pagamento real:) Tj
+/F1 11 Tf
+1 0 0 1 50 582 Tm
+(1. Criar evento privado/teste com preco minimo de 2 EUR.) Tj
+/F1 11 Tf
+1 0 0 1 50 567 Tm
+(2. Usar conta de publico controlada.) Tj
+/F1 11 Tf
+1 0 0 1 50 552 Tm
+(3. Comprar 1 bilhete.) Tj
+/F1 11 Tf
+1 0 0 1 50 537 Tm
+(4. Confirmar acesso.) Tj
+/F1 11 Tf
+1 0 0 1 50 522 Tm
+(5. Confirmar valor no Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 507 Tm
+(6. Confirmar taxa/comissao.) Tj
+/F1 11 Tf
+1 0 0 1 50 492 Tm
+(7. Confirmar estado da conta conectada do artista.) Tj
 /F2 14 Tf
-1 0 0 1 50 762 Tm
-(17. O que mudar quando chegar a hora de live) Tj
+1 0 0 1 50 447 Tm
+(17. Checklist antes de mudar para Stripe live) Tj
 /F1 11 Tf
-1 0 0 1 50 730 Tm
-(Quando tudo estiver aprovado:) Tj
+1 0 0 1 50 415 Tm
+(So avancar se tudo estiver marcado:) Tj
 /F1 11 Tf
-1 0 0 1 50 700 Tm
-(1. Trocar STRIPE_SECRET_KEY para chave live.) Tj
+1 0 0 1 50 385 Tm
+(1. Dominio stagehub.pt funciona.) Tj
 /F1 11 Tf
-1 0 0 1 50 685 Tm
-(2. Trocar STRIPE_PUBLISHABLE_KEY para chave live, se usada no frontend.) Tj
+1 0 0 1 50 370 Tm
+(2. Login funciona.) Tj
 /F1 11 Tf
-1 0 0 1 50 670 Tm
-(3. Trocar webhook secret para live, se existir.) Tj
+1 0 0 1 50 355 Tm
+(3. Registo funciona.) Tj
 /F1 11 Tf
-1 0 0 1 50 655 Tm
-(4. Confirmar que a conta Stripe principal esta em modo live.) Tj
+1 0 0 1 50 340 Tm
+(4. Perfil de artista completo.) Tj
 /F1 11 Tf
-1 0 0 1 50 640 Tm
-(5. Confirmar que o artista liga a sua propria conta real.) Tj
+1 0 0 1 50 325 Tm
+(5. Contactos publicos funcionam.) Tj
 /F1 11 Tf
-1 0 0 1 50 625 Tm
-(6. Fazer deploy/restart se necessario.) Tj
+1 0 0 1 50 310 Tm
+(6. Eventos pagos criam corretamente.) Tj
 /F1 11 Tf
-1 0 0 1 50 610 Tm
-(7. Fazer pagamento real pequeno.) Tj
+1 0 0 1 50 295 Tm
+(7. Eventos abaixo de 2 EUR sao bloqueados.) Tj
 /F1 11 Tf
-1 0 0 1 50 580 Tm
-(Importante: contas conectadas reais sao criadas/completadas pelo artista ou pela) Tj
+1 0 0 1 50 280 Tm
+(8. OBS testado.) Tj
 /F1 11 Tf
-1 0 0 1 50 565 Tm
-(equipa responsavel pelo artista, nao por uma conta falsa de teste.) Tj
-/F2 14 Tf
-1 0 0 1 50 520 Tm
-(18. Decisao final) Tj
+1 0 0 1 50 265 Tm
+(9. Sala ao vivo testada.) Tj
 /F1 11 Tf
-1 0 0 1 50 488 Tm
-(So considerar a StageHub pronta para pagamentos live quando:) Tj
+1 0 0 1 50 250 Tm
+(10. Chat testado.) Tj
 /F1 11 Tf
-1 0 0 1 50 458 Tm
-(1. A experiencia sem pagamentos esta estavel.) Tj
+1 0 0 1 50 235 Tm
+(11. Video gravado testado.) Tj
 /F1 11 Tf
-1 0 0 1 50 443 Tm
-(2. A experiencia com pagamentos de teste esta estavel.) Tj
+1 0 0 1 50 220 Tm
+(12. Limite de 1 hora testado.) Tj
 /F1 11 Tf
-1 0 0 1 50 428 Tm
-(3. O artista sabe ligar Stripe.) Tj
+1 0 0 1 50 205 Tm
+(13. Biblioteca de videos testada.) Tj
 /F1 11 Tf
-1 0 0 1 50 413 Tm
-(4. O publico sabe comprar e entrar.) Tj
+1 0 0 1 50 190 Tm
+(14. Galerias pagas testadas.) Tj
 /F1 11 Tf
-1 0 0 1 50 398 Tm
-(5. A equipa sabe verificar problemas.) Tj
+1 0 0 1 50 175 Tm
+(15. Limites de 30 fotos, 5 MB por foto e 150 MB por envio testados.) Tj
 /F1 11 Tf
-1 0 0 1 50 383 Tm
-(6. A comissao esta confirmada.) Tj
+1 0 0 1 50 160 Tm
+(16. Moderacao de galerias testada.) Tj
 /F1 11 Tf
-1 0 0 1 50 368 Tm
-(7. Existe plano claro para suporte no primeiro evento real.) Tj
+1 0 0 1 50 145 Tm
+(17. Subscricao teste funciona.) Tj
 /F1 11 Tf
-1 0 0 1 50 338 Tm
-(Se algum ponto falhar, corrigir antes de ativar pagamentos live.) Tj
+1 0 0 1 50 130 Tm
+(18. Bilhete teste funciona.) Tj
+/F1 11 Tf
+1 0 0 1 50 115 Tm
+(19. Gorjeta teste funciona.) Tj
+/F1 11 Tf
+1 0 0 1 50 100 Tm
+(20. Stripe Connect teste funciona.) Tj
+/F1 11 Tf
+1 0 0 1 50 85 Tm
+(21. Comissao de 20% confirmada em teste.) Tj
+/F1 11 Tf
+1 0 0 1 50 70 Tm
+(22. Pagina mobile aceitavel.) Tj
 ET
 endstream
 endobj
 22 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 21 0 R >>
 endobj
+23 0 obj
+<< /Length 1798 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 50 792 Tm
+(23. Guias PDF prontos para artista e publico.) Tj
+/F2 14 Tf
+1 0 0 1 50 747 Tm
+(18. O que mudar quando chegar a hora de live) Tj
+/F1 11 Tf
+1 0 0 1 50 715 Tm
+(Quando tudo estiver aprovado:) Tj
+/F1 11 Tf
+1 0 0 1 50 685 Tm
+(1. Trocar STRIPE_SECRET_KEY para chave live.) Tj
+/F1 11 Tf
+1 0 0 1 50 670 Tm
+(2. Trocar STRIPE_PUBLISHABLE_KEY para chave live, se usada no frontend.) Tj
+/F1 11 Tf
+1 0 0 1 50 655 Tm
+(3. Trocar webhook secret para live, se existir.) Tj
+/F1 11 Tf
+1 0 0 1 50 640 Tm
+(4. Confirmar que a conta Stripe principal esta em modo live.) Tj
+/F1 11 Tf
+1 0 0 1 50 625 Tm
+(5. Confirmar que o artista liga a sua propria conta real.) Tj
+/F1 11 Tf
+1 0 0 1 50 610 Tm
+(6. Fazer deploy/restart se necessario.) Tj
+/F1 11 Tf
+1 0 0 1 50 595 Tm
+(7. Fazer pagamento real pequeno.) Tj
+/F1 11 Tf
+1 0 0 1 50 565 Tm
+(Importante: contas conectadas reais sao criadas/completadas pelo artista ou pela) Tj
+/F1 11 Tf
+1 0 0 1 50 550 Tm
+(equipa responsavel pelo artista, nao por uma conta falsa de teste.) Tj
+/F2 14 Tf
+1 0 0 1 50 505 Tm
+(19. Decisao final) Tj
+/F1 11 Tf
+1 0 0 1 50 473 Tm
+(So considerar a StageHub pronta para pagamentos live quando:) Tj
+/F1 11 Tf
+1 0 0 1 50 443 Tm
+(1. A experiencia sem pagamentos esta estavel.) Tj
+/F1 11 Tf
+1 0 0 1 50 428 Tm
+(2. A experiencia com pagamentos de teste esta estavel.) Tj
+/F1 11 Tf
+1 0 0 1 50 413 Tm
+(3. O artista sabe ligar Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 398 Tm
+(4. O publico sabe comprar e entrar.) Tj
+/F1 11 Tf
+1 0 0 1 50 383 Tm
+(5. A equipa sabe verificar problemas.) Tj
+/F1 11 Tf
+1 0 0 1 50 368 Tm
+(6. A comissao esta confirmada.) Tj
+/F1 11 Tf
+1 0 0 1 50 353 Tm
+(7. Existe plano claro para suporte no primeiro evento real.) Tj
+/F1 11 Tf
+1 0 0 1 50 323 Tm
+(Se algum ponto falhar, corrigir antes de ativar pagamentos live.) Tj
+ET
+endstream
+endobj
+24 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 23 0 R >>
+endobj
 xref
-0 23
+0 25
 0000000000 65535 f 
 0000000009 00000 n 
 0000000058 00000 n 
-0000000170 00000 n 
-0000000240 00000 n 
-0000000315 00000 n 
-0000002406 00000 n 
-0000002542 00000 n 
-0000004925 00000 n 
-0000005061 00000 n 
-0000007335 00000 n 
-0000007472 00000 n 
-0000009651 00000 n 
-0000009789 00000 n 
-0000012081 00000 n 
-0000012219 00000 n 
-0000014547 00000 n 
-0000014685 00000 n 
-0000016858 00000 n 
-0000016996 00000 n 
-0000019753 00000 n 
-0000019891 00000 n 
-0000021663 00000 n 
+0000000178 00000 n 
+0000000248 00000 n 
+0000000323 00000 n 
+0000002414 00000 n 
+0000002550 00000 n 
+0000004933 00000 n 
+0000005069 00000 n 
+0000007343 00000 n 
+0000007480 00000 n 
+0000009659 00000 n 
+0000009797 00000 n 
+0000012089 00000 n 
+0000012227 00000 n 
+0000014866 00000 n 
+0000015004 00000 n 
+0000017346 00000 n 
+0000017484 00000 n 
+0000019661 00000 n 
+0000019799 00000 n 
+0000022638 00000 n 
+0000022776 00000 n 
+0000024627 00000 n 
 trailer
-<< /Size 23 /Root 1 0 R >>
+<< /Size 25 /Root 1 0 R >>
 startxref
-21801
+24765
 %%EOF

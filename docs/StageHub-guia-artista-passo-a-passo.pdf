@@ -3,7 +3,7 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R] /Count 6 >>
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R] /Count 7 >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
@@ -221,7 +221,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
 endobj
 9 0 obj
-<< /Length 2172 >>
+<< /Length 2164 >>
 stream
 BT
 /F1 11 Tf
@@ -286,16 +286,16 @@ BT
 (6. Escolher tipo de conteudo:) Tj
 /F1 11 Tf
 1 0 0 1 50 308 Tm
-(     - Ao vivo;) Tj
+(   - Ao vivo;) Tj
 /F1 11 Tf
 1 0 0 1 50 293 Tm
-(     - Estreia;) Tj
+(   - Estreia;) Tj
 /F1 11 Tf
 1 0 0 1 50 278 Tm
-(     - Video gravado;) Tj
+(   - Video gravado;) Tj
 /F1 11 Tf
 1 0 0 1 50 263 Tm
-(     - Replay.) Tj
+(   - Replay.) Tj
 /F1 11 Tf
 1 0 0 1 50 248 Tm
 (7. Definir preco, sempre igual ou superior a 2 EUR.) Tj
@@ -330,7 +330,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
 endobj
 11 0 obj
-<< /Length 2299 >>
+<< /Length 2295 >>
 stream
 BT
 /F1 11 Tf
@@ -344,10 +344,10 @@ BT
 (2. Copiar os dados privados:) Tj
 /F1 11 Tf
 1 0 0 1 50 717 Tm
-(     - Servidor OBS;) Tj
+(   - Servidor OBS;) Tj
 /F1 11 Tf
 1 0 0 1 50 702 Tm
-(     - Chave de transmissao.) Tj
+(   - Chave de transmissao.) Tj
 /F1 11 Tf
 1 0 0 1 50 687 Tm
 (3. Abrir o OBS.) Tj
@@ -542,7 +542,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 13 0 R >>
 endobj
 15 0 obj
-<< /Length 1921 >>
+<< /Length 2420 >>
 stream
 BT
 /F1 11 Tf
@@ -577,91 +577,175 @@ BT
 (5. O restante fica para o artista.) Tj
 /F2 14 Tf
 1 0 0 1 50 520 Tm
-(15. Checklist rapido do artista) Tj
+(15. Galerias de fotos pagas) Tj
 /F1 11 Tf
 1 0 0 1 50 488 Tm
-(Antes do primeiro evento, confirmar:) Tj
+(A StageHub tambem permite galerias de fotos pagas para fotografos, artistas e) Tj
 /F1 11 Tf
-1 0 0 1 50 458 Tm
-(1. Pagina publica completa.) Tj
+1 0 0 1 50 473 Tm
+(conteudo exclusivo.) Tj
 /F1 11 Tf
 1 0 0 1 50 443 Tm
-(2. Stripe ligado e ativo.) Tj
-/F1 11 Tf
-1 0 0 1 50 428 Tm
-(3. Evento criado com preco minimo de 2 EUR.) Tj
+(Regras principais:) Tj
 /F1 11 Tf
 1 0 0 1 50 413 Tm
-(4. Video StageHub configurado.) Tj
+(1. A galeria tem uma capa publica discreta.) Tj
 /F1 11 Tf
 1 0 0 1 50 398 Tm
-(5. OBS testado, se for ao vivo.) Tj
+(2. As fotos privadas so aparecem depois de compra/acesso.) Tj
 /F1 11 Tf
 1 0 0 1 50 383 Tm
-(6. Video enviado, se for gravado.) Tj
+(3. O preco minimo e 2 EUR.) Tj
 /F1 11 Tf
 1 0 0 1 50 368 Tm
-(7. Sala testada.) Tj
+(4. Cada galeria pode ter no maximo 30 fotos.) Tj
 /F1 11 Tf
 1 0 0 1 50 353 Tm
-(8. Chat testado.) Tj
+(5. Cada foto pode ter no maximo 5 MB.) Tj
 /F1 11 Tf
 1 0 0 1 50 338 Tm
-(9. Link publico copiado.) Tj
+(6. Cada envio pode ter no maximo 150 MB no total.) Tj
 /F1 11 Tf
 1 0 0 1 50 323 Tm
-(10. Evento ativado.) Tj
-/F2 14 Tf
+(7. Formatos aceites: JPG, PNG e WebP.) Tj
+/F1 11 Tf
+1 0 0 1 50 308 Tm
+(8. Galerias sensiveis/adultas devem ser marcadas como conteudo sensivel.) Tj
+/F1 11 Tf
+1 0 0 1 50 293 Tm
+(9. A galeria tem de ser enviada para validacao StageHub.) Tj
+/F1 11 Tf
 1 0 0 1 50 278 Tm
-(16. Suporte) Tj
+(10. So galerias aprovadas e ativas aparecem ao publico.) Tj
 /F1 11 Tf
-1 0 0 1 50 246 Tm
-(Se algo falhar:) Tj
+1 0 0 1 50 248 Tm
+(Passos:) Tj
 /F1 11 Tf
-1 0 0 1 50 216 Tm
-(1. Nao apagar o evento.) Tj
+1 0 0 1 50 218 Tm
+(1. No dashboard, clicar em Nova galeria.) Tj
 /F1 11 Tf
-1 0 0 1 50 201 Tm
-(2. Tirar screenshot do erro.) Tj
+1 0 0 1 50 203 Tm
+(2. Preencher titulo, descricao, capa publica e preco.) Tj
 /F1 11 Tf
-1 0 0 1 50 186 Tm
-(3. Dizer qual artista, evento e hora do problema.) Tj
+1 0 0 1 50 188 Tm
+(3. Marcar conteudo sensivel/adulto, se aplicavel.) Tj
 /F1 11 Tf
-1 0 0 1 50 171 Tm
-(4. Contactar a equipa StageHub.) Tj
+1 0 0 1 50 173 Tm
+(4. Guardar a galeria.) Tj
 /F1 11 Tf
-1 0 0 1 50 141 Tm
-(A equipa StageHub consegue rever configuracao, pagamentos, estado do video e) Tj
+1 0 0 1 50 158 Tm
+(5. Adicionar fotos privadas.) Tj
 /F1 11 Tf
-1 0 0 1 50 126 Tm
-(acesso ao evento.) Tj
+1 0 0 1 50 143 Tm
+(6. Enviar para validacao.) Tj
+/F1 11 Tf
+1 0 0 1 50 128 Tm
+(7. Aguardar aprovacao StageHub.) Tj
+/F1 11 Tf
+1 0 0 1 50 113 Tm
+(8. Ativar quando estiver pronta para venda.) Tj
+/F2 14 Tf
+1 0 0 1 50 68 Tm
+(16. Checklist rapido do artista) Tj
 ET
 endstream
 endobj
 16 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 15 0 R >>
 endobj
+17 0 obj
+<< /Length 1289 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 50 777 Tm
+(Antes do primeiro evento, confirmar:) Tj
+/F1 11 Tf
+1 0 0 1 50 747 Tm
+(1. Pagina publica completa.) Tj
+/F1 11 Tf
+1 0 0 1 50 732 Tm
+(2. Stripe ligado e ativo.) Tj
+/F1 11 Tf
+1 0 0 1 50 717 Tm
+(3. Evento criado com preco minimo de 2 EUR.) Tj
+/F1 11 Tf
+1 0 0 1 50 702 Tm
+(4. Video StageHub configurado.) Tj
+/F1 11 Tf
+1 0 0 1 50 687 Tm
+(5. OBS testado, se for ao vivo.) Tj
+/F1 11 Tf
+1 0 0 1 50 672 Tm
+(6. Video enviado, se for gravado.) Tj
+/F1 11 Tf
+1 0 0 1 50 657 Tm
+(7. Galeria paga validada, se houver fotos exclusivas.) Tj
+/F1 11 Tf
+1 0 0 1 50 642 Tm
+(8. Sala testada.) Tj
+/F1 11 Tf
+1 0 0 1 50 627 Tm
+(9. Chat testado.) Tj
+/F1 11 Tf
+1 0 0 1 50 612 Tm
+(10. Link publico copiado.) Tj
+/F1 11 Tf
+1 0 0 1 50 597 Tm
+(11. Evento ativado.) Tj
+/F2 14 Tf
+1 0 0 1 50 552 Tm
+(17. Suporte) Tj
+/F1 11 Tf
+1 0 0 1 50 520 Tm
+(Se algo falhar:) Tj
+/F1 11 Tf
+1 0 0 1 50 490 Tm
+(1. Nao apagar o evento.) Tj
+/F1 11 Tf
+1 0 0 1 50 475 Tm
+(2. Tirar screenshot do erro.) Tj
+/F1 11 Tf
+1 0 0 1 50 460 Tm
+(3. Dizer qual artista, evento e hora do problema.) Tj
+/F1 11 Tf
+1 0 0 1 50 445 Tm
+(4. Contactar a equipa StageHub.) Tj
+/F1 11 Tf
+1 0 0 1 50 415 Tm
+(A equipa StageHub consegue rever configuracao, pagamentos, estado do video e) Tj
+/F1 11 Tf
+1 0 0 1 50 400 Tm
+(acesso ao evento.) Tj
+ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 17 0 R >>
+endobj
 xref
-0 17
+0 19
 0000000000 65535 f 
 0000000009 00000 n 
 0000000058 00000 n 
-0000000149 00000 n 
-0000000219 00000 n 
-0000000294 00000 n 
-0000002623 00000 n 
-0000002759 00000 n 
-0000005226 00000 n 
-0000005362 00000 n 
-0000007586 00000 n 
-0000007723 00000 n 
-0000010075 00000 n 
-0000010213 00000 n 
-0000012416 00000 n 
-0000012554 00000 n 
-0000014528 00000 n 
+0000000156 00000 n 
+0000000226 00000 n 
+0000000301 00000 n 
+0000002630 00000 n 
+0000002766 00000 n 
+0000005233 00000 n 
+0000005369 00000 n 
+0000007585 00000 n 
+0000007722 00000 n 
+0000010070 00000 n 
+0000010208 00000 n 
+0000012411 00000 n 
+0000012549 00000 n 
+0000015022 00000 n 
+0000015160 00000 n 
+0000016502 00000 n 
 trailer
-<< /Size 17 /Root 1 0 R >>
+<< /Size 19 /Root 1 0 R >>
 startxref
-14666
+16640
 %%EOF

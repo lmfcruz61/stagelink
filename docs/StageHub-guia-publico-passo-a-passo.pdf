@@ -3,7 +3,7 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R] /Count 5 >>
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R] /Count 6 >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
@@ -215,7 +215,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
 endobj
 9 0 obj
-<< /Length 2119 >>
+<< /Length 2167 >>
 stream
 BT
 /F1 11 Tf
@@ -283,31 +283,34 @@ BT
 (Os videos gravados na StageHub têm duracao maxima de 1 hora.) Tj
 /F2 14 Tf
 1 0 0 1 50 263 Tm
-(9. Subscricoes mensais) Tj
+(9. Ver galerias de fotos) Tj
 /F1 11 Tf
 1 0 0 1 50 231 Tm
-(Podes apoiar artistas com uma subscricao mensal.) Tj
+(Alguns artistas e fotografos podem publicar galerias de fotos pagas.) Tj
 /F1 11 Tf
 1 0 0 1 50 201 Tm
-(Planos atuais:) Tj
+(Antes da compra, o publico ve apenas:) Tj
 /F1 11 Tf
 1 0 0 1 50 171 Tm
-(1. Subscritor: 5 EUR por mes.) Tj
+(1. Capa publica discreta.) Tj
 /F1 11 Tf
 1 0 0 1 50 156 Tm
-(2. Subscritor Pro: 10 EUR por mes.) Tj
+(2. Titulo.) Tj
+/F1 11 Tf
+1 0 0 1 50 141 Tm
+(3. Descricao.) Tj
 /F1 11 Tf
 1 0 0 1 50 126 Tm
-(Beneficios:) Tj
+(4. Preco.) Tj
+/F1 11 Tf
+1 0 0 1 50 111 Tm
+(5. Numero de fotos.) Tj
 /F1 11 Tf
 1 0 0 1 50 96 Tm
-(1. Acesso ao arquivo recente dos ultimos 30 dias.) Tj
-/F1 11 Tf
-1 0 0 1 50 81 Tm
-(2. Participacao no chat durante lives.) Tj
+(6. Aviso de conteudo sensivel/adulto, se aplicavel.) Tj
 /F1 11 Tf
 1 0 0 1 50 66 Tm
-(3. No plano Pro, desconto em bilhetes de lives pagas, quando aplicavel.) Tj
+(As fotos privadas so aparecem depois de comprares acesso com a tua conta.) Tj
 ET
 endstream
 endobj
@@ -315,99 +318,99 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
 endobj
 11 0 obj
-<< /Length 2221 >>
+<< /Length 2199 >>
 stream
 BT
 /F1 11 Tf
 1 0 0 1 50 777 Tm
-(Importante: uma subscricao nao substitui automaticamente todos os bilhetes pagos.) Tj
+(Se a galeria estiver marcada como conteudo sensivel/adulto, confirma antes de) Tj
 /F1 11 Tf
 1 0 0 1 50 762 Tm
-(Alguns eventos continuam a precisar de bilhete proprio.) Tj
+(comprar que queres aceder a esse tipo de conteudo.) Tj
 /F2 14 Tf
 1 0 0 1 50 717 Tm
-(10. Gorjetas) Tj
+(10. Subscricoes mensais) Tj
 /F1 11 Tf
 1 0 0 1 50 685 Tm
-(Durante eventos pagos, podes apoiar o artista com uma gorjeta.) Tj
+(Podes apoiar artistas com uma subscricao mensal.) Tj
 /F1 11 Tf
 1 0 0 1 50 655 Tm
-(Passos:) Tj
+(Planos atuais:) Tj
 /F1 11 Tf
 1 0 0 1 50 625 Tm
-(1. Entrar na sala do evento.) Tj
+(1. Subscritor: 5 EUR por mes.) Tj
 /F1 11 Tf
 1 0 0 1 50 610 Tm
-(2. Escolher o valor da gorjeta.) Tj
-/F1 11 Tf
-1 0 0 1 50 595 Tm
-(3. Escrever uma mensagem opcional.) Tj
+(2. Subscritor Pro: 10 EUR por mes.) Tj
 /F1 11 Tf
 1 0 0 1 50 580 Tm
-(4. Pagar pela Stripe.) Tj
+(Beneficios:) Tj
 /F1 11 Tf
-1 0 0 1 50 565 Tm
-(5. Voltar ao evento.) Tj
+1 0 0 1 50 550 Tm
+(1. Acesso ao arquivo recente dos ultimos 30 dias.) Tj
 /F1 11 Tf
 1 0 0 1 50 535 Tm
-(As gorjetas sao uma forma direta de apoiar o artista.) Tj
-/F2 14 Tf
+(2. Participacao no chat durante lives.) Tj
+/F1 11 Tf
+1 0 0 1 50 520 Tm
+(3. No plano Pro, desconto em bilhetes de lives pagas, quando aplicavel.) Tj
+/F1 11 Tf
 1 0 0 1 50 490 Tm
-(11. Reembolsos e problemas de pagamento) Tj
+(Importante: uma subscricao nao substitui automaticamente todos os bilhetes pagos.) Tj
 /F1 11 Tf
-1 0 0 1 50 458 Tm
-(Se tiveres um problema:) Tj
-/F1 11 Tf
-1 0 0 1 50 428 Tm
-(1. Confirma se estas na conta certa.) Tj
-/F1 11 Tf
-1 0 0 1 50 413 Tm
-(2. Confirma se o pagamento aparece como concluido na Stripe.) Tj
+1 0 0 1 50 475 Tm
+(Alguns eventos continuam a precisar de bilhete proprio.) Tj
+/F2 14 Tf
+1 0 0 1 50 430 Tm
+(11. Gorjetas) Tj
 /F1 11 Tf
 1 0 0 1 50 398 Tm
-(3. Nao compres novamente sem verificar primeiro.) Tj
-/F1 11 Tf
-1 0 0 1 50 383 Tm
-(4. Guarda o email/recibo da Stripe.) Tj
+(Durante eventos pagos, podes apoiar o artista com uma gorjeta.) Tj
 /F1 11 Tf
 1 0 0 1 50 368 Tm
-(5. Contacta a equipa StageHub com o email da conta, nome do evento e hora do) Tj
+(Passos:) Tj
 /F1 11 Tf
-1 0 0 1 50 353 Tm
-(   problema.) Tj
+1 0 0 1 50 338 Tm
+(1. Entrar na sala do evento.) Tj
 /F1 11 Tf
 1 0 0 1 50 323 Tm
-(Pedidos de reembolso podem depender do caso, do evento e das regras definidas pela) Tj
+(2. Escolher o valor da gorjeta.) Tj
 /F1 11 Tf
 1 0 0 1 50 308 Tm
-(plataforma ou pelo artista.) Tj
+(3. Escrever uma mensagem opcional.) Tj
+/F1 11 Tf
+1 0 0 1 50 293 Tm
+(4. Pagar pela Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 278 Tm
+(5. Voltar ao evento.) Tj
+/F1 11 Tf
+1 0 0 1 50 248 Tm
+(As gorjetas sao uma forma direta de apoiar o artista.) Tj
 /F2 14 Tf
-1 0 0 1 50 263 Tm
-(12. Problemas de video ou som) Tj
-/F1 11 Tf
-1 0 0 1 50 231 Tm
-(Se o video ou som nao funcionar:) Tj
-/F1 11 Tf
-1 0 0 1 50 201 Tm
-(1. Atualiza a pagina.) Tj
-/F1 11 Tf
-1 0 0 1 50 186 Tm
-(2. Confirma a ligacao a internet.) Tj
+1 0 0 1 50 203 Tm
+(12. Reembolsos e problemas de pagamento) Tj
 /F1 11 Tf
 1 0 0 1 50 171 Tm
-(3. Testa noutro browser, se possivel.) Tj
-/F1 11 Tf
-1 0 0 1 50 156 Tm
-(4. Desliga bloqueadores que possam afetar video.) Tj
+(Se tiveres um problema:) Tj
 /F1 11 Tf
 1 0 0 1 50 141 Tm
-(5. Confirma se o evento ja comecou.) Tj
+(1. Confirma se estas na conta certa.) Tj
 /F1 11 Tf
 1 0 0 1 50 126 Tm
-(6. Confirma se entraste com a conta que comprou o bilhete.) Tj
+(2. Confirma se o pagamento aparece como concluido na Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 111 Tm
+(3. Nao compres novamente sem verificar primeiro.) Tj
 /F1 11 Tf
 1 0 0 1 50 96 Tm
-(Se o problema continuar, tira screenshot e contacta o suporte.) Tj
+(4. Guarda o email/recibo da Stripe.) Tj
+/F1 11 Tf
+1 0 0 1 50 81 Tm
+(5. Contacta a equipa StageHub com o email da conta, nome do evento e hora do) Tj
+/F1 11 Tf
+1 0 0 1 50 66 Tm
+(   problema.) Tj
 ET
 endstream
 endobj
@@ -415,121 +418,166 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 11 0 R >>
 endobj
 13 0 obj
-<< /Length 1826 >>
+<< /Length 2065 >>
 stream
 BT
+/F1 11 Tf
+1 0 0 1 50 777 Tm
+(Pedidos de reembolso podem depender do caso, do evento e das regras definidas pela) Tj
+/F1 11 Tf
+1 0 0 1 50 762 Tm
+(plataforma ou pelo artista.) Tj
 /F2 14 Tf
-1 0 0 1 50 792 Tm
-(13. Boas praticas) Tj
-/F1 11 Tf
-1 0 0 1 50 760 Tm
-(Antes de um evento:) Tj
-/F1 11 Tf
-1 0 0 1 50 730 Tm
-(1. Compra o bilhete com antecedencia.) Tj
-/F1 11 Tf
-1 0 0 1 50 715 Tm
-(2. Guarda o email de confirmacao.) Tj
-/F1 11 Tf
-1 0 0 1 50 700 Tm
-(3. Entra alguns minutos antes da hora.) Tj
+1 0 0 1 50 717 Tm
+(13. Problemas de video ou som) Tj
 /F1 11 Tf
 1 0 0 1 50 685 Tm
-(4. Usa uma ligacao estavel.) Tj
+(Se o video ou som nao funcionar:) Tj
 /F1 11 Tf
-1 0 0 1 50 670 Tm
-(5. Mantem o browser atualizado.) Tj
+1 0 0 1 50 655 Tm
+(1. Atualiza a pagina.) Tj
 /F1 11 Tf
 1 0 0 1 50 640 Tm
-(Durante o evento:) Tj
+(2. Confirma a ligacao a internet.) Tj
+/F1 11 Tf
+1 0 0 1 50 625 Tm
+(3. Testa noutro browser, se possivel.) Tj
 /F1 11 Tf
 1 0 0 1 50 610 Tm
-(1. Respeita o artista e outros participantes.) Tj
+(4. Desliga bloqueadores que possam afetar video.) Tj
 /F1 11 Tf
 1 0 0 1 50 595 Tm
-(2. Nao partilhes acessos indevidamente.) Tj
+(5. Confirma se o evento ja comecou.) Tj
 /F1 11 Tf
 1 0 0 1 50 580 Tm
-(3. Usa o chat de forma construtiva.) Tj
-/F2 14 Tf
-1 0 0 1 50 535 Tm
-(14. Checklist rapido) Tj
+(6. Confirma se entraste com a conta que comprou o bilhete.) Tj
 /F1 11 Tf
-1 0 0 1 50 503 Tm
-(Antes de assistir, confirma:) Tj
+1 0 0 1 50 550 Tm
+(Se o problema continuar, tira screenshot e contacta o suporte.) Tj
+/F2 14 Tf
+1 0 0 1 50 505 Tm
+(14. Boas praticas) Tj
 /F1 11 Tf
 1 0 0 1 50 473 Tm
-(1. Conta criada.) Tj
-/F1 11 Tf
-1 0 0 1 50 458 Tm
-(2. Login feito.) Tj
+(Antes de um evento:) Tj
 /F1 11 Tf
 1 0 0 1 50 443 Tm
-(3. Bilhete comprado.) Tj
+(1. Compra o bilhete com antecedencia.) Tj
 /F1 11 Tf
 1 0 0 1 50 428 Tm
-(4. Pagamento confirmado.) Tj
+(2. Guarda o email de confirmacao.) Tj
 /F1 11 Tf
 1 0 0 1 50 413 Tm
-(5. Evento aberto na hora correta.) Tj
+(3. Entra alguns minutos antes da hora.) Tj
 /F1 11 Tf
 1 0 0 1 50 398 Tm
-(6. Som do dispositivo ligado.) Tj
+(4. Usa uma ligacao estavel.) Tj
 /F1 11 Tf
 1 0 0 1 50 383 Tm
-(7. Internet estavel.) Tj
+(5. Mantem o browser atualizado.) Tj
+/F1 11 Tf
+1 0 0 1 50 353 Tm
+(Durante o evento:) Tj
+/F1 11 Tf
+1 0 0 1 50 323 Tm
+(1. Respeita o artista e outros participantes.) Tj
+/F1 11 Tf
+1 0 0 1 50 308 Tm
+(2. Nao partilhes acessos indevidamente.) Tj
+/F1 11 Tf
+1 0 0 1 50 293 Tm
+(3. Usa o chat de forma construtiva.) Tj
 /F2 14 Tf
-1 0 0 1 50 338 Tm
-(15. Suporte) Tj
-/F1 11 Tf
-1 0 0 1 50 306 Tm
-(Para pedir ajuda, envia:) Tj
-/F1 11 Tf
-1 0 0 1 50 276 Tm
-(1. Email da tua conta StageHub.) Tj
-/F1 11 Tf
-1 0 0 1 50 261 Tm
-(2. Nome do artista.) Tj
-/F1 11 Tf
-1 0 0 1 50 246 Tm
-(3. Nome do evento ou video.) Tj
-/F1 11 Tf
-1 0 0 1 50 231 Tm
-(4. Hora aproximada do problema.) Tj
+1 0 0 1 50 248 Tm
+(15. Checklist rapido) Tj
 /F1 11 Tf
 1 0 0 1 50 216 Tm
-(5. Screenshot, se existir.) Tj
+(Antes de assistir, confirma:) Tj
 /F1 11 Tf
-1 0 0 1 50 201 Tm
-(6. Recibo Stripe, se o problema for de pagamento.) Tj
+1 0 0 1 50 186 Tm
+(1. Conta criada.) Tj
 /F1 11 Tf
 1 0 0 1 50 171 Tm
-(A equipa StageHub consegue verificar acesso, pagamento e estado do evento.) Tj
+(2. Login feito.) Tj
+/F1 11 Tf
+1 0 0 1 50 156 Tm
+(3. Bilhete comprado.) Tj
+/F1 11 Tf
+1 0 0 1 50 141 Tm
+(4. Pagamento confirmado.) Tj
+/F1 11 Tf
+1 0 0 1 50 126 Tm
+(5. Evento aberto na hora correta.) Tj
+/F1 11 Tf
+1 0 0 1 50 111 Tm
+(6. Som do dispositivo ligado.) Tj
+/F1 11 Tf
+1 0 0 1 50 96 Tm
+(7. Internet estavel.) Tj
 ET
 endstream
 endobj
 14 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 13 0 R >>
 endobj
+15 0 obj
+<< /Length 603 >>
+stream
+BT
+/F2 14 Tf
+1 0 0 1 50 792 Tm
+(16. Suporte) Tj
+/F1 11 Tf
+1 0 0 1 50 760 Tm
+(Para pedir ajuda, envia:) Tj
+/F1 11 Tf
+1 0 0 1 50 730 Tm
+(1. Email da tua conta StageHub.) Tj
+/F1 11 Tf
+1 0 0 1 50 715 Tm
+(2. Nome do artista.) Tj
+/F1 11 Tf
+1 0 0 1 50 700 Tm
+(3. Nome do evento ou video.) Tj
+/F1 11 Tf
+1 0 0 1 50 685 Tm
+(4. Hora aproximada do problema.) Tj
+/F1 11 Tf
+1 0 0 1 50 670 Tm
+(5. Screenshot, se existir.) Tj
+/F1 11 Tf
+1 0 0 1 50 655 Tm
+(6. Recibo Stripe, se o problema for de pagamento.) Tj
+/F1 11 Tf
+1 0 0 1 50 625 Tm
+(A equipa StageHub consegue verificar acesso, pagamento e estado do evento.) Tj
+ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 15 0 R >>
+endobj
 xref
-0 15
+0 17
 0000000000 65535 f 
 0000000009 00000 n 
 0000000058 00000 n 
-0000000142 00000 n 
-0000000212 00000 n 
-0000000287 00000 n 
-0000002452 00000 n 
-0000002588 00000 n 
-0000004733 00000 n 
-0000004869 00000 n 
-0000007040 00000 n 
-0000007177 00000 n 
-0000009451 00000 n 
-0000009589 00000 n 
-0000011468 00000 n 
+0000000149 00000 n 
+0000000219 00000 n 
+0000000294 00000 n 
+0000002459 00000 n 
+0000002595 00000 n 
+0000004740 00000 n 
+0000004876 00000 n 
+0000007095 00000 n 
+0000007232 00000 n 
+0000009484 00000 n 
+0000009622 00000 n 
+0000011740 00000 n 
+0000011878 00000 n 
+0000012533 00000 n 
 trailer
-<< /Size 15 /Root 1 0 R >>
+<< /Size 17 /Root 1 0 R >>
 startxref
-11606
+12671
 %%EOF
