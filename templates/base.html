@@ -293,6 +293,7 @@
   <script>
     (function() {
       const storageKey = 'stagehub_cookie_consent_v1';
+      const cookieName = 'stagehub_cookie_consent';
       const banner = document.querySelector('#cookie-consent');
       const options = document.querySelector('#cookie-consent-options');
       const marketingInput = document.querySelector('#cookie-consent-marketing');
@@ -306,10 +307,28 @@
 
       function readConsent() {
         try {
-          return JSON.parse(window.localStorage.getItem(storageKey) || 'null');
+          const localConsent = JSON.parse(window.localStorage.getItem(storageKey) || 'null');
+          if (localConsent) return localConsent;
+        } catch (error) {
+        }
+        const cookieValue = document.cookie
+          .split('; ')
+          .find(function(row) { return row.startsWith(`${cookieName}=`); })
+          ?.split('=')[1];
+        if (!cookieValue) return null;
+        try {
+          return JSON.parse(decodeURIComponent(cookieValue));
         } catch (error) {
           return null;
         }
+      }
+
+      function consentCookieDomain() {
+        const hostname = window.location.hostname;
+        if (hostname === 'stagehub.pt' || hostname.endsWith('.stagehub.pt')) {
+          return '; Domain=.stagehub.pt';
+        }
+        return '';
       }
 
       function writeConsent(consent) {
@@ -319,7 +338,12 @@
           external: Boolean(consent.external),
           updatedAt: new Date().toISOString()
         };
-        window.localStorage.setItem(storageKey, JSON.stringify(payload));
+        const serialized = JSON.stringify(payload);
+        try {
+          window.localStorage.setItem(storageKey, serialized);
+        } catch (error) {
+        }
+        document.cookie = `${cookieName}=${encodeURIComponent(serialized)}; Max-Age=31536000; Path=/; SameSite=Lax${consentCookieDomain()}`;
         return payload;
       }
 
