@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('artistas/<int:artist_id>/', views.artist_detail, name='artist_detail'),
     path('artistas/<int:artist_id>/favorito/', views.favorite_artist_toggle, name='favorite_artist_toggle'),
+    path('galerias/<int:gallery_id>/', views.photo_gallery_detail, name='photo_gallery_detail'),
     path('eventos/<int:stream_id>/', views.stream_detail, name='event_detail'),
     path('streams/<int:stream_id>/', views.stream_room, name='room'),
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -21,4 +22,8 @@ urlpatterns = [
     path('dashboard/streams/<int:stream_id>/alternar-ativo/', views.stream_toggle_active, name='stream_toggle_active'),
     path('dashboard/streams/<int:stream_id>/upload-concluido/', views.stream_mark_upload_complete, name='stream_mark_upload_complete'),
     path('dashboard/streams/<int:stream_id>/apagar/', views.stream_delete, name='stream_delete'),
+    path('dashboard/galerias/nova/', views.photo_gallery_create, name='photo_gallery_create'),
+    path('dashboard/galerias/<int:gallery_id>/editar/', views.photo_gallery_update, name='photo_gallery_update'),
+    path('dashboard/galerias/<int:gallery_id>/apagar/', views.photo_gallery_delete, name='photo_gallery_delete'),
+    path('dashboard/galerias/fotos/<int:image_id>/remover/', views.photo_gallery_image_delete, name='photo_gallery_image_delete'),
 ]

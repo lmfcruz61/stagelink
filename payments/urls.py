@@ -9,6 +9,7 @@ urlpatterns = [
     path('artistas/<int:artist_id>/stripe/refresh/', views.stripe_connect_refresh, name='stripe_connect_refresh'),
     path('artistas/<int:artist_id>/stripe/return/', views.stripe_connect_return, name='stripe_connect_return'),
     path('artistas/<int:artist_id>/subscrever/', views.subscribe_artist, name='subscribe_artist'),
+    path('galerias/<int:gallery_id>/comprar/', views.buy_photo_gallery, name='buy_photo_gallery'),
     path('streams/<int:stream_id>/bilhete/', views.buy_ticket, name='buy_ticket'),
     path('streams/<int:stream_id>/gorjeta/', views.create_tip, name='create_tip'),
     path('stripe/sucesso/', views.checkout_success, name='checkout_success'),

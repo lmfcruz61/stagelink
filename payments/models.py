@@ -75,3 +75,23 @@ class StreamTicketPurchase(models.Model):
 
     def __str__(self):
         return f'Bilhete {self.stream} - {self.fan}'
+
+
+class PhotoGalleryPurchase(models.Model):
+    fan = models.ForeignKey('accounts.Fan', on_delete=models.CASCADE, related_name='photo_gallery_purchases')
+    gallery = models.ForeignKey('streams.PhotoGallery', on_delete=models.CASCADE, related_name='purchases')
+    stripe_session_id = models.CharField(max_length=120, blank=True)
+    stripe_payment_intent = models.CharField(max_length=120, blank=True)
+    stripe_connected_account_id = models.CharField(max_length=120, blank=True)
+    amount = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    platform_fee_amount = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    artist_net_amount = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    commission_percent = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('20.00'))
+    paid = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('fan', 'gallery')
+
+    def __str__(self):
+        return f'Galeria {self.gallery} - {self.fan}'

@@ -16,9 +16,9 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from accounts.models import Artist, Fan, OrganizationMember
-from streams.models import LiveStream, Tip
+from streams.models import LiveStream, PhotoGallery, Tip
 
-from .models import StreamTicketPurchase, Subscription
+from .models import PhotoGalleryPurchase, StreamTicketPurchase, Subscription
 from .pricing import split_platform_fee, stagehub_commission_percent, ticket_checkout_pricing
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -230,7 +230,7 @@ def _complete_checkout_session(session):
     payment_status = session.get('payment_status', '')
     checkout_type = metadata.get('type')
 
-    if checkout_type in {'ticket', 'tip'} and payment_status != 'paid':
+    if checkout_type in {'ticket', 'tip', 'photo_gallery'} and payment_status != 'paid':
         return checkout_type, False
 
     if checkout_type == 'ticket':
@@ -248,6 +248,26 @@ def _complete_checkout_session(session):
                 'stripe_connected_account_id': metadata.get('stripe_connected_account_id', ''),
                 'stripe_payment_intent': session.get('payment_intent') or '',
                 'stripe_session_id': session_id,
+                'paid': True,
+            },
+        )
+        return checkout_type, True
+
+    if checkout_type == 'photo_gallery':
+        amount = Decimal(metadata.get('amount') or '0')
+        platform_fee = Decimal(metadata.get('platform_fee_amount') or '0')
+        artist_net = Decimal(metadata.get('artist_net_amount') or '0')
+        PhotoGalleryPurchase.objects.update_or_create(
+            fan_id=metadata['fan_id'],
+            gallery_id=metadata['gallery_id'],
+            defaults={
+                'stripe_session_id': session_id,
+                'stripe_payment_intent': session.get('payment_intent') or '',
+                'stripe_connected_account_id': metadata.get('stripe_connected_account_id', ''),
+                'amount': amount,
+                'platform_fee_amount': platform_fee,
+                'artist_net_amount': artist_net,
+                'commission_percent': Decimal(metadata.get('commission_percent') or '0'),
                 'paid': True,
             },
         )
@@ -444,6 +464,82 @@ def buy_ticket(request, stream_id):
 
 
 @login_required
+def buy_photo_gallery(request, gallery_id):
+    gallery = get_object_or_404(PhotoGallery.objects.select_related('artist'), pk=gallery_id)
+    fan = getattr(request.user, 'fan_profile', None)
+    if fan is None:
+        messages.error(request, 'So contas de publico podem comprar galerias.')
+        return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
+
+    if gallery.user_has_access(request.user):
+        return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
+
+    if not gallery.is_publicly_available:
+        messages.error(request, 'Esta galeria ainda nao esta disponivel para compra.')
+        return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
+
+    if gallery.access_price < Decimal('2.00'):
+        messages.error(request, 'O preco minimo de acesso a galerias na StageHub e 2 EUR.')
+        return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
+
+    if not settings.STRIPE_SECRET_KEY:
+        messages.error(request, 'Configura STRIPE_SECRET_KEY para ativar venda de galerias.')
+        return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
+
+    if not _payment_artist_or_redirect(request, gallery.artist):
+        return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
+
+    fee_split, payment_intent_data = _connect_payment_intent_data(gallery.artist, gallery.access_price)
+    session = stripe.checkout.Session.create(
+        mode='payment',
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'currency': 'eur',
+                'unit_amount': int(gallery.access_price * 100),
+                'product_data': {'name': f'Galeria - {gallery.title}'},
+            },
+            'quantity': 1,
+        }],
+        success_url=_absolute_url_with_query(request, 'payments:checkout_success', {
+            'session_id': '{CHECKOUT_SESSION_ID}',
+            'gallery_id': gallery.id,
+            'artist_id': gallery.artist_id,
+        }),
+        cancel_url=_absolute_url_with_query(request, 'payments:checkout_cancel', {
+            'gallery_id': gallery.id,
+            'artist_id': gallery.artist_id,
+        }),
+        payment_intent_data=payment_intent_data,
+        metadata={
+            'type': 'photo_gallery',
+            'fan_id': fan.id,
+            'artist_id': gallery.artist_id,
+            'gallery_id': gallery.id,
+            'amount': str(gallery.access_price),
+            'platform_fee_amount': str(fee_split['platform_fee_amount']),
+            'artist_net_amount': str(fee_split['artist_net_amount']),
+            'commission_percent': str(fee_split['commission_percent']),
+            'stripe_connected_account_id': gallery.artist.stripe_account_id,
+        },
+    )
+    PhotoGalleryPurchase.objects.update_or_create(
+        fan=fan,
+        gallery=gallery,
+        defaults={
+            'stripe_session_id': session.id,
+            'stripe_connected_account_id': gallery.artist.stripe_account_id,
+            'amount': gallery.access_price,
+            'platform_fee_amount': fee_split['platform_fee_amount'],
+            'artist_net_amount': fee_split['artist_net_amount'],
+            'commission_percent': fee_split['commission_percent'],
+            'paid': False,
+        },
+    )
+    return redirect(session.url)
+
+
+@login_required
 def create_tip(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
     if stream.access_price <= 0:
@@ -511,6 +607,7 @@ def checkout_success(request):
     session_id = request.GET.get('session_id', '').strip()
     stream_id = request.GET.get('stream_id')
     artist_id = request.GET.get('artist_id')
+    gallery_id = request.GET.get('gallery_id')
     if not session_id:
         messages.error(request, 'Nao foi possivel confirmar o pagamento.')
         return redirect('streams:home')
@@ -572,6 +669,14 @@ def checkout_success(request):
             messages.warning(request, 'A gorjeta ainda nao foi confirmada pelo Stripe.')
         return redirect('streams:room', stream_id=stream_id)
 
+    if checkout_type == 'photo_gallery':
+        gallery_id = metadata.get('gallery_id')
+        if completed:
+            messages.success(request, 'Acesso a galeria confirmado.')
+        else:
+            messages.warning(request, 'O pagamento da galeria ainda nao foi confirmado pelo Stripe.')
+        return redirect('streams:photo_gallery_detail', gallery_id=gallery_id)
+
     if checkout_type == 'subscription':
         artist_id = metadata.get('artist_id')
         if completed:
@@ -588,9 +693,12 @@ def checkout_success(request):
 def checkout_cancel(request):
     messages.info(request, 'Pagamento cancelado. Podes tentar novamente quando quiseres.')
     stream_id = request.GET.get('stream_id')
+    gallery_id = request.GET.get('gallery_id')
     artist_id = request.GET.get('artist_id')
     if stream_id:
         return redirect('streams:event_detail', stream_id=stream_id)
+    if gallery_id:
+        return redirect('streams:photo_gallery_detail', gallery_id=gallery_id)
     if artist_id:
         return redirect('streams:artist_detail', artist_id=artist_id)
     return redirect('streams:home')

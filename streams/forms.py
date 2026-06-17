@@ -1,7 +1,7 @@
 from django import forms
 from urllib.parse import parse_qs, urlparse
 
-from .models import LiveStream
+from .models import LiveStream, PhotoGallery
 
 
 class LiveStreamForm(forms.ModelForm):
@@ -214,3 +214,78 @@ class LiveStreamForm(forms.ModelForm):
         if len(video_id) < 10:
             raise forms.ValidationError('Confirma o ID/link do YouTube. Um ID normal tem cerca de 11 caracteres.')
         return video_id
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            return [single_file_clean(file, initial) for file in data]
+        return [single_file_clean(data, initial)] if data else []
+
+
+class PhotoGalleryForm(forms.ModelForm):
+    class Meta:
+        model = PhotoGallery
+        fields = (
+            'title',
+            'description',
+            'public_cover',
+            'access_price',
+            'is_sensitive',
+            'is_active',
+        )
+        labels = {
+            'title': 'Titulo',
+            'description': 'Descricao publica',
+            'public_cover': 'Capa publica discreta',
+            'access_price': 'Preco de acesso',
+            'is_sensitive': 'Conteudo sensivel/adulto',
+            'is_active': 'Ativa',
+        }
+        help_texts = {
+            'public_cover': 'Esta imagem aparece antes da compra. Deve ser segura para publico geral.',
+            'is_active': 'A galeria so aparece ao publico quando estiver ativa e aprovada pela StageHub.',
+        }
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 5}),
+        }
+
+    def clean_access_price(self):
+        value = self.cleaned_data['access_price']
+        if value < PhotoGallery.MIN_PRICE:
+            raise forms.ValidationError('O preco minimo de acesso a galerias na StageHub e 2 EUR.')
+        return value
+
+
+class PhotoGalleryImageUploadForm(forms.Form):
+    images = MultipleFileField(
+        label='Fotos privadas da galeria',
+        required=True,
+        widget=MultipleFileInput(attrs={'multiple': True, 'accept': 'image/jpeg,image/png,image/webp'}),
+        help_text='Maximo 30 fotos por galeria. Cada foto pode ter ate 10 MB.',
+    )
+
+    MAX_IMAGE_SIZE = 10 * 1024 * 1024
+    ALLOWED_CONTENT_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
+
+    def __init__(self, *args, gallery=None, **kwargs):
+        self.gallery = gallery
+        super().__init__(*args, **kwargs)
+
+    def clean_images(self):
+        images = self.cleaned_data['images']
+        existing_count = self.gallery.images.count() if self.gallery else 0
+        if existing_count + len(images) > PhotoGallery.MAX_IMAGES:
+            raise forms.ValidationError(f'Cada galeria pode ter no maximo {PhotoGallery.MAX_IMAGES} fotos.')
+        for image in images:
+            content_type = getattr(image, 'content_type', '')
+            if content_type not in self.ALLOWED_CONTENT_TYPES:
+                raise forms.ValidationError('Usa apenas imagens JPG, PNG ou WebP.')
+            if image.size > self.MAX_IMAGE_SIZE:
+                raise forms.ValidationError('Cada foto pode ter no maximo 10 MB.')
+        return images

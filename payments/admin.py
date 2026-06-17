@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import StreamTicketPurchase, Subscription
+from .models import PhotoGalleryPurchase, StreamTicketPurchase, Subscription
 
 
 @admin.register(Subscription)
@@ -15,3 +15,10 @@ class StreamTicketPurchaseAdmin(admin.ModelAdmin):
     list_display = ('fan', 'stream', 'amount', 'platform_fee_amount', 'artist_net_amount', 'paid', 'created_at')
     list_filter = ('paid', 'stream__artist')
     search_fields = ('fan__display_name', 'fan__user__username', 'stream__title', 'stripe_session_id', 'stripe_connected_account_id')
+
+
+@admin.register(PhotoGalleryPurchase)
+class PhotoGalleryPurchaseAdmin(admin.ModelAdmin):
+    list_display = ('fan', 'gallery', 'amount', 'platform_fee_amount', 'artist_net_amount', 'paid', 'created_at')
+    list_filter = ('paid', 'gallery__artist')
+    search_fields = ('fan__display_name', 'fan__user__username', 'gallery__title', 'stripe_session_id', 'stripe_connected_account_id')

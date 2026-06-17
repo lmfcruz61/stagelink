@@ -26,7 +26,8 @@ from payments.pricing import ticket_checkout_pricing
 
 from .cloudflare import CloudflareStreamError, create_direct_upload_for_stream, create_live_input_for_artist
 from .forms import LiveStreamForm
-from .models import LiveStream
+from .forms import PhotoGalleryForm, PhotoGalleryImageUploadForm
+from .models import LiveStream, PhotoGallery, PhotoGalleryImage
 
 
 def absolute_static(request, path):
@@ -63,6 +64,10 @@ def event_og_context(request, stream, url=None):
 
 def artist_public_url(request, artist):
     return request.build_absolute_uri(reverse('streams:artist_detail', args=[artist.id]))
+
+
+def photo_gallery_public_url(request, gallery):
+    return request.build_absolute_uri(reverse('streams:photo_gallery_detail', args=[gallery.id]))
 
 
 def artist_og_context(request, artist, url=None):
@@ -181,8 +186,14 @@ def artist_detail(request, artist_id):
     now = timezone.now()
     can_manage_current_artist = request.user.is_authenticated and can_manage_artist(request.user, artist)
     streams = artist.streams.all()
+    photo_galleries = artist.photo_galleries.all()
     if not can_manage_current_artist:
         streams = streams.filter(Q(is_active=True) | Q(scheduled_at__gte=now), access_price__gt=0)
+        photo_galleries = photo_galleries.filter(
+            is_active=True,
+            moderation_status=PhotoGallery.APPROVED,
+            access_price__gte=PhotoGallery.MIN_PRICE,
+        )
     upcoming_streams = streams.filter(scheduled_at__gte=now).order_by('scheduled_at')
     video_library_streams = streams.filter(
         event_type__in=(LiveStream.RECORDED, LiveStream.REPLAY),
@@ -211,6 +222,7 @@ def artist_detail(request, artist_id):
         'upcoming_streams': upcoming_streams,
         'video_library_streams': video_library_streams,
         'past_streams': past_streams,
+        'photo_galleries': photo_galleries.order_by('-created_at'),
     })
 
 
@@ -382,6 +394,7 @@ def dashboard(request):
         })
 
     streams = artist.streams.all()
+    photo_galleries = artist.photo_galleries.all()
     subscribers = Subscription.objects.filter(artist=artist, status=Subscription.ACTIVE).select_related('fan__user')
     tips_total = artist.tips.aggregate(total=Sum('amount'))['total'] or 0
     return render(request, 'dashboard/index.html', {
@@ -390,6 +403,7 @@ def dashboard(request):
         'can_manage_organizations': can_manage_orgs,
         'organizations': organizations,
         'streams': streams,
+        'photo_galleries': photo_galleries,
         'subscribers': subscribers,
         'tips_total': tips_total,
     })
@@ -561,6 +575,151 @@ def artist_photo_delete(request, photo_id):
         photo.delete()
         messages.success(request, 'Foto removida.')
     return redirect(f"{reverse('streams:artist_profile_edit')}?artist={artist_id}")
+
+
+def can_view_photo_gallery(request, gallery):
+    if gallery.is_publicly_available:
+        return True
+    return request.user.is_authenticated and can_manage_artist(request.user, gallery.artist)
+
+
+def photo_gallery_detail(request, gallery_id):
+    gallery = get_object_or_404(PhotoGallery.objects.select_related('artist'), pk=gallery_id)
+    if not can_view_photo_gallery(request, gallery):
+        messages.warning(request, 'Esta galeria ainda nao esta disponivel.')
+        return redirect('streams:artist_detail', artist_id=gallery.artist_id)
+    has_access = gallery.user_has_access(request.user)
+    gallery_url = photo_gallery_public_url(request, gallery)
+    return render(request, 'streams/photo_gallery_detail.html', {
+        'gallery': gallery,
+        'gallery_url': gallery_url,
+        'has_access': has_access,
+        'share_text': f'Descobre {gallery.title} de {gallery.artist.name} na StageHub.',
+        'share_url': gallery_url,
+    })
+
+
+@login_required
+def photo_gallery_create(request):
+    artists = editable_artists_for(request.user).order_by('name')
+    if not artists.exists():
+        messages.error(request, 'Precisas de um artista ou equipa para criar galerias.')
+        return redirect('streams:home')
+
+    selected_artist_id = request.GET.get('artist') or request.POST.get('artist')
+    selected_artist = get_object_or_404(artists, pk=selected_artist_id) if selected_artist_id else artists.first()
+
+    if request.method == 'POST':
+        artist = selected_artist or get_object_or_404(artists, pk=request.POST.get('artist'))
+        form = PhotoGalleryForm(request.POST, request.FILES)
+        if form.is_valid():
+            gallery = form.save(commit=False)
+            gallery.artist = artist
+            gallery.moderation_status = PhotoGallery.DRAFT
+            gallery.save()
+            messages.success(request, 'Galeria criada. Adiciona fotos e envia para validacao.')
+            return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
+        messages.error(request, 'Nao foi possivel criar a galeria. Confirma os campos assinalados.')
+    else:
+        form = PhotoGalleryForm(initial={'access_price': PhotoGallery.MIN_PRICE})
+
+    return render(request, 'dashboard/photo_gallery_form.html', {
+        'artists': artists,
+        'form': form,
+        'gallery': None,
+        'image_form': None,
+        'selected_artist_id': selected_artist.id if selected_artist else None,
+    })
+
+
+@login_required
+def photo_gallery_update(request, gallery_id):
+    gallery = get_object_or_404(PhotoGallery.objects.select_related('artist'), pk=gallery_id)
+    if not can_manage_artist(request.user, gallery.artist):
+        messages.error(request, 'Nao tens permissao para gerir esta galeria.')
+        return redirect('streams:dashboard')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'save_gallery':
+            form = PhotoGalleryForm(request.POST, request.FILES, instance=gallery)
+            image_form = PhotoGalleryImageUploadForm(gallery=gallery)
+            if form.is_valid():
+                gallery = form.save(commit=False)
+                if gallery.moderation_status in {PhotoGallery.APPROVED, PhotoGallery.SUSPENDED}:
+                    gallery.save()
+                else:
+                    gallery.moderation_status = PhotoGallery.DRAFT
+                    gallery.rejection_reason = ''
+                    gallery.save()
+                messages.success(request, 'Galeria atualizada.')
+                return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
+            messages.error(request, 'Nao foi possivel guardar a galeria.')
+        elif action == 'add_images':
+            form = PhotoGalleryForm(instance=gallery)
+            image_form = PhotoGalleryImageUploadForm(request.POST, request.FILES, gallery=gallery)
+            if image_form.is_valid():
+                start_position = gallery.images.count()
+                for index, image in enumerate(image_form.cleaned_data['images'], start=start_position):
+                    PhotoGalleryImage.objects.create(gallery=gallery, image=image, position=index)
+                if gallery.moderation_status == PhotoGallery.REJECTED:
+                    gallery.moderation_status = PhotoGallery.DRAFT
+                    gallery.rejection_reason = ''
+                    gallery.save(update_fields=['moderation_status', 'rejection_reason'])
+                messages.success(request, 'Fotos adicionadas a galeria.')
+                return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
+            messages.error(request, 'Nao foi possivel adicionar as fotos.')
+        elif action == 'submit_review':
+            if not gallery.images.exists():
+                messages.error(request, 'Adiciona pelo menos uma foto antes de enviar para validacao.')
+            elif gallery.access_price < PhotoGallery.MIN_PRICE:
+                messages.error(request, 'O preco minimo de acesso a galerias na StageHub e 2 EUR.')
+            else:
+                gallery.moderation_status = PhotoGallery.PENDING
+                gallery.rejection_reason = ''
+                gallery.save(update_fields=['moderation_status', 'rejection_reason'])
+                messages.success(request, 'Galeria enviada para validacao StageHub.')
+            return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
+    else:
+        form = PhotoGalleryForm(instance=gallery)
+        image_form = PhotoGalleryImageUploadForm(gallery=gallery)
+
+    return render(request, 'dashboard/photo_gallery_form.html', {
+        'form': form,
+        'gallery': gallery,
+        'image_form': image_form,
+    })
+
+
+@login_required
+@require_POST
+def photo_gallery_image_delete(request, image_id):
+    image = get_object_or_404(PhotoGalleryImage.objects.select_related('gallery__artist'), pk=image_id)
+    gallery = image.gallery
+    if not can_manage_artist(request.user, gallery.artist):
+        messages.error(request, 'Nao tens permissao para gerir esta galeria.')
+        return redirect('streams:dashboard')
+    image.delete()
+    if gallery.moderation_status == PhotoGallery.REJECTED:
+        gallery.moderation_status = PhotoGallery.DRAFT
+        gallery.rejection_reason = ''
+        gallery.save(update_fields=['moderation_status', 'rejection_reason'])
+    messages.success(request, 'Foto removida.')
+    return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
+
+
+@login_required
+def photo_gallery_delete(request, gallery_id):
+    gallery = get_object_or_404(PhotoGallery.objects.select_related('artist'), pk=gallery_id)
+    if not can_manage_artist(request.user, gallery.artist):
+        messages.error(request, 'Nao tens permissao para apagar esta galeria.')
+        return redirect('streams:dashboard')
+    artist_id = gallery.artist_id
+    if request.method == 'POST':
+        gallery.delete()
+        messages.success(request, 'Galeria apagada.')
+        return redirect(f"{reverse('streams:dashboard')}?artist={artist_id}")
+    return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
 
 
 @login_required

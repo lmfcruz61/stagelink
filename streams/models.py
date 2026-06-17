@@ -1,12 +1,13 @@
 import logging
 from datetime import timedelta
+from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from urllib.parse import parse_qs, urlparse
 
-from accounts.models import Artist
+from accounts.models import Artist, OrganizationMember
 
 logger = logging.getLogger(__name__)
 
@@ -353,6 +354,87 @@ class LiveStream(models.Model):
 
     def user_has_access(self, user):
         return self.access_decision(user)['allowed']
+
+
+class PhotoGallery(models.Model):
+    DRAFT = 'draft'
+    PENDING = 'pending'
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
+    SUSPENDED = 'suspended'
+    MODERATION_CHOICES = (
+        (DRAFT, 'Rascunho'),
+        (PENDING, 'Pendente de validacao'),
+        (APPROVED, 'Aprovada'),
+        (REJECTED, 'Rejeitada'),
+        (SUSPENDED, 'Suspensa'),
+    )
+    MIN_PRICE = Decimal('2.00')
+    MAX_IMAGES = 30
+
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='photo_galleries')
+    title = models.CharField(max_length=180)
+    description = models.TextField(blank=True)
+    public_cover = models.ImageField(upload_to='photo_galleries/covers/')
+    access_price = models.DecimalField(max_digits=8, decimal_places=2, default=MIN_PRICE)
+    is_active = models.BooleanField(default=False)
+    is_sensitive = models.BooleanField(default=False)
+    moderation_status = models.CharField(max_length=20, choices=MODERATION_CHOICES, default=DRAFT)
+    rejection_reason = models.TextField(blank=True)
+    internal_note = models.TextField(blank=True)
+    reviewed_by = models.ForeignKey(
+        'auth.User',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='reviewed_photo_galleries',
+    )
+    reviewed_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.title} - {self.artist.name}'
+
+    @property
+    def is_publicly_available(self):
+        return self.is_active and self.moderation_status == self.APPROVED and self.access_price >= self.MIN_PRICE
+
+    @property
+    def image_count(self):
+        return self.images.count()
+
+    def user_has_access(self, user):
+        if not user.is_authenticated:
+            return False
+        if user.is_staff or user.is_superuser:
+            return True
+        if self.artist.user_id == user.id:
+            return True
+        if self.artist.organization_id:
+            if self.artist.organization.members.filter(user=user, role__in=OrganizationMember.EDIT_ROLES).exists():
+                return True
+        fan = getattr(user, 'fan_profile', None)
+        if not fan:
+            return False
+        return self.purchases.filter(fan=fan, paid=True).exists()
+
+
+class PhotoGalleryImage(models.Model):
+    gallery = models.ForeignKey(PhotoGallery, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='photo_galleries/private/')
+    caption = models.CharField(max_length=140, blank=True)
+    position = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['position', 'id']
+
+    def __str__(self):
+        return f'Foto de {self.gallery.title}'
 
 
 class Tip(models.Model):

@@ -9,11 +9,11 @@ from django.test import TestCase
 from django.utils import timezone
 
 from accounts.models import Artist, Fan
-from payments.models import StreamTicketPurchase
+from payments.models import PhotoGalleryPurchase, StreamTicketPurchase
 
-from .forms import LiveStreamForm
+from .forms import LiveStreamForm, PhotoGalleryForm
 from .cloudflare import create_direct_upload_for_stream
-from .models import LiveStream
+from .models import LiveStream, PhotoGallery, PhotoGalleryImage
 
 
 class LiveStreamFormTests(TestCase):
@@ -316,6 +316,73 @@ class LiveStreamAccessAndEmbedTests(TestCase):
         )
 
         self.assertTrue(stream.has_pending_direct_upload)
+
+
+class PhotoGalleryAccessTests(TestCase):
+    def setUp(self):
+        self.artist_user = User.objects.create_user(username='gallery_artist')
+        self.artist = Artist.objects.create(user=self.artist_user, name='Fotografo')
+        self.fan_user = User.objects.create_user(username='gallery_fan')
+        self.fan = Fan.objects.create(user=self.fan_user, display_name='Publico Galeria')
+
+    def create_gallery(self, **kwargs):
+        defaults = {
+            'artist': self.artist,
+            'title': 'Galeria exclusiva',
+            'description': 'Fotos protegidas',
+            'public_cover': 'covers/capa.jpg',
+            'access_price': Decimal('5.00'),
+            'is_active': True,
+            'moderation_status': PhotoGallery.APPROVED,
+        }
+        defaults.update(kwargs)
+        return PhotoGallery.objects.create(**defaults)
+
+    def test_photo_gallery_form_rejects_price_below_minimum(self):
+        form = PhotoGalleryForm(data={
+            'title': 'Galeria barata',
+            'description': '',
+            'public_cover': 'covers/capa.jpg',
+            'access_price': '1.99',
+            'is_sensitive': '',
+            'is_active': 'on',
+        })
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('access_price', form.errors)
+
+    def test_pending_gallery_does_not_show_to_public_on_artist_page(self):
+        self.create_gallery(moderation_status=PhotoGallery.PENDING)
+
+        response = self.client.get(f'/artistas/{self.artist.id}/')
+
+        self.assertNotContains(response, 'Galeria exclusiva')
+
+    def test_approved_gallery_shows_public_cover_but_not_private_images_to_non_buyer(self):
+        gallery = self.create_gallery()
+        PhotoGalleryImage.objects.create(gallery=gallery, image='private/foto-secreta.jpg')
+
+        response = self.client.get(f'/galerias/{gallery.id}/')
+
+        self.assertContains(response, 'Galeria exclusiva')
+        self.assertContains(response, 'covers/capa.jpg')
+        self.assertNotContains(response, 'private/foto-secreta.jpg')
+        self.assertContains(response, 'Fotos privadas')
+
+    def test_paid_buyer_can_view_private_gallery_images(self):
+        gallery = self.create_gallery()
+        PhotoGalleryImage.objects.create(gallery=gallery, image='private/foto-secreta.jpg')
+        PhotoGalleryPurchase.objects.create(
+            fan=self.fan,
+            gallery=gallery,
+            amount=Decimal('5.00'),
+            paid=True,
+        )
+
+        self.client.force_login(self.fan_user)
+        response = self.client.get(f'/galerias/{gallery.id}/')
+
+        self.assertContains(response, 'private/foto-secreta.jpg')
 
 
 class CloudflareDirectUploadTests(TestCase):

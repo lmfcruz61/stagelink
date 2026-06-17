@@ -16,6 +16,7 @@
     {% endif %}
     {% if artist %}
       <a class="sl-secondary" href="{% url 'streams:artist_profile_edit' %}?artist={{ artist.id }}">Editar pagina</a>
+      <a class="sl-secondary" href="{% url 'streams:photo_gallery_create' %}?artist={{ artist.id }}">Nova galeria</a>
       <a class="sl-secondary" href="{% url 'streams:stream_create' %}?artist={{ artist.id }}&type=recorded">Novo video</a>
       <a class="sl-primary" href="{% url 'streams:stream_create' %}">Novo evento</a>
     {% endif %}
@@ -166,6 +167,33 @@
         </article>
       {% empty %}
         <p class="text-zinc-400">Cria o teu primeiro evento.</p>
+      {% endfor %}
+    </div>
+
+    <h2 class="mt-8 mb-4 text-xl font-semibold">Galerias de fotos</h2>
+    <div class="space-y-3">
+      {% for gallery in photo_galleries %}
+        <article class="sl-card p-4">
+          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div class="flex min-w-0 gap-4">
+              <a href="{% url 'streams:photo_gallery_update' gallery.id %}" class="block h-24 w-40 shrink-0 overflow-hidden rounded border border-zinc-800 bg-zinc-950">
+                <img src="{{ gallery.public_cover.url }}" alt="{{ gallery.title }}" class="h-full w-full object-cover">
+              </a>
+              <div class="min-w-0">
+                <a class="font-semibold hover:text-[#2596BE]" href="{% url 'streams:photo_gallery_update' gallery.id %}">{{ gallery.title }}</a>
+                <p class="mt-1 text-sm text-zinc-400">{{ gallery.access_price }} EUR &middot; {{ gallery.image_count }} fotos &middot; {% if gallery.is_active %}ativa{% else %}inativa{% endif %}</p>
+                <p class="mt-1 text-xs text-zinc-500">Validacao: {{ gallery.get_moderation_status_display }}</p>
+                {% if gallery.is_sensitive %}<p class="mt-1 text-xs text-amber-200">Conteudo sensivel/adulto</p>{% endif %}
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:photo_gallery_update' gallery.id %}">Editar</a>
+              <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:photo_gallery_detail' gallery.id %}">Ver galeria</a>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <p class="text-zinc-400">Ainda nao criaste galerias pagas.</p>
       {% endfor %}
     </div>
   </div>

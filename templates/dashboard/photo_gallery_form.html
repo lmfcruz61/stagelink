@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}{% if gallery %}Editar galeria{% else %}Nova galeria{% endif %} - StageHub{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-4xl">
+  <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div>
+      <p class="text-sm text-[#2596BE]">Galerias pagas</p>
+      <h1 class="text-3xl font-semibold">{% if gallery %}Editar galeria{% else %}Nova galeria{% endif %}</h1>
+      <p class="mt-2 max-w-2xl text-sm text-zinc-400">Usa uma capa publica discreta. As fotos internas so aparecem a quem tem acesso.</p>
+    </div>
+    {% if gallery %}
+      <a class="sl-secondary" href="{% url 'streams:photo_gallery_detail' gallery.id %}">Ver galeria</a>
+    {% endif %}
+  </div>
+
+  {% if gallery %}
+    <section class="mb-5 rounded-xl border border-zinc-800 bg-zinc-900/90 p-5">
+      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p class="text-sm text-zinc-400">Estado de validacao</p>
+          <p class="text-lg font-semibold">{{ gallery.get_moderation_status_display }}</p>
+          {% if gallery.rejection_reason %}
+            <p class="mt-2 text-sm text-red-200">{{ gallery.rejection_reason }}</p>
+          {% endif %}
+          <p class="mt-2 text-xs text-zinc-500">So galerias aprovadas e ativas aparecem ao publico.</p>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="submit_review">
+          <button class="sl-primary" {% if gallery.moderation_status == gallery.PENDING %}disabled{% endif %}>Enviar para validacao</button>
+        </form>
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="grid gap-8 lg:grid-cols-[1fr_320px]">
+    <div class="space-y-6">
+      <form method="post" enctype="multipart/form-data" class="sl-card space-y-4 p-6">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="save_gallery">
+        {% if not gallery %}
+          <label>
+            <span>Artista</span>
+            <select name="artist" required>
+              {% for artist in artists %}
+                <option value="{{ artist.id }}"{% if selected_artist_id == artist.id %} selected{% endif %}>{{ artist.name }}{% if artist.organization %} - {{ artist.organization.name }}{% endif %}</option>
+              {% endfor %}
+            </select>
+          </label>
+        {% endif %}
+        {{ form.as_p }}
+        <button class="sl-primary">Guardar galeria</button>
+      </form>
+
+      {% if gallery %}
+        <section class="sl-card p-6">
+          <h2 class="text-xl font-semibold">Fotos privadas</h2>
+          <p class="mt-1 text-sm text-zinc-400">Estas fotos so devem aparecer depois de compra/acesso. Maximo 30 fotos.</p>
+          <form method="post" enctype="multipart/form-data" class="mt-5 space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_images">
+            {{ image_form.as_p }}
+            <button class="sl-primary">Adicionar fotos</button>
+          </form>
+        </section>
+
+        <section>
+          <h2 class="mb-4 text-xl font-semibold">Fotos na galeria</h2>
+          <div class="grid gap-4 md:grid-cols-3">
+            {% for image in gallery.images.all %}
+              <article class="sl-card p-3">
+                <img src="{{ image.image.url }}" alt="{{ image.caption|default:gallery.title }}" class="aspect-square w-full rounded object-cover">
+                {% if image.caption %}<p class="mt-2 text-sm text-zinc-300">{{ image.caption }}</p>{% endif %}
+                <form method="post" action="{% url 'streams:photo_gallery_image_delete' image.id %}" class="mt-3">
+                  {% csrf_token %}
+                  <button class="w-full rounded bg-zinc-800 px-3 py-2 text-sm hover:bg-zinc-700">Remover</button>
+                </form>
+              </article>
+            {% empty %}
+              <p class="text-zinc-400">Ainda nao adicionaste fotos privadas.</p>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+    </div>
+
+    <aside class="space-y-5">
+      {% if gallery %}
+        <div class="sl-card p-5">
+          <h2 class="text-xl font-semibold">Resumo</h2>
+          <p class="mt-3 text-sm text-zinc-400">Preco: <span class="text-zinc-100">{{ gallery.access_price }} EUR</span></p>
+          <p class="mt-1 text-sm text-zinc-400">Fotos: <span class="text-zinc-100">{{ gallery.image_count }}</span></p>
+          <p class="mt-1 text-sm text-zinc-400">Publicacao: <span class="text-zinc-100">{% if gallery.is_active %}ativa{% else %}inativa{% endif %}</span></p>
+          {% if gallery.is_sensitive %}<p class="mt-3 rounded border border-amber-500/50 bg-amber-500/10 p-3 text-sm text-amber-100">Marcada como conteudo sensivel/adulto.</p>{% endif %}
+        </div>
+        <div class="sl-card p-5">
+          <h2 class="text-xl font-semibold">Capa publica</h2>
+          <img src="{{ gallery.public_cover.url }}" alt="{{ gallery.title }}" class="mt-4 aspect-video w-full rounded object-cover">
+        </div>
+        <form method="post" action="{% url 'streams:photo_gallery_delete' gallery.id %}" class="rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('Apagar esta galeria? Esta acao nao pode ser desfeita.');">
+          {% csrf_token %}
+          <h2 class="text-lg font-semibold text-red-200">Apagar galeria</h2>
+          <p class="mt-2 text-sm text-red-100/80">Remove a galeria e as fotos associadas.</p>
+          <button class="mt-4 rounded-full border border-red-700 bg-red-950/60 px-4 py-3 font-semibold text-red-100 hover:border-red-500">Apagar definitivamente</button>
+        </form>
+      {% else %}
+        <div class="sl-card p-5">
+          <h2 class="text-xl font-semibold">Antes de criar</h2>
+          <ul class="mt-3 space-y-2 text-sm text-zinc-300">
+            <li>Usa uma capa publica segura.</li>
+            <li>Define preco minimo de 2 EUR.</li>
+            <li>Depois adiciona as fotos privadas.</li>
+            <li>Envia para validacao StageHub.</li>
+          </ul>
+        </div>
+      {% endif %}
+    </aside>
+  </section>
+</section>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.utils import timezone
 
-from .models import ChatMessage, LiveStream, Tip
+from .models import ChatMessage, LiveStream, PhotoGallery, PhotoGalleryImage, Tip
 
 
 @admin.register(LiveStream)
@@ -27,3 +28,38 @@ class TipAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ChatMessage)
+
+
+class PhotoGalleryImageInline(admin.TabularInline):
+    model = PhotoGalleryImage
+    extra = 0
+
+
+@admin.register(PhotoGallery)
+class PhotoGalleryAdmin(admin.ModelAdmin):
+    list_display = (
+        'title',
+        'artist',
+        'access_price',
+        'moderation_status',
+        'is_sensitive',
+        'is_active',
+        'created_at',
+    )
+    list_filter = ('moderation_status', 'is_sensitive', 'is_active', 'created_at')
+    search_fields = ('title', 'artist__name', 'description')
+    readonly_fields = ('created_at', 'updated_at', 'reviewed_at')
+    inlines = (PhotoGalleryImageInline,)
+    actions = ('approve_galleries', 'reject_galleries', 'suspend_galleries')
+
+    @admin.action(description='Aprovar galerias selecionadas')
+    def approve_galleries(self, request, queryset):
+        queryset.update(moderation_status=PhotoGallery.APPROVED, reviewed_by_id=request.user.id, reviewed_at=timezone.now())
+
+    @admin.action(description='Rejeitar galerias selecionadas')
+    def reject_galleries(self, request, queryset):
+        queryset.update(moderation_status=PhotoGallery.REJECTED, reviewed_by_id=request.user.id, reviewed_at=timezone.now())
+
+    @admin.action(description='Suspender galerias selecionadas')
+    def suspend_galleries(self, request, queryset):
+        queryset.update(moderation_status=PhotoGallery.SUSPENDED, reviewed_by_id=request.user.id, reviewed_at=timezone.now())

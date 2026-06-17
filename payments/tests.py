@@ -8,9 +8,9 @@ from django.test import override_settings, TestCase
 from django.utils import timezone
 
 from accounts.models import Artist, Fan
-from streams.models import LiveStream
+from streams.models import LiveStream, PhotoGallery
 
-from .models import Subscription
+from .models import PhotoGalleryPurchase, Subscription
 from .pricing import split_platform_fee, stagehub_commission_percent, ticket_checkout_pricing
 
 
@@ -156,3 +156,37 @@ class SubscriptionTierRulesTests(TestCase):
         response = self.client.get(f'/pagamentos/streams/{stream.id}/bilhete/')
 
         self.assertRedirects(response, f'/eventos/{stream.id}/')
+
+    @override_settings(STRIPE_SECRET_KEY='sk_test_xxx', STAGEHUB_COMMISSION_PERCENT='20.00')
+    @patch('payments.views.stripe.checkout.Session.create')
+    @patch('payments.views.stripe.Account.retrieve')
+    def test_photo_gallery_checkout_uses_connect_destination_charge(self, mock_retrieve, mock_session_create):
+        self.mark_artist_stripe_ready()
+        gallery = PhotoGallery.objects.create(
+            artist=self.artist,
+            title='Galeria paga',
+            public_cover='covers/capa.jpg',
+            access_price=Decimal('10.00'),
+            is_active=True,
+            moderation_status=PhotoGallery.APPROVED,
+        )
+        mock_retrieve.return_value = {
+            'details_submitted': True,
+            'charges_enabled': True,
+            'payouts_enabled': True,
+        }
+        mock_session_create.return_value = SimpleNamespace(id='cs_test_gallery', url='https://stripe.test/gallery')
+
+        self.client.force_login(self.fan_user)
+        response = self.client.get(f'/pagamentos/galerias/{gallery.id}/comprar/')
+
+        self.assertEqual(response.status_code, 302)
+        kwargs = mock_session_create.call_args.kwargs
+        self.assertEqual(kwargs['payment_intent_data']['application_fee_amount'], 200)
+        self.assertEqual(kwargs['payment_intent_data']['transfer_data']['destination'], 'acct_test_artist')
+        self.assertEqual(kwargs['metadata']['type'], 'photo_gallery')
+        self.assertEqual(kwargs['metadata']['platform_fee_amount'], '2.00')
+        self.assertEqual(kwargs['metadata']['artist_net_amount'], '8.00')
+        purchase = PhotoGalleryPurchase.objects.get(fan=self.fan, gallery=gallery)
+        self.assertFalse(purchase.paid)
+        self.assertEqual(purchase.stripe_session_id, 'cs_test_gallery')

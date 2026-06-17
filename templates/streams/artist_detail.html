@@ -237,6 +237,36 @@
   </div>
 </section>
 
+<section class="mb-10">
+  <div class="mb-4 flex items-center justify-between">
+    <h2 class="text-2xl font-semibold">Galerias de fotos</h2>
+    {% if can_manage_current_artist %}
+      <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:photo_gallery_create' %}?artist={{ artist.id }}">Nova galeria</a>
+    {% endif %}
+  </div>
+  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    {% for gallery in photo_galleries %}
+      <a class="sl-video-card" href="{% if can_manage_current_artist %}{% url 'streams:photo_gallery_update' gallery.id %}{% else %}{% url 'streams:photo_gallery_detail' gallery.id %}{% endif %}">
+        <div class="sl-thumb relative">
+          <img src="{{ gallery.public_cover.url }}" alt="{{ gallery.title }}" class="h-full w-full object-cover">
+          <span class="absolute left-3 top-3 rounded border border-zinc-700 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-zinc-100">
+            {% if gallery.is_sensitive %}Conteudo sensivel{% else %}Galeria{% endif %}
+          </span>
+        </div>
+        <div class="px-1 py-3">
+          <h3 class="font-semibold">{{ gallery.title }}</h3>
+          <p class="mt-1 text-sm text-zinc-400">{{ gallery.access_price }} EUR &middot; {{ gallery.image_count }} fotos</p>
+          {% if can_manage_current_artist %}
+            <span class="mt-3 inline-flex rounded-full border border-[#5230EF] px-3 py-2 text-sm font-semibold text-zinc-100">{{ gallery.get_moderation_status_display }}</span>
+          {% endif %}
+        </div>
+      </a>
+    {% empty %}
+      <p class="text-zinc-400">Ainda nao ha galerias de fotos publicadas.</p>
+    {% endfor %}
+  </div>
+</section>
+
 {% if gallery_photos %}
   <section class="mb-10">
     <h2 class="mb-4 text-2xl font-semibold">Galeria</h2>
