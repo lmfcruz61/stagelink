@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from accounts.models import Artist, Fan
@@ -15,6 +16,30 @@ from payments.models import PhotoGalleryPurchase, StreamTicketPurchase
 from .forms import LiveStreamForm, PhotoGalleryForm, PhotoGalleryImageUploadForm
 from .cloudflare import create_direct_upload_for_stream
 from .models import LiveStream, PhotoGallery, PhotoGalleryImage
+
+
+class LegalPageTests(TestCase):
+    def test_legal_pages_are_public(self):
+        cases = (
+            ('streams:privacy_policy', 'Politica de Privacidade'),
+            ('streams:cookie_policy', 'Politica de Cookies'),
+            ('streams:terms_conditions', 'Termos e Condicoes'),
+        )
+
+        for url_name, expected_text in cases:
+            with self.subTest(url_name=url_name):
+                response = self.client.get(reverse(url_name))
+
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, expected_text)
+
+    def test_footer_links_to_legal_pages_and_cookie_settings(self):
+        response = self.client.get(reverse('streams:home'))
+
+        self.assertContains(response, reverse('streams:privacy_policy'))
+        self.assertContains(response, reverse('streams:cookie_policy'))
+        self.assertContains(response, reverse('streams:terms_conditions'))
+        self.assertContains(response, 'Gerir cookies')
 
 
 class LiveStreamFormTests(TestCase):

@@ -126,14 +126,12 @@
 {% block extra_body %}
   {% if facebook_pixel_id %}
     <script>
-      if (window.fbq) {
-        fbq('track', 'ViewContent', {
+      window.StageHubConsent?.trackMeta('ViewContent', {
           content_name: '{{ stream.title|escapejs }}',
           content_type: 'event',
           currency: 'EUR',
           value: '{{ stream.access_price }}'
-        });
-      }
+      });
     </script>
   {% endif %}
 {% endblock %}

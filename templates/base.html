@@ -8,21 +8,7 @@
   <title>{% block title %}StageHub{% endblock %}</title>
   {% block meta %}{% endblock %}
   {% if facebook_pixel_id %}
-    <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '{{ facebook_pixel_id|escapejs }}');
-      fbq('track', 'PageView');
-    </script>
-    <noscript>
-      <img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id={{ facebook_pixel_id|urlencode }}&ev=PageView&noscript=1">
-    </noscript>
+    <meta name="stagehub-facebook-pixel-id" content="{{ facebook_pixel_id }}">
   {% endif %}
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -161,6 +147,14 @@
     .share-feedback.is-visible {
       opacity: 1;
     }
+
+    .cookie-consent-backdrop {
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    .cookie-consent-panel {
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
+    }
   </style>
 </head>
 <body class="min-h-screen bg-zinc-950 text-zinc-100">
@@ -242,10 +236,192 @@
       <p>StageHub usa ligacao segura. Pagamentos sao processados pela Stripe.</p>
       <div class="flex flex-wrap gap-3">
         <a class="hover:text-zinc-300" href="{% url 'accounts:password_reset' %}">Recuperar password</a>
+        <a class="hover:text-zinc-300" href="{% url 'streams:privacy_policy' %}">Privacidade</a>
+        <a class="hover:text-zinc-300" href="{% url 'streams:cookie_policy' %}">Cookies</a>
+        <a class="hover:text-zinc-300" href="{% url 'streams:terms_conditions' %}">Termos</a>
+        <button type="button" class="hover:text-zinc-300" data-cookie-settings>Gerir cookies</button>
         <span>Nunca partilhes a tua password.</span>
       </div>
     </div>
   </footer>
+  <div id="cookie-consent" class="cookie-consent-backdrop fixed inset-0 z-50 hidden items-end p-4 md:items-center md:justify-center">
+    <section class="cookie-consent-panel w-full max-w-2xl rounded-xl border border-zinc-800 bg-zinc-950 p-5 text-sm text-zinc-300">
+      <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <p class="font-semibold text-[#2596BE]">Privacidade e cookies</p>
+          <h2 class="mt-1 text-xl font-semibold text-zinc-100">Controla o que carregamos no teu browser</h2>
+          <p class="mt-2 max-w-xl">Usamos cookies necessarios para login, seguranca e pagamentos. Marketing, medicao e conteudo externo so carregam com consentimento.</p>
+        </div>
+      </div>
+
+      <div id="cookie-consent-options" class="mt-5 hidden space-y-3 rounded border border-zinc-800 bg-zinc-900 p-4">
+        <label class="flex items-start gap-3">
+          <input type="checkbox" checked disabled>
+          <span>
+            <span class="block font-semibold text-zinc-100">Necessarios</span>
+            <span class="text-zinc-400">Login, seguranca, sessoes, pagamentos e funcionamento base.</span>
+          </span>
+        </label>
+        <label class="flex items-start gap-3">
+          <input id="cookie-consent-marketing" type="checkbox">
+          <span>
+            <span class="block font-semibold text-zinc-100">Marketing e medicao</span>
+            <span class="text-zinc-400">Permite Meta/Facebook Pixel e eventos de medicao, se configurados.</span>
+          </span>
+        </label>
+        <label class="flex items-start gap-3">
+          <input id="cookie-consent-external" type="checkbox">
+          <span>
+            <span class="block font-semibold text-zinc-100">Conteudo externo</span>
+            <span class="text-zinc-400">Permite carregar players ou scripts externos nao essenciais quando existirem.</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
+        <button id="cookie-consent-configure" type="button" class="sl-secondary">Configurar</button>
+        <button id="cookie-consent-reject" type="button" class="sl-secondary">Rejeitar</button>
+        <button id="cookie-consent-save" type="button" class="sl-secondary hidden">Guardar escolhas</button>
+        <button id="cookie-consent-accept" type="button" class="sl-primary">Aceitar</button>
+      </div>
+      <p class="mt-3 text-xs text-zinc-500">
+        Podes alterar a decisao em "Gerir cookies". Ve tambem a
+        <a class="text-[#2596BE] hover:text-[#2596BE]" href="{% url 'streams:cookie_policy' %}">Politica de Cookies</a>.
+      </p>
+    </section>
+  </div>
+  <script>
+    (function() {
+      const storageKey = 'stagehub_cookie_consent_v1';
+      const banner = document.querySelector('#cookie-consent');
+      const options = document.querySelector('#cookie-consent-options');
+      const marketingInput = document.querySelector('#cookie-consent-marketing');
+      const externalInput = document.querySelector('#cookie-consent-external');
+      const configureButton = document.querySelector('#cookie-consent-configure');
+      const rejectButton = document.querySelector('#cookie-consent-reject');
+      const acceptButton = document.querySelector('#cookie-consent-accept');
+      const saveButton = document.querySelector('#cookie-consent-save');
+      const settingsButtons = document.querySelectorAll('[data-cookie-settings]');
+      let pixelLoading = false;
+
+      function readConsent() {
+        try {
+          return JSON.parse(window.localStorage.getItem(storageKey) || 'null');
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function writeConsent(consent) {
+        const payload = {
+          necessary: true,
+          marketing: Boolean(consent.marketing),
+          external: Boolean(consent.external),
+          updatedAt: new Date().toISOString()
+        };
+        window.localStorage.setItem(storageKey, JSON.stringify(payload));
+        return payload;
+      }
+
+      function showBanner(showOptions) {
+        const consent = readConsent();
+        marketingInput.checked = Boolean(consent?.marketing);
+        externalInput.checked = Boolean(consent?.external);
+        options.classList.toggle('hidden', !showOptions);
+        saveButton.classList.toggle('hidden', !showOptions);
+        configureButton.classList.toggle('hidden', showOptions);
+        banner.classList.remove('hidden');
+        banner.classList.add('flex');
+      }
+
+      function hideBanner() {
+        banner.classList.add('hidden');
+        banner.classList.remove('flex');
+      }
+
+      function loadFacebookPixel() {
+        const pixelId = document.querySelector('meta[name="stagehub-facebook-pixel-id"]')?.content;
+        if (!pixelId || window.fbq || pixelLoading) return;
+        pixelLoading = true;
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', pixelId);
+        fbq('track', 'PageView');
+      }
+
+      function applyConsent(consent) {
+        if (consent?.marketing) {
+          loadFacebookPixel();
+        }
+        window.dispatchEvent(new CustomEvent('stagehub:consent-changed', { detail: consent || {} }));
+      }
+
+      window.StageHubConsent = {
+        get: readConsent,
+        has: function(category) {
+          const consent = readConsent();
+          return Boolean(consent && consent[category]);
+        },
+        open: function() {
+          showBanner(true);
+        },
+        trackMeta: function(eventName, payload) {
+          const consent = readConsent();
+          if (!consent?.marketing) return;
+          loadFacebookPixel();
+          if (window.fbq) {
+            fbq('track', eventName, payload || {});
+          } else {
+            window.addEventListener('stagehub:consent-changed', function retryTrack() {
+              if (window.fbq) {
+                fbq('track', eventName, payload || {});
+              }
+            }, { once: true });
+          }
+        }
+      };
+
+      configureButton?.addEventListener('click', function() {
+        showBanner(true);
+      });
+      rejectButton?.addEventListener('click', function() {
+        const consent = writeConsent({ marketing: false, external: false });
+        hideBanner();
+        applyConsent(consent);
+      });
+      acceptButton?.addEventListener('click', function() {
+        const consent = writeConsent({ marketing: true, external: true });
+        hideBanner();
+        applyConsent(consent);
+      });
+      saveButton?.addEventListener('click', function() {
+        const consent = writeConsent({
+          marketing: marketingInput.checked,
+          external: externalInput.checked
+        });
+        hideBanner();
+        applyConsent(consent);
+      });
+      settingsButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+          showBanner(true);
+        });
+      });
+
+      const existingConsent = readConsent();
+      if (existingConsent) {
+        applyConsent(existingConsent);
+      } else {
+        showBanner(false);
+      }
+    })();
+  </script>
   {% block extra_body %}{% endblock %}
 </body>
 </html>

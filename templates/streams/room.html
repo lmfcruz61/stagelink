@@ -258,6 +258,10 @@
       buildPlayer();
       return;
     }
+    if (videoProvider === 'youtube' && !window.StageHubConsent?.has('external')) {
+      showVideoStatus('Este player externo so carrega depois de autorizares conteudo externo nas preferencias de cookies.');
+      return;
+    }
     if (!youtubeApiReady || !window.YT || !window.YT.Player) {
       showVideoStatus('A preparar o player do YouTube...', false);
       return;
@@ -295,6 +299,10 @@
 
   reloadVideoButton.addEventListener('click', function() {
     if (videoLocked) return;
+    if (videoProvider === 'youtube' && !window.StageHubConsent?.has('external')) {
+      window.StageHubConsent?.open();
+      return;
+    }
     player = null;
     playerRetryCount = 0;
     playerContainer.innerHTML = '';
@@ -306,6 +314,12 @@
 
   function requestYouTubeApi() {
     if (videoProvider !== 'youtube') return;
+    if (!window.StageHubConsent?.has('external')) {
+      if (streamStarted) {
+        showVideoStatus('Este player externo so carrega depois de autorizares conteudo externo nas preferencias de cookies.');
+      }
+      return;
+    }
     if (youtubeApiReady || youtubeApiLoading) return;
     youtubeApiLoading = true;
     const youtubeApiScript = document.createElement('script');
@@ -327,6 +341,11 @@
   }
 
   requestYouTubeApi();
+  window.addEventListener('stagehub:consent-changed', function(event) {
+    if (videoProvider !== 'youtube' || !event.detail.external) return;
+    requestYouTubeApi();
+    loadPlayerWhenReady();
+  });
 
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const chatSocket = new WebSocket(`${protocol}://${window.location.host}/ws/streams/{{ stream.id }}/chat/`);

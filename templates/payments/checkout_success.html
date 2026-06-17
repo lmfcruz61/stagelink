@@ -41,14 +41,12 @@
 {% block extra_body %}
   {% if facebook_pixel_id %}
     <script>
-      if (window.fbq) {
-        fbq('track', 'Purchase', {
+      window.StageHubConsent?.trackMeta('Purchase', {
           content_name: '{{ stream.title|escapejs }}',
           content_type: 'event_ticket',
           currency: 'EUR',
           value: '{{ purchase_value|escapejs }}'
-        });
-      }
+      });
     </script>
   {% endif %}
 {% endblock %}

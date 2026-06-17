@@ -181,6 +181,18 @@ def home(request):
     })
 
 
+def privacy_policy(request):
+    return render(request, 'legal/privacy_policy.html')
+
+
+def cookie_policy(request):
+    return render(request, 'legal/cookie_policy.html')
+
+
+def terms_conditions(request):
+    return render(request, 'legal/terms_conditions.html')
+
+
 def artist_detail(request, artist_id):
     artist = get_object_or_404(Artist.objects.prefetch_related('gallery_photos'), pk=artist_id)
     now = timezone.now()
