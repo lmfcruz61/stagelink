@@ -112,6 +112,39 @@ class LiveStreamFormTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn('duration_minutes', form.errors)
 
+    def test_recorded_cloudflare_video_rejects_duration_over_one_hour_on_edit(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Video existente',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_video_uid='video-stagehub-123',
+            event_type=LiveStream.RECORDED,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.now(),
+            duration_minutes=45,
+        )
+        scheduled_at = timezone.localtime(stream.scheduled_at).strftime('%Y-%m-%dT%H:%M')
+        form = LiveStreamForm(
+            data={
+                'title': stream.title,
+                'description': stream.description,
+                'video_provider': stream.video_provider,
+                'cloudflare_stream_id': stream.cloudflare_video_uid,
+                'cloudflare_playback_url': stream.cloudflare_playback_url,
+                'youtube_video_id': stream.youtube_video_id,
+                'event_type': stream.event_type,
+                'access_price': str(stream.access_price),
+                'scheduled_at': scheduled_at,
+                'duration_minutes': '61',
+                'create_upload_url': '',
+            },
+            instance=stream,
+            artist=self.artist,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('duration_minutes', form.errors)
+
     def test_events_below_minimum_price_are_rejected(self):
         scheduled_at = timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M')
         form = LiveStreamForm(
@@ -325,6 +358,7 @@ class CloudflareDirectUploadTests(TestCase):
 
         self.assertEqual(upload['uid'], 'video-uid')
         self.assertEqual(upload['upload_url'], 'https://upload.videodelivery.net/tus/upload')
+        self.assertEqual(upload['expires'], '2026-06-14T20:00:00Z')
 
     @override_settings(CLOUDFLARE_ACCOUNT_ID='account', CLOUDFLARE_API_TOKEN='token')
     @patch('streams.cloudflare.urlopen')

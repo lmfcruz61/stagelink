@@ -88,6 +88,7 @@ class LiveStreamForm(forms.ModelForm):
             'cloudflare_playback_url',
             'cloudflare_stream_id',
             'create_upload_url',
+            'duration_minutes',
             'event_type',
             'video_provider',
             'youtube_video_id',
