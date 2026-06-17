@@ -17,6 +17,7 @@
       <a class="sl-primary w-full" href="{% url 'payments:buy_ticket' stream.id %}">{% trans "Comprar bilhete" %}</a>
       <a class="sl-secondary w-full" href="{% url 'streams:artist_detail' stream.artist.id %}#subscricoes">{% trans "Ver planos de subscricao" %}</a>
     </div>
+    <p class="mt-4 text-xs text-zinc-500">Por seguranca, entra sempre com a mesma conta usada na compra.</p>
   </div>
 </section>
 {% endblock %}

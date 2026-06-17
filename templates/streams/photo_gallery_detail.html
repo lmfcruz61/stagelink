@@ -25,6 +25,7 @@
       {% elif user.is_authenticated and user.fan_profile %}
         <p class="mt-2 text-sm text-zinc-400">Compra acesso para ver as fotos privadas desta galeria.</p>
         <a class="sl-primary mt-5 w-full" href="{% url 'payments:buy_photo_gallery' gallery.id %}">Comprar acesso</a>
+        <p class="mt-4 text-xs text-zinc-500">As fotos privadas so aparecem dentro da tua conta apos pagamento confirmado.</p>
       {% elif user.is_authenticated %}
         <p class="mt-2 text-sm text-zinc-400">As compras estao disponiveis para contas de publico.</p>
       {% else %}
