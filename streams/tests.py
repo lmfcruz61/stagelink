@@ -467,11 +467,11 @@ class PhotoGalleryAccessTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn('access_price', form.errors)
 
-    def test_photo_gallery_upload_rejects_images_over_five_mb(self):
+    def test_photo_gallery_upload_rejects_images_over_three_mb(self):
         gallery = self.create_gallery()
         image = SimpleUploadedFile(
             'foto.jpg',
-            b'x' * ((5 * 1024 * 1024) + 1),
+            b'x' * ((3 * 1024 * 1024) + 1),
             content_type='image/jpeg',
         )
         form = PhotoGalleryImageUploadForm(
@@ -480,7 +480,45 @@ class PhotoGalleryAccessTests(TestCase):
         )
 
         self.assertFalse(form.is_valid())
-        self.assertIn('Cada foto pode ter no maximo 5 MB.', form.errors['images'])
+        self.assertIn('Cada foto pode ter no maximo 3 MB.', form.errors['images'])
+
+    def test_photo_gallery_upload_rejects_more_than_ten_images_per_upload(self):
+        gallery = self.create_gallery()
+        images = [
+            SimpleUploadedFile(f'foto-{index}.jpg', b'x', content_type='image/jpeg')
+            for index in range(11)
+        ]
+        form = PhotoGalleryImageUploadForm(
+            files={'images': images},
+            gallery=gallery,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('Envia no maximo 10 fotos de cada vez.', form.errors['images'])
+
+    def test_photo_gallery_upload_rejects_total_over_thirty_mb(self):
+        gallery = self.create_gallery()
+        images = [
+            SimpleUploadedFile(f'foto-{index}.jpg', b'x' * ((3 * 1024 * 1024) + 1), content_type='image/jpeg')
+            for index in range(10)
+        ]
+        form = PhotoGalleryImageUploadForm(
+            files={'images': images},
+            gallery=gallery,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('Cada envio pode ter no maximo 30 MB no total.', form.errors['images'])
+
+    def test_photo_gallery_form_shows_safer_upload_limits(self):
+        gallery = self.create_gallery()
+        self.client.force_login(self.artist_user)
+
+        response = self.client.get(f'/dashboard/galerias/{gallery.id}/editar/')
+
+        self.assertContains(response, '10 fotos por envio')
+        self.assertContains(response, '3 MB por foto')
+        self.assertContains(response, '30 MB por envio')
 
     def test_pending_gallery_does_not_show_to_public_on_artist_page(self):
         self.create_gallery(moderation_status=PhotoGallery.PENDING)

@@ -725,6 +725,11 @@ def photo_gallery_create(request):
         'gallery': None,
         'image_form': None,
         'selected_artist_id': selected_artist.id if selected_artist else None,
+        'max_gallery_images': PhotoGallery.MAX_IMAGES,
+        'max_upload_images': PhotoGalleryImageUploadForm.MAX_UPLOAD_IMAGES,
+        'max_upload_image_size': PhotoGalleryImageUploadForm.MAX_IMAGE_SIZE,
+        'max_upload_total_size': PhotoGalleryImageUploadForm.MAX_TOTAL_SIZE,
+        'remaining_image_slots': PhotoGallery.MAX_IMAGES,
     })
 
 
@@ -784,6 +789,11 @@ def photo_gallery_update(request, gallery_id):
         'form': form,
         'gallery': gallery,
         'image_form': image_form,
+        'max_gallery_images': PhotoGallery.MAX_IMAGES,
+        'max_upload_images': PhotoGalleryImageUploadForm.MAX_UPLOAD_IMAGES,
+        'max_upload_image_size': PhotoGalleryImageUploadForm.MAX_IMAGE_SIZE,
+        'max_upload_total_size': PhotoGalleryImageUploadForm.MAX_TOTAL_SIZE,
+        'remaining_image_slots': max(PhotoGallery.MAX_IMAGES - gallery.images.count(), 0),
     })
 
 

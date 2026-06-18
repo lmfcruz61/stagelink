@@ -250,10 +250,11 @@ Criar galeria:
 8. Guardar.
 9. Adicionar fotos privadas.
 10. Confirmar limite de 30 fotos por galeria.
-11. Confirmar limite de 5 MB por foto.
-12. Confirmar limite de 150 MB por envio.
-13. Confirmar formatos JPG, PNG ou WebP.
-14. Enviar para validacao.
+11. Confirmar limite de 10 fotos por envio.
+12. Confirmar limite de 3 MB por foto.
+13. Confirmar limite de 30 MB por envio.
+14. Confirmar formatos JPG, PNG ou WebP.
+15. Enviar para validacao.
 
 Testar moderacao:
 
@@ -409,7 +410,7 @@ So avancar se tudo estiver marcado:
 12. Limite de 1 hora testado.
 13. Biblioteca de videos testada.
 14. Galerias pagas testadas.
-15. Limites de 30 fotos, 5 MB por foto e 150 MB por envio testados.
+15. Limites de 30 fotos por galeria, 10 fotos por envio, 3 MB por foto e 30 MB por envio testados.
 16. Moderacao de galerias testada.
 17. Subscricao teste funciona.
 18. Bilhete teste funciona.

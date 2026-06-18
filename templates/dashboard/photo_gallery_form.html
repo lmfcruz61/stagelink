@@ -55,12 +55,14 @@
       {% if gallery %}
         <section class="sl-card p-6">
           <h2 class="text-xl font-semibold">Fotos privadas</h2>
-          <p class="mt-1 text-sm text-zinc-400">Estas fotos so devem aparecer depois de compra/acesso. Maximo 30 fotos, 5 MB por foto e 150 MB por envio.</p>
-          <form method="post" enctype="multipart/form-data" class="mt-5 space-y-4">
+          <p class="mt-1 text-sm text-zinc-400">Estas fotos so devem aparecer depois de compra/acesso. Maximo {{ max_gallery_images }} fotos por galeria, {{ max_upload_images }} fotos por envio, 3 MB por foto e 30 MB por envio.</p>
+          <p class="mt-2 text-xs text-zinc-500">Ainda podes adicionar {{ remaining_image_slots }} foto{{ remaining_image_slots|pluralize }} a esta galeria.</p>
+          <form method="post" enctype="multipart/form-data" class="mt-5 space-y-4" data-photo-upload-form data-max-files="{{ max_upload_images }}" data-max-image-size="{{ max_upload_image_size }}" data-max-total-size="{{ max_upload_total_size }}" data-remaining-slots="{{ remaining_image_slots }}">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_images">
             {{ image_form.as_p }}
-            <button class="sl-primary">Adicionar fotos</button>
+            <p class="hidden rounded border border-red-500/50 bg-red-950/40 p-3 text-sm text-red-100" data-photo-upload-error></p>
+            <button class="sl-primary" data-photo-upload-submit {% if remaining_image_slots <= 0 %}disabled{% endif %}>Adicionar fotos</button>
           </form>
         </section>
 
@@ -117,4 +119,93 @@
     </aside>
   </section>
 </section>
+{% if gallery %}
+  <script>
+    (function () {
+      const form = document.querySelector('[data-photo-upload-form]');
+      if (!form) return;
+
+      const input = form.querySelector('input[type="file"][name="images"]');
+      const errorBox = form.querySelector('[data-photo-upload-error]');
+      const submitButton = form.querySelector('[data-photo-upload-submit]');
+      const maxFiles = Number(form.dataset.maxFiles || 10);
+      const maxImageSize = Number(form.dataset.maxImageSize || 3145728);
+      const maxTotalSize = Number(form.dataset.maxTotalSize || 31457280);
+      const remainingSlots = Number(form.dataset.remainingSlots || 0);
+      const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+      function formatMb(bytes) {
+        return (bytes / 1024 / 1024).toFixed(1).replace('.', ',') + ' MB';
+      }
+
+      function showError(message) {
+        if (!errorBox) return;
+        errorBox.textContent = message;
+        errorBox.classList.remove('hidden');
+      }
+
+      function clearError() {
+        if (!errorBox) return;
+        errorBox.textContent = '';
+        errorBox.classList.add('hidden');
+      }
+
+      function validateFiles() {
+        clearError();
+        if (!input || !input.files.length) {
+          showError('Escolhe pelo menos uma foto para adicionar.');
+          return false;
+        }
+
+        const files = Array.from(input.files);
+        const allowedCount = Math.min(maxFiles, remainingSlots);
+
+        if (remainingSlots <= 0) {
+          showError('Esta galeria ja atingiu o limite de fotos.');
+          return false;
+        }
+
+        if (files.length > allowedCount) {
+          showError('Podes enviar no maximo ' + allowedCount + ' foto' + (allowedCount === 1 ? '' : 's') + ' agora.');
+          return false;
+        }
+
+        let totalSize = 0;
+        for (const file of files) {
+          totalSize += file.size;
+          if (!allowedTypes.has(file.type)) {
+            showError('Usa apenas imagens JPG, PNG ou WebP.');
+            return false;
+          }
+          if (file.size > maxImageSize) {
+            showError('A foto "' + file.name + '" tem ' + formatMb(file.size) + '. Cada foto pode ter no maximo ' + formatMb(maxImageSize) + '.');
+            return false;
+          }
+        }
+
+        if (totalSize > maxTotalSize) {
+          showError('Este envio tem ' + formatMb(totalSize) + '. O maximo por envio e ' + formatMb(maxTotalSize) + '.');
+          return false;
+        }
+
+        return true;
+      }
+
+      if (input) {
+        input.addEventListener('change', validateFiles);
+      }
+
+      form.addEventListener('submit', function (event) {
+        if (!validateFiles()) {
+          event.preventDefault();
+          return;
+        }
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.textContent = 'A enviar...';
+        }
+      });
+    })();
+  </script>
+{% endif %}
 {% endblock %}

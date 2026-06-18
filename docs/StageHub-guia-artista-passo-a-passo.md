@@ -242,12 +242,13 @@ Regras principais:
 2. As fotos privadas so aparecem depois de compra/acesso.
 3. O preco minimo e 2 EUR.
 4. Cada galeria pode ter no maximo 30 fotos.
-5. Cada foto pode ter no maximo 5 MB.
-6. Cada envio pode ter no maximo 150 MB no total.
-7. Formatos aceites: JPG, PNG e WebP.
-8. Galerias sensiveis/adultas devem ser marcadas como conteudo sensivel.
-9. A galeria tem de ser enviada para validacao StageHub.
-10. So galerias aprovadas e ativas aparecem ao publico.
+5. Cada envio pode ter no maximo 10 fotos de cada vez.
+6. Cada foto pode ter no maximo 3 MB.
+7. Cada envio pode ter no maximo 30 MB no total.
+8. Formatos aceites: JPG, PNG e WebP.
+9. Galerias sensiveis/adultas devem ser marcadas como conteudo sensivel.
+10. A galeria tem de ser enviada para validacao StageHub.
+11. So galerias aprovadas e ativas aparecem ao publico.
 
 Passos:
 

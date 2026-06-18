@@ -229,6 +229,9 @@ class MultipleFileField(forms.FileField):
 
 
 class PhotoGalleryForm(forms.ModelForm):
+    MAX_COVER_SIZE = 5 * 1024 * 1024
+    ALLOWED_COVER_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
+
     class Meta:
         model = PhotoGallery
         fields = (
@@ -261,17 +264,32 @@ class PhotoGalleryForm(forms.ModelForm):
             raise forms.ValidationError('O preco minimo de acesso a galerias na StageHub e 2 EUR.')
         return value
 
+    def clean_public_cover(self):
+        cover = self.cleaned_data.get('public_cover')
+        if not cover:
+            return cover
+        content_type = getattr(cover, 'content_type', '')
+        if not content_type:
+            return cover
+        if content_type not in self.ALLOWED_COVER_TYPES:
+            raise forms.ValidationError('Usa uma capa JPG, PNG ou WebP.')
+        size = getattr(cover, 'size', 0)
+        if size and size > self.MAX_COVER_SIZE:
+            raise forms.ValidationError('A capa publica pode ter no maximo 5 MB.')
+        return cover
+
 
 class PhotoGalleryImageUploadForm(forms.Form):
     images = MultipleFileField(
         label='Fotos privadas da galeria',
         required=True,
         widget=MultipleFileInput(attrs={'multiple': True, 'accept': 'image/jpeg,image/png,image/webp'}),
-        help_text='Maximo 30 fotos por galeria, 5 MB por foto e 150 MB no total.',
+        help_text='Maximo 10 fotos por envio, 30 por galeria, 3 MB por foto e 30 MB por envio.',
     )
 
-    MAX_IMAGE_SIZE = 5 * 1024 * 1024
-    MAX_TOTAL_SIZE = 150 * 1024 * 1024
+    MAX_UPLOAD_IMAGES = 10
+    MAX_IMAGE_SIZE = 3 * 1024 * 1024
+    MAX_TOTAL_SIZE = 30 * 1024 * 1024
     ALLOWED_CONTENT_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
 
     def __init__(self, *args, gallery=None, **kwargs):
@@ -281,14 +299,16 @@ class PhotoGalleryImageUploadForm(forms.Form):
     def clean_images(self):
         images = self.cleaned_data['images']
         existing_count = self.gallery.images.count() if self.gallery else 0
+        if len(images) > self.MAX_UPLOAD_IMAGES:
+            raise forms.ValidationError(f'Envia no maximo {self.MAX_UPLOAD_IMAGES} fotos de cada vez.')
         if existing_count + len(images) > PhotoGallery.MAX_IMAGES:
             raise forms.ValidationError(f'Cada galeria pode ter no maximo {PhotoGallery.MAX_IMAGES} fotos.')
         if sum(image.size for image in images) > self.MAX_TOTAL_SIZE:
-            raise forms.ValidationError('Cada envio pode ter no maximo 150 MB no total.')
+            raise forms.ValidationError('Cada envio pode ter no maximo 30 MB no total.')
         for image in images:
             content_type = getattr(image, 'content_type', '')
             if content_type not in self.ALLOWED_CONTENT_TYPES:
                 raise forms.ValidationError('Usa apenas imagens JPG, PNG ou WebP.')
             if image.size > self.MAX_IMAGE_SIZE:
-                raise forms.ValidationError('Cada foto pode ter no maximo 5 MB.')
+                raise forms.ValidationError('Cada foto pode ter no maximo 3 MB.')
         return images
