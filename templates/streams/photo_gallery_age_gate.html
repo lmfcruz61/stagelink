@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Confirmar acesso - StageHub{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-2xl">
+  <div class="rounded-xl border border-amber-500/50 bg-zinc-950/95 p-6 shadow-2xl">
+    <p class="text-sm font-semibold text-amber-200">Conteudo sensivel</p>
+    <h1 class="mt-2 text-3xl font-semibold">Confirma antes de continuar</h1>
+    <p class="mt-4 text-zinc-300">
+      Esta galeria foi marcada como conteudo sensivel/adulto. Antes de abrir a pagina, confirma que tens 18 anos ou mais e que aceitas ver este tipo de conteudo.
+    </p>
+    <p class="mt-3 text-sm text-zinc-500">
+      A capa publica deve ser discreta e as fotos privadas continuam protegidas ate existir compra/acesso confirmado.
+    </p>
+
+    <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+      <form method="post" class="sm:flex-1" data-sensitive-confirm-form>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="confirm_sensitive_content">
+        <button class="sl-primary w-full">Tenho 18+ e quero continuar</button>
+      </form>
+      <form method="post" class="sm:flex-1">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="leave_sensitive_content">
+        <button class="sl-secondary w-full">Voltar</button>
+      </form>
+    </div>
+  </div>
+</section>
+<script>
+  (function () {
+    const form = document.querySelector('[data-sensitive-confirm-form]');
+    if (!form) return;
+    try {
+      if (window.localStorage.getItem('stagehub_sensitive_content_confirmed') === 'true') {
+        form.submit();
+        return;
+      }
+    } catch (error) {
+      // Browser storage may be unavailable; the server session still records consent.
+    }
+    form.addEventListener('submit', function () {
+      try {
+        window.localStorage.setItem('stagehub_sensitive_content_confirmed', 'true');
+      } catch (error) {
+        // Browser storage may be unavailable; the server session still records consent.
+      }
+    });
+  })();
+</script>
+{% endblock %}

@@ -711,11 +711,27 @@ def can_view_photo_gallery(request, gallery):
     return request.user.is_authenticated and can_manage_artist(request.user, gallery.artist)
 
 
+def sensitive_gallery_confirmed(request):
+    return bool(request.session.get('sensitive_gallery_confirmed'))
+
+
 def photo_gallery_detail(request, gallery_id):
     gallery = get_object_or_404(PhotoGallery.objects.select_related('artist'), pk=gallery_id)
     if not can_view_photo_gallery(request, gallery):
         messages.warning(request, 'Esta galeria ainda nao esta disponivel.')
         return redirect('streams:artist_detail', artist_id=gallery.artist_id)
+    can_manage_current_artist = request.user.is_authenticated and can_manage_artist(request.user, gallery.artist)
+    if gallery.is_sensitive and not can_manage_current_artist and not sensitive_gallery_confirmed(request):
+        if request.method == 'POST':
+            action = request.POST.get('action')
+            if action == 'confirm_sensitive_content':
+                request.session['sensitive_gallery_confirmed'] = True
+                return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
+            messages.info(request, 'Podes continuar a explorar outros conteudos StageHub.')
+            return redirect('streams:home')
+        return render(request, 'streams/photo_gallery_age_gate.html', {
+            'gallery': gallery,
+        })
     has_access = gallery.user_has_access(request.user)
     gallery_url = photo_gallery_public_url(request, gallery)
     return render(request, 'streams/photo_gallery_detail.html', {

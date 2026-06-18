@@ -637,6 +637,37 @@ class PhotoGalleryAccessTests(TestCase):
         self.assertNotContains(response, 'private/foto-secreta.jpg')
         self.assertContains(response, 'Fotos privadas')
 
+    def test_sensitive_gallery_requires_age_confirmation_before_public_view(self):
+        gallery = self.create_gallery(is_sensitive=True)
+
+        response = self.client.get(f'/galerias/{gallery.id}/')
+
+        self.assertContains(response, 'Confirma antes de continuar')
+        self.assertContains(response, 'Tenho 18+ e quero continuar')
+        self.assertNotContains(response, 'covers/capa.jpg')
+
+    def test_sensitive_gallery_confirmation_allows_public_view(self):
+        gallery = self.create_gallery(is_sensitive=True)
+
+        response = self.client.post(
+            f'/galerias/{gallery.id}/',
+            {'action': 'confirm_sensitive_content'},
+        )
+
+        self.assertRedirects(response, f'/galerias/{gallery.id}/')
+        response = self.client.get(f'/galerias/{gallery.id}/')
+        self.assertContains(response, 'Galeria exclusiva')
+        self.assertContains(response, 'covers/capa.jpg')
+
+    def test_artist_manager_can_view_sensitive_gallery_without_age_gate(self):
+        gallery = self.create_gallery(is_sensitive=True)
+        self.client.force_login(self.artist_user)
+
+        response = self.client.get(f'/galerias/{gallery.id}/')
+
+        self.assertContains(response, 'Galeria exclusiva')
+        self.assertNotContains(response, 'Confirma antes de continuar')
+
     def test_paid_buyer_can_view_private_gallery_images(self):
         gallery = self.create_gallery()
         PhotoGalleryImage.objects.create(gallery=gallery, image='private/foto-secreta.jpg')
