@@ -46,8 +46,10 @@
     <h2 class="mb-4 text-2xl font-semibold">Fotos</h2>
     <div class="grid gap-4 md:grid-cols-3">
       {% for image in gallery.images.all %}
-        <figure class="sl-card">
-          <img src="{{ image.image.url }}" alt="{{ image.caption|default:gallery.title }}" class="aspect-square w-full object-cover">
+        <figure class="sl-card overflow-hidden">
+          <button type="button" class="block w-full text-left" data-gallery-lightbox-trigger data-image-url="{{ image.image.url }}" data-image-alt="{{ image.caption|default:gallery.title }}">
+            <img src="{{ image.image.url }}" alt="{{ image.caption|default:gallery.title }}" class="aspect-square w-full object-cover transition duration-200 hover:scale-[1.02]">
+          </button>
           {% if image.caption %}<figcaption class="p-3 text-sm text-zinc-300">{{ image.caption }}</figcaption>{% endif %}
         </figure>
       {% empty %}
@@ -55,10 +57,86 @@
       {% endfor %}
     </div>
   </section>
+  <div id="gallery-lightbox" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 p-4" role="dialog" aria-modal="true" aria-label="Foto ampliada">
+    <button type="button" class="absolute right-4 top-4 rounded-full border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm font-semibold text-zinc-100 hover:border-[#5230EF]" data-gallery-lightbox-close>Fechar</button>
+    <button type="button" class="absolute left-4 top-1/2 hidden -translate-y-1/2 rounded-full border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm font-semibold text-zinc-100 hover:border-[#5230EF] md:block" data-gallery-lightbox-prev>Anterior</button>
+    <img id="gallery-lightbox-image" src="" alt="" class="max-h-[86vh] max-w-full rounded border border-zinc-800 object-contain shadow-2xl">
+    <button type="button" class="absolute right-4 top-1/2 hidden -translate-y-1/2 rounded-full border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm font-semibold text-zinc-100 hover:border-[#5230EF] md:block" data-gallery-lightbox-next>Seguinte</button>
+  </div>
 {% else %}
   <section class="rounded-xl border border-zinc-800 bg-zinc-900/80 p-6">
-    <h2 class="text-2xl font-semibold">Fotos privadas</h2>
-    <p class="mt-2 text-zinc-400">As fotos desta galeria ficam protegidas ate comprares acesso.</p>
+    <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold">Fotos privadas</h2>
+        <p class="mt-2 text-zinc-400">As fotos reais ficam protegidas ate comprares acesso. A pre-visualizacao abaixo e mascarada.</p>
+      </div>
+      {% if user.is_authenticated and user.fan_profile %}
+        <a class="sl-primary w-fit" href="{% url 'payments:buy_photo_gallery' gallery.id %}">Comprar acesso</a>
+      {% endif %}
+    </div>
+    <div class="grid gap-4 md:grid-cols-3">
+      {% for image in gallery.images.all %}
+        <div class="relative aspect-square overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+          <div class="absolute inset-0 scale-110 bg-[radial-gradient(circle_at_25%_25%,rgba(82,48,239,.45),transparent_26%),radial-gradient(circle_at_75%_35%,rgba(37,150,190,.38),transparent_24%),linear-gradient(135deg,rgba(39,39,42,.95),rgba(9,9,11,.98))] blur-xl"></div>
+          <div class="absolute inset-0 bg-zinc-950/45 backdrop-blur-md"></div>
+          <div class="absolute inset-0 flex flex-col items-center justify-center p-5 text-center">
+            <span class="rounded-full border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-xs font-semibold uppercase text-zinc-300">Foto protegida</span>
+            <p class="mt-3 text-sm text-zinc-400">Disponivel apos compra</p>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-zinc-400">Esta galeria ainda nao tem fotos.</p>
+      {% endfor %}
+    </div>
   </section>
+{% endif %}
+{% if has_access %}
+  <script>
+    (function () {
+      const triggers = Array.from(document.querySelectorAll('[data-gallery-lightbox-trigger]'));
+      const lightbox = document.querySelector('#gallery-lightbox');
+      const image = document.querySelector('#gallery-lightbox-image');
+      const closeButton = document.querySelector('[data-gallery-lightbox-close]');
+      const prevButton = document.querySelector('[data-gallery-lightbox-prev]');
+      const nextButton = document.querySelector('[data-gallery-lightbox-next]');
+      if (!triggers.length || !lightbox || !image) return;
+
+      let currentIndex = 0;
+
+      function openAt(index) {
+        currentIndex = (index + triggers.length) % triggers.length;
+        const trigger = triggers[currentIndex];
+        image.src = trigger.dataset.imageUrl;
+        image.alt = trigger.dataset.imageAlt || '';
+        lightbox.classList.remove('hidden');
+        lightbox.classList.add('flex');
+      }
+
+      function close() {
+        lightbox.classList.add('hidden');
+        lightbox.classList.remove('flex');
+        image.src = '';
+      }
+
+      triggers.forEach(function (trigger, index) {
+        trigger.addEventListener('click', function () {
+          openAt(index);
+        });
+      });
+
+      closeButton?.addEventListener('click', close);
+      prevButton?.addEventListener('click', function () { openAt(currentIndex - 1); });
+      nextButton?.addEventListener('click', function () { openAt(currentIndex + 1); });
+      lightbox.addEventListener('click', function (event) {
+        if (event.target === lightbox) close();
+      });
+      document.addEventListener('keydown', function (event) {
+        if (lightbox.classList.contains('hidden')) return;
+        if (event.key === 'Escape') close();
+        if (event.key === 'ArrowLeft') openAt(currentIndex - 1);
+        if (event.key === 'ArrowRight') openAt(currentIndex + 1);
+      });
+    })();
+  </script>
 {% endif %}
 {% endblock %}

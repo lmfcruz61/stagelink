@@ -764,6 +764,8 @@ class PhotoGalleryAccessTests(TestCase):
         self.assertContains(response, 'Galeria exclusiva')
         self.assertContains(response, 'covers/capa.jpg')
         self.assertNotContains(response, 'private/foto-secreta.jpg')
+        self.assertContains(response, 'Foto protegida')
+        self.assertContains(response, 'Disponivel apos compra')
         self.assertContains(response, 'Fotos privadas')
 
     def test_sensitive_gallery_requires_age_confirmation_before_public_view(self):
@@ -811,6 +813,8 @@ class PhotoGalleryAccessTests(TestCase):
         response = self.client.get(f'/galerias/{gallery.id}/')
 
         self.assertContains(response, 'private/foto-secreta.jpg')
+        self.assertContains(response, 'data-gallery-lightbox-trigger')
+        self.assertContains(response, 'gallery-lightbox')
 
 
 class CloudflareDirectUploadTests(TestCase):
