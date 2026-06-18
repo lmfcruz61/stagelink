@@ -131,6 +131,7 @@ class DashboardPaymentPanelTests(TestCase):
         response = self.client.get(reverse('streams:dashboard'))
 
         self.assertContains(response, 'Pagamentos ativos')
+        self.assertContains(response, 'Abrir painel Stripe')
         self.assertContains(response, '23,00 EUR')
         self.assertContains(response, '4,60 EUR')
         self.assertContains(response, '18,40 EUR')

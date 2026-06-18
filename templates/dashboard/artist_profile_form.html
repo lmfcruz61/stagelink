@@ -57,7 +57,7 @@
           {% endif %}
         </div>
         <a class="sl-primary whitespace-nowrap" href="{% url 'payments:stripe_connect_start' artist.id %}">
-          {% if artist.stripe_account_id %}Continuar Stripe{% else %}Ligar Stripe{% endif %}
+          {% if artist.stripe_connect_ready %}Abrir painel Stripe{% elif artist.stripe_account_id %}Continuar validacao Stripe{% else %}Ligar Stripe{% endif %}
         </a>
       </div>
     </div>

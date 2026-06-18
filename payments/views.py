@@ -200,6 +200,10 @@ def stripe_connect_start(request, artist_id):
                 setattr(artist, field, value)
             artist.save(update_fields=['stripe_account_id', *payload.keys()])
 
+        if artist.stripe_connect_ready:
+            login_link = stripe.Account.create_login_link(artist.stripe_account_id)
+            return redirect(login_link.url)
+
         account_link = stripe.AccountLink.create(
             account=artist.stripe_account_id,
             refresh_url=_absolute_url(request, 'payments:stripe_connect_refresh', artist.id),

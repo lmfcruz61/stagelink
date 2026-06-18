@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.test import override_settings, TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from accounts.models import Artist, Fan
@@ -116,6 +117,24 @@ class SubscriptionTierRulesTests(TestCase):
         self.assertEqual(stagehub_commission_percent(), Decimal('20.00'))
         self.assertEqual(split['platform_fee_amount'], Decimal('2.00'))
         self.assertEqual(split['artist_net_amount'], Decimal('8.00'))
+
+    @override_settings(STRIPE_SECRET_KEY='sk_live_xxx')
+    @patch('payments.views.stripe.AccountLink.create')
+    @patch('payments.views.stripe.Account.create_login_link')
+    def test_ready_connect_account_opens_express_dashboard(self, mock_login_link, mock_account_link):
+        self.mark_artist_stripe_ready()
+        mock_login_link.return_value = SimpleNamespace(url='https://connect.stripe.com/express/dashboard')
+        self.client.force_login(self.artist_user)
+
+        response = self.client.get(reverse('payments:stripe_connect_start', args=[self.artist.id]))
+
+        self.assertRedirects(
+            response,
+            'https://connect.stripe.com/express/dashboard',
+            fetch_redirect_response=False,
+        )
+        mock_login_link.assert_called_once_with('acct_test_artist')
+        mock_account_link.assert_not_called()
 
     @override_settings(STRIPE_SECRET_KEY='sk_test_xxx', STAGEHUB_COMMISSION_PERCENT='20.00')
     @patch('payments.views.stripe.checkout.Session.create')
