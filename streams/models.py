@@ -448,6 +448,7 @@ class Tip(models.Model):
     message = models.CharField(max_length=240, blank=True)
     stripe_payment_intent = models.CharField(max_length=120, blank=True)
     stripe_connected_account_id = models.CharField(max_length=120, blank=True)
+    stripe_livemode = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

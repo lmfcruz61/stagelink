@@ -92,7 +92,8 @@ class DashboardPaymentPanelTests(TestCase):
         StreamTicketPurchase.objects.create(
             fan=self.fan,
             stream=stream,
-            stripe_session_id='cs_ticket',
+            stripe_session_id='cs_live_ticket',
+            stripe_livemode=True,
             amount=Decimal('10.00'),
             platform_fee_amount=Decimal('2.00'),
             artist_net_amount=Decimal('8.00'),
@@ -101,7 +102,8 @@ class DashboardPaymentPanelTests(TestCase):
         PhotoGalleryPurchase.objects.create(
             fan=self.fan,
             gallery=gallery,
-            stripe_session_id='cs_gallery',
+            stripe_session_id='cs_live_gallery',
+            stripe_livemode=True,
             amount=Decimal('5.00'),
             platform_fee_amount=Decimal('1.00'),
             artist_net_amount=Decimal('4.00'),
@@ -114,12 +116,14 @@ class DashboardPaymentPanelTests(TestCase):
             amount=Decimal('3.00'),
             platform_fee_amount=Decimal('0.60'),
             artist_net_amount=Decimal('2.40'),
+            stripe_livemode=True,
         )
         Subscription.objects.create(
             fan=self.fan,
             artist=self.artist,
             tier=Subscription.SUBSCRIBER,
             status=Subscription.ACTIVE,
+            stripe_livemode=True,
             current_period_end=timezone.now() + timedelta(days=30),
         )
         self.client.login(username='artist', password='pass12345')
@@ -132,6 +136,72 @@ class DashboardPaymentPanelTests(TestCase):
         self.assertContains(response, '18,40 EUR')
         self.assertContains(response, '1 vendas')
         self.assertContains(response, '1 recebidas')
+
+    def test_dashboard_excludes_test_mode_payments_from_summary(self):
+        self.artist.stripe_account_id = 'acct_artist'
+        self.artist.stripe_details_submitted = True
+        self.artist.stripe_charges_enabled = True
+        self.artist.stripe_payouts_enabled = True
+        self.artist.save(update_fields=[
+            'stripe_account_id',
+            'stripe_details_submitted',
+            'stripe_charges_enabled',
+            'stripe_payouts_enabled',
+        ])
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Evento',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            event_type=LiveStream.LIVE,
+            access_price=Decimal('10.00'),
+            scheduled_at=timezone.now(),
+        )
+        gallery = PhotoGallery.objects.create(
+            artist=self.artist,
+            title='Galeria',
+            public_cover=SimpleUploadedFile('cover.jpg', b'cover', content_type='image/jpeg'),
+            access_price=Decimal('2.00'),
+            is_active=True,
+            moderation_status=PhotoGallery.APPROVED,
+        )
+        StreamTicketPurchase.objects.create(
+            fan=self.fan,
+            stream=stream,
+            stripe_session_id='cs_test_ticket',
+            stripe_livemode=False,
+            amount=Decimal('10.00'),
+            platform_fee_amount=Decimal('2.00'),
+            artist_net_amount=Decimal('8.00'),
+            paid=True,
+        )
+        Tip.objects.create(
+            fan=self.fan,
+            artist=self.artist,
+            stream=stream,
+            amount=Decimal('10.00'),
+            platform_fee_amount=Decimal('2.00'),
+            artist_net_amount=Decimal('8.00'),
+            stripe_livemode=False,
+        )
+        PhotoGalleryPurchase.objects.create(
+            fan=self.fan,
+            gallery=gallery,
+            stripe_session_id='cs_live_gallery',
+            stripe_livemode=True,
+            amount=Decimal('2.00'),
+            platform_fee_amount=Decimal('0.40'),
+            artist_net_amount=Decimal('1.60'),
+            paid=True,
+        )
+        self.client.login(username='artist', password='pass12345')
+
+        response = self.client.get(reverse('streams:dashboard'))
+
+        self.assertContains(response, '2,00 EUR')
+        self.assertContains(response, '0,40 EUR')
+        self.assertContains(response, '1,60 EUR')
+        self.assertContains(response, '0 recebidas')
+        self.assertNotContains(response, '12,00 EUR')
 
 
 class LiveStreamFormTests(TestCase):

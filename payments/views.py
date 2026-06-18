@@ -44,6 +44,19 @@ def _absolute_image_url(request, image):
     return _absolute_static(request, 'img/stagehub-og-placeholder.svg')
 
 
+def _stripe_object_livemode(stripe_object):
+    livemode = None
+    if hasattr(stripe_object, 'get'):
+        livemode = stripe_object.get('livemode')
+        object_id = stripe_object.get('id', '')
+    else:
+        livemode = getattr(stripe_object, 'livemode', None)
+        object_id = getattr(stripe_object, 'id', '')
+    if livemode is not None:
+        return bool(livemode)
+    return str(object_id).startswith('cs_live_')
+
+
 def _event_public_url(request, stream):
     return request.build_absolute_uri(reverse('streams:event_detail', args=[stream.id]))
 
@@ -229,6 +242,7 @@ def _complete_checkout_session(session):
     session_id = session.get('id', '')
     payment_status = session.get('payment_status', '')
     checkout_type = metadata.get('type')
+    livemode = _stripe_object_livemode(session)
 
     if checkout_type in {'ticket', 'tip', 'photo_gallery'} and payment_status != 'paid':
         return checkout_type, False
@@ -246,6 +260,7 @@ def _complete_checkout_session(session):
                 'commission_percent': Decimal(metadata.get('commission_percent') or '0'),
                 'platform_fee_amount': platform_fee,
                 'stripe_connected_account_id': metadata.get('stripe_connected_account_id', ''),
+                'stripe_livemode': livemode,
                 'stripe_payment_intent': session.get('payment_intent') or '',
                 'stripe_session_id': session_id,
                 'paid': True,
@@ -264,6 +279,7 @@ def _complete_checkout_session(session):
                 'stripe_session_id': session_id,
                 'stripe_payment_intent': session.get('payment_intent') or '',
                 'stripe_connected_account_id': metadata.get('stripe_connected_account_id', ''),
+                'stripe_livemode': livemode,
                 'amount': amount,
                 'platform_fee_amount': platform_fee,
                 'artist_net_amount': artist_net,
@@ -290,6 +306,7 @@ def _complete_checkout_session(session):
                 message=metadata.get('message', ''),
                 stripe_connected_account_id=metadata.get('stripe_connected_account_id', ''),
                 stripe_payment_intent=payment_intent,
+                stripe_livemode=livemode,
             )
         return checkout_type, True
 
@@ -301,6 +318,7 @@ def _complete_checkout_session(session):
                 'stripe_subscription_id': session.get('subscription', ''),
                 'stripe_customer_id': session.get('customer', ''),
                 'stripe_connected_account_id': metadata.get('stripe_connected_account_id', ''),
+                'stripe_livemode': livemode,
                 'commission_percent': Decimal(metadata.get('commission_percent') or '0'),
                 'status': Subscription.ACTIVE,
                 'tier': metadata.get('tier', Subscription.SUBSCRIBER),
@@ -456,6 +474,7 @@ def buy_ticket(request, stream_id):
             'commission_percent': fee_split['commission_percent'],
             'platform_fee_amount': fee_split['platform_fee_amount'],
             'stripe_connected_account_id': stream.artist.stripe_account_id,
+            'stripe_livemode': _stripe_object_livemode(session),
             'stripe_session_id': session.id,
             'paid': False,
         },
@@ -529,6 +548,7 @@ def buy_photo_gallery(request, gallery_id):
         defaults={
             'stripe_session_id': session.id,
             'stripe_connected_account_id': gallery.artist.stripe_account_id,
+            'stripe_livemode': _stripe_object_livemode(session),
             'amount': gallery.access_price,
             'platform_fee_amount': fee_split['platform_fee_amount'],
             'artist_net_amount': fee_split['artist_net_amount'],

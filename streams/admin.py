@@ -23,8 +23,8 @@ class LiveStreamAdmin(admin.ModelAdmin):
 
 @admin.register(Tip)
 class TipAdmin(admin.ModelAdmin):
-    list_display = ('fan', 'artist', 'stream', 'amount', 'platform_fee_amount', 'artist_net_amount', 'created_at')
-    list_filter = ('artist', 'stream')
+    list_display = ('fan', 'artist', 'stream', 'amount', 'platform_fee_amount', 'artist_net_amount', 'stripe_livemode', 'created_at')
+    list_filter = ('artist', 'stream', 'stripe_livemode')
     search_fields = ('fan__display_name', 'fan__user__username', 'artist__name', 'stream__title', 'stripe_payment_intent')
 
 

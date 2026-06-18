@@ -386,12 +386,14 @@ def artist_payment_summary(artist, subscribers):
     ticket_sales = StreamTicketPurchase.objects.filter(
         stream__artist=artist,
         paid=True,
+        stripe_livemode=True,
     ).exclude(stripe_session_id='')
     gallery_sales = PhotoGalleryPurchase.objects.filter(
         gallery__artist=artist,
         paid=True,
+        stripe_livemode=True,
     ).exclude(stripe_session_id='')
-    tips = artist.tips.all()
+    tips = artist.tips.filter(stripe_livemode=True)
 
     ticket_totals = ticket_sales.aggregate(
         count=Count('id'),
@@ -412,9 +414,14 @@ def artist_payment_summary(artist, subscribers):
         artist_net=Sum('artist_net_amount'),
     )
 
+    live_subscribers = [
+        subscription for subscription in subscribers
+        if subscription.stripe_livemode
+    ]
+
     subscriber_monthly_gross = sum(
         Subscription.price_for_tier(subscription.tier)
-        for subscription in subscribers
+        for subscription in live_subscribers
     )
     subscriber_monthly_fee = subscriber_monthly_gross * artist_commission_decimal()
     subscriber_monthly_net = subscriber_monthly_gross - subscriber_monthly_fee
@@ -445,7 +452,7 @@ def artist_payment_summary(artist, subscribers):
         'gallery_gross': money(gallery_totals['gross']),
         'tip_count': tip_totals['count'] or 0,
         'tip_gross': money(tip_totals['gross']),
-        'subscriber_count': len(subscribers),
+        'subscriber_count': len(live_subscribers),
         'subscriber_monthly_gross': money(subscriber_monthly_gross),
         'total_gross': money(total_gross),
         'total_platform_fee': money(total_platform_fee),
