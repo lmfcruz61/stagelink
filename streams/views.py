@@ -1,10 +1,12 @@
 from datetime import timezone as datetime_timezone
+from decimal import Decimal
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.db.models import Case, IntegerField, Prefetch, Q, Sum, Value, When
+from django.db.models import Case, Count, IntegerField, Prefetch, Q, Sum, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.templatetags.static import static
 from django.urls import reverse
@@ -21,7 +23,7 @@ from accounts.forms import (
     OrganizationMemberForm,
 )
 from accounts.models import Artist, ArtistPhoto, Organization, OrganizationMember
-from payments.models import StreamTicketPurchase, Subscription
+from payments.models import PhotoGalleryPurchase, StreamTicketPurchase, Subscription
 from payments.pricing import ticket_checkout_pricing
 
 from .cloudflare import CloudflareStreamError, create_direct_upload_for_stream, create_live_input_for_artist
@@ -355,6 +357,85 @@ def can_manage_organizations(user):
     return OrganizationMember.objects.filter(user=user, role__in=OrganizationMember.EDIT_ROLES).exists()
 
 
+def artist_payment_summary(artist, subscribers):
+    ticket_sales = StreamTicketPurchase.objects.filter(
+        stream__artist=artist,
+        paid=True,
+    ).exclude(stripe_session_id='')
+    gallery_sales = PhotoGalleryPurchase.objects.filter(
+        gallery__artist=artist,
+        paid=True,
+    ).exclude(stripe_session_id='')
+    tips = artist.tips.all()
+
+    ticket_totals = ticket_sales.aggregate(
+        count=Count('id'),
+        gross=Sum('amount'),
+        platform_fee=Sum('platform_fee_amount'),
+        artist_net=Sum('artist_net_amount'),
+    )
+    gallery_totals = gallery_sales.aggregate(
+        count=Count('id'),
+        gross=Sum('amount'),
+        platform_fee=Sum('platform_fee_amount'),
+        artist_net=Sum('artist_net_amount'),
+    )
+    tip_totals = tips.aggregate(
+        count=Count('id'),
+        gross=Sum('amount'),
+        platform_fee=Sum('platform_fee_amount'),
+        artist_net=Sum('artist_net_amount'),
+    )
+
+    subscriber_monthly_gross = sum(
+        Subscription.price_for_tier(subscription.tier)
+        for subscription in subscribers
+    )
+    subscriber_monthly_fee = subscriber_monthly_gross * artist_commission_decimal()
+    subscriber_monthly_net = subscriber_monthly_gross - subscriber_monthly_fee
+
+    total_gross = (
+        (ticket_totals['gross'] or 0)
+        + (gallery_totals['gross'] or 0)
+        + (tip_totals['gross'] or 0)
+        + subscriber_monthly_gross
+    )
+    total_platform_fee = (
+        (ticket_totals['platform_fee'] or 0)
+        + (gallery_totals['platform_fee'] or 0)
+        + (tip_totals['platform_fee'] or 0)
+        + subscriber_monthly_fee
+    )
+    total_artist_net = (
+        (ticket_totals['artist_net'] or 0)
+        + (gallery_totals['artist_net'] or 0)
+        + (tip_totals['artist_net'] or 0)
+        + subscriber_monthly_net
+    )
+
+    return {
+        'ticket_count': ticket_totals['count'] or 0,
+        'ticket_gross': money(ticket_totals['gross']),
+        'gallery_count': gallery_totals['count'] or 0,
+        'gallery_gross': money(gallery_totals['gross']),
+        'tip_count': tip_totals['count'] or 0,
+        'tip_gross': money(tip_totals['gross']),
+        'subscriber_count': len(subscribers),
+        'subscriber_monthly_gross': money(subscriber_monthly_gross),
+        'total_gross': money(total_gross),
+        'total_platform_fee': money(total_platform_fee),
+        'total_artist_net': money(total_artist_net),
+    }
+
+
+def artist_commission_decimal():
+    return Decimal(str(getattr(settings, 'STAGEHUB_COMMISSION_PERCENT', '20.00'))) / Decimal('100')
+
+
+def money(value):
+    return Decimal(value or 0).quantize(Decimal('0.01'))
+
+
 @login_required
 def stream_room(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
@@ -402,6 +483,7 @@ def dashboard(request):
             'organizations': organizations,
             'streams': [],
             'subscribers': [],
+            'payment_summary': {},
             'tips_total': 0,
         })
 
@@ -409,6 +491,7 @@ def dashboard(request):
     photo_galleries = artist.photo_galleries.all()
     subscribers = Subscription.objects.filter(artist=artist, status=Subscription.ACTIVE).select_related('fan__user')
     tips_total = artist.tips.aggregate(total=Sum('amount'))['total'] or 0
+    payment_summary = artist_payment_summary(artist, list(subscribers))
     return render(request, 'dashboard/index.html', {
         'artist': artist,
         'artists': artists,
@@ -417,6 +500,7 @@ def dashboard(request):
         'streams': streams,
         'photo_galleries': photo_galleries,
         'subscribers': subscribers,
+        'payment_summary': payment_summary,
         'tips_total': tips_total,
     })
 

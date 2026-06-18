@@ -103,27 +103,105 @@
 {% endif %}
 
 {% if artist %}
-{% if not artist.stripe_connect_ready %}
-  <section class="mb-8 rounded-xl border border-amber-500/60 bg-amber-500/10 p-5">
-    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h2 class="text-lg font-semibold text-amber-100">Pagamentos ainda nao ativos</h2>
-        <p class="mt-1 text-sm text-amber-50/80">Liga ou completa o Stripe Connect deste artista para vender bilhetes pagos, gorjetas e subscricoes.</p>
-      </div>
-      <a class="sl-primary" href="{% url 'payments:stripe_connect_start' artist.id %}">Ligar Stripe</a>
+<section class="mb-8 rounded-xl border {% if artist.stripe_connect_ready %}border-[#10B981]/70 bg-[#10B981]/10{% elif artist.stripe_account_id %}border-amber-500/60 bg-amber-500/10{% else %}border-zinc-800 bg-zinc-900/80{% endif %} p-5">
+  <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <div class="max-w-3xl">
+      <p class="text-sm font-semibold {% if artist.stripe_connect_ready %}text-emerald-200{% elif artist.stripe_account_id %}text-amber-100{% else %}text-[#2596BE]{% endif %}">Pagamentos</p>
+      {% if artist.stripe_connect_ready %}
+        <h2 class="mt-1 text-2xl font-semibold">Pagamentos ativos</h2>
+        <p class="mt-2 text-sm text-zinc-300">Este artista ja pode vender bilhetes, galerias, subscricoes e receber gorjetas. O saldo real, pagamentos ao banco e verificacoes continuam no painel Stripe.</p>
+      {% elif artist.stripe_account_id %}
+        <h2 class="mt-1 text-2xl font-semibold">Stripe em validacao</h2>
+        <p class="mt-2 text-sm text-zinc-300">A conta Stripe deste artista ja foi criada, mas ainda falta a Stripe confirmar todos os dados para permitir cobrancas e pagamentos.</p>
+      {% else %}
+        <h2 class="mt-1 text-2xl font-semibold">Pagamentos ainda nao ligados</h2>
+        <p class="mt-2 text-sm text-zinc-300">Liga o Stripe para este artista poder vender conteudos pagos. Enquanto nao estiver ativo, o publico nao consegue comprar bilhetes, galerias, subscricoes ou gorjetas deste artista.</p>
+      {% endif %}
     </div>
-  </section>
-{% endif %}
+    <a class="sl-primary whitespace-nowrap" href="{% url 'payments:stripe_connect_start' artist.id %}">
+      {% if artist.stripe_account_id %}Continuar Stripe{% else %}Ligar Stripe{% endif %}
+    </a>
+  </div>
 
-<section class="mb-8 grid gap-4 md:grid-cols-2">
-  <div class="sl-card p-5">
-    <p class="text-sm text-zinc-400">Gorjetas recebidas</p>
-    <p class="mt-2 text-3xl font-semibold">{{ tips_total }} EUR</p>
+  <div class="mt-5 grid gap-3 md:grid-cols-3">
+    <div class="rounded border border-zinc-800 bg-zinc-950/70 p-4">
+      <p class="text-xs font-semibold uppercase text-zinc-500">Conta Stripe</p>
+      <p class="mt-2 font-semibold">
+        {% if artist.stripe_account_id %}
+          Ligada
+        {% else %}
+          Por ligar
+        {% endif %}
+      </p>
+      {% if artist.stripe_account_id %}<p class="mt-1 font-mono text-xs text-zinc-500">{{ artist.stripe_account_id }}</p>{% endif %}
+    </div>
+    <div class="rounded border border-zinc-800 bg-zinc-950/70 p-4">
+      <p class="text-xs font-semibold uppercase text-zinc-500">Cobrancas</p>
+      <p class="mt-2 font-semibold {% if artist.stripe_charges_enabled %}text-emerald-200{% else %}text-amber-100{% endif %}">
+        {% if artist.stripe_charges_enabled %}Ativas{% else %}A aguardar{% endif %}
+      </p>
+      <p class="mt-1 text-xs text-zinc-500">Necessario para vender ao publico.</p>
+    </div>
+    <div class="rounded border border-zinc-800 bg-zinc-950/70 p-4">
+      <p class="text-xs font-semibold uppercase text-zinc-500">Pagamentos ao banco</p>
+      <p class="mt-2 font-semibold {% if artist.stripe_payouts_enabled %}text-emerald-200{% else %}text-amber-100{% endif %}">
+        {% if artist.stripe_payouts_enabled %}Ativos{% else %}A aguardar{% endif %}
+      </p>
+      <p class="mt-1 text-xs text-zinc-500">Gerido pela Stripe do artista.</p>
+    </div>
   </div>
-  <div class="sl-card p-5">
-    <p class="text-sm text-zinc-400">Subscritores ativos</p>
-    <p class="mt-2 text-3xl font-semibold">{{ subscribers|length }}</p>
+
+  {% if not artist.stripe_connect_ready %}
+    <div class="mt-5 rounded border border-zinc-800 bg-zinc-950/70 p-4">
+      <p class="font-semibold">Checklist para ativar pagamentos</p>
+      <ol class="mt-3 grid gap-2 text-sm text-zinc-300 md:grid-cols-2">
+        <li>{% if artist.stripe_account_id %}<span class="text-emerald-200">OK</span>{% else %}<span class="text-amber-100">1.</span>{% endif %} Criar/ligar conta Stripe.</li>
+        <li>{% if artist.stripe_details_submitted %}<span class="text-emerald-200">OK</span>{% else %}<span class="text-amber-100">2.</span>{% endif %} Submeter dados pedidos pela Stripe.</li>
+        <li>{% if artist.stripe_charges_enabled %}<span class="text-emerald-200">OK</span>{% else %}<span class="text-amber-100">3.</span>{% endif %} Ativar cobrancas.</li>
+        <li>{% if artist.stripe_payouts_enabled %}<span class="text-emerald-200">OK</span>{% else %}<span class="text-amber-100">4.</span>{% endif %} Ativar pagamentos para a conta bancaria.</li>
+      </ol>
+    </div>
+  {% endif %}
+
+  <div class="mt-5 grid gap-4 md:grid-cols-3">
+    <div class="rounded border border-zinc-800 bg-zinc-950/70 p-4">
+      <p class="text-sm text-zinc-400">Receita bruta registada</p>
+      <p class="mt-2 text-3xl font-semibold">{{ payment_summary.total_gross }} EUR</p>
+    </div>
+    <div class="rounded border border-zinc-800 bg-zinc-950/70 p-4">
+      <p class="text-sm text-zinc-400">Comissao StageHub</p>
+      <p class="mt-2 text-3xl font-semibold">{{ payment_summary.total_platform_fee }} EUR</p>
+    </div>
+    <div class="rounded border border-zinc-800 bg-zinc-950/70 p-4">
+      <p class="text-sm text-zinc-400">Liquido estimado artista</p>
+      <p class="mt-2 text-3xl font-semibold">{{ payment_summary.total_artist_net }} EUR</p>
+    </div>
   </div>
+
+  <div class="mt-5 grid gap-3 text-sm md:grid-cols-4">
+    <div class="rounded border border-zinc-800 bg-zinc-950/70 p-3">
+      <p class="text-zinc-500">Bilhetes</p>
+      <p class="mt-1 font-semibold">{{ payment_summary.ticket_count }} vendas</p>
+      <p class="text-zinc-400">{{ payment_summary.ticket_gross }} EUR</p>
+    </div>
+    <div class="rounded border border-zinc-800 bg-zinc-950/70 p-3">
+      <p class="text-zinc-500">Galerias</p>
+      <p class="mt-1 font-semibold">{{ payment_summary.gallery_count }} vendas</p>
+      <p class="text-zinc-400">{{ payment_summary.gallery_gross }} EUR</p>
+    </div>
+    <div class="rounded border border-zinc-800 bg-zinc-950/70 p-3">
+      <p class="text-zinc-500">Gorjetas</p>
+      <p class="mt-1 font-semibold">{{ payment_summary.tip_count }} recebidas</p>
+      <p class="text-zinc-400">{{ payment_summary.tip_gross }} EUR</p>
+    </div>
+    <div class="rounded border border-zinc-800 bg-zinc-950/70 p-3">
+      <p class="text-zinc-500">Subscritores</p>
+      <p class="mt-1 font-semibold">{{ payment_summary.subscriber_count }} ativos</p>
+      <p class="text-zinc-400">{{ payment_summary.subscriber_monthly_gross }} EUR / mes</p>
+    </div>
+  </div>
+
+  <p class="mt-4 text-xs text-zinc-500">Estes valores sao calculados a partir dos registos da StageHub. O saldo disponivel, saldo pendente e transferencias bancarias devem ser confirmados no painel Stripe do artista.</p>
 </section>
 
 <section class="grid gap-8 lg:grid-cols-[1fr_320px]">
