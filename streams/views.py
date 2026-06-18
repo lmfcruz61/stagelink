@@ -100,12 +100,19 @@ def home(request):
 
     visible_streams_filter = (Q(is_active=True) | Q(scheduled_at__gte=now)) & Q(access_price__gt=0)
     purchased_stream_ids = set()
+    purchased_gallery_ids = set()
     if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
         purchased_stream_ids = set(
             StreamTicketPurchase.objects.filter(
                 fan=request.user.fan_profile,
                 paid=True,
             ).values_list('stream_id', flat=True),
+        )
+        purchased_gallery_ids = set(
+            PhotoGalleryPurchase.objects.filter(
+                fan=request.user.fan_profile,
+                paid=True,
+            ).values_list('gallery_id', flat=True),
         )
         if purchased_stream_ids:
             visible_streams_filter |= Q(id__in=purchased_stream_ids)
@@ -126,9 +133,11 @@ def home(request):
     artists = Artist.objects.prefetch_related(visible_artist_streams)
     concert_streams = LiveStream.objects.filter(visible_streams_filter).select_related('artist')
     public_photo_galleries = PhotoGallery.objects.filter(
-        is_active=True,
-        moderation_status=PhotoGallery.APPROVED,
-        access_price__gte=PhotoGallery.MIN_PRICE,
+        (
+            Q(is_active=True)
+            & Q(moderation_status=PhotoGallery.APPROVED)
+            & Q(access_price__gte=PhotoGallery.MIN_PRICE)
+        ) | Q(id__in=purchased_gallery_ids),
     ).select_related('artist')
 
     if query:
@@ -204,6 +213,7 @@ def home(request):
         'newsletter_form': newsletter_form,
         'public_photo_galleries': public_photo_galleries,
         'purchased_stream_ids': purchased_stream_ids,
+        'purchased_gallery_ids': purchased_gallery_ids,
         'search_query': query,
     })
 
@@ -708,6 +718,8 @@ def artist_photo_delete(request, photo_id):
 def can_view_photo_gallery(request, gallery):
     if gallery.is_publicly_available:
         return True
+    if gallery.user_has_access(request.user):
+        return True
     return request.user.is_authenticated and can_manage_artist(request.user, gallery.artist)
 
 
@@ -862,6 +874,9 @@ def photo_gallery_image_delete(request, image_id):
     if not can_manage_artist(request.user, gallery.artist):
         messages.error(request, 'Nao tens permissao para gerir esta galeria.')
         return redirect('streams:dashboard')
+    if gallery.has_paid_purchases:
+        messages.error(request, 'Esta galeria ja teve compras. As fotos privadas nao podem ser removidas para proteger quem comprou acesso.')
+        return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
     image.delete()
     if gallery.moderation_status == PhotoGallery.REJECTED:
         gallery.moderation_status = PhotoGallery.DRAFT
@@ -879,6 +894,11 @@ def photo_gallery_delete(request, gallery_id):
         return redirect('streams:dashboard')
     artist_id = gallery.artist_id
     if request.method == 'POST':
+        if gallery.has_paid_purchases:
+            gallery.is_active = False
+            gallery.save(update_fields=['is_active'])
+            messages.success(request, 'Galeria retirada de venda. Quem ja comprou continua com acesso.')
+            return redirect(f"{reverse('streams:dashboard')}?artist={artist_id}")
         gallery.delete()
         messages.success(request, 'Galeria apagada.')
         return redirect(f"{reverse('streams:dashboard')}?artist={artist_id}")
@@ -1004,6 +1024,11 @@ def stream_delete(request, stream_id):
 
     artist_id = stream.artist_id
     if request.method == 'POST':
+        if stream.has_paid_tickets:
+            stream.is_active = False
+            stream.save(update_fields=['is_active'])
+            messages.success(request, 'Evento arquivado e retirado de venda. Quem ja comprou continua com acesso.')
+            return redirect(f"{reverse('streams:dashboard')}?artist={artist_id}")
         stream.delete()
         messages.success(request, 'Evento apagado.')
         return redirect(f"{reverse('streams:dashboard')}?artist={artist_id}")

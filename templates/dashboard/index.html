@@ -236,9 +236,9 @@
               <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:event_detail' stream.id %}">Ver evento</a>
               <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:room' stream.id %}">Ver sala</a>
               <button type="button" class="copy-event-link sl-secondary px-3 py-2 text-sm" data-copy-url="{{ request.scheme }}://{{ request.get_host }}{% url 'streams:event_detail' stream.id %}">Copiar link</button>
-              <form method="post" action="{% url 'streams:stream_delete' stream.id %}" onsubmit="return confirm('Apagar este evento? Esta acao nao pode ser desfeita.');">
+              <form method="post" action="{% url 'streams:stream_delete' stream.id %}" onsubmit="return confirm('{% if stream.has_paid_tickets %}Arquivar este evento? Quem ja comprou continua com acesso.{% else %}Apagar este evento? Esta acao nao pode ser desfeita.{% endif %}');">
                 {% csrf_token %}
-                <button class="rounded-full border border-red-700 bg-red-950/40 px-3 py-2 text-sm font-semibold text-red-200 hover:border-red-500">Apagar</button>
+                <button class="rounded-full border border-red-700 bg-red-950/40 px-3 py-2 text-sm font-semibold text-red-200 hover:border-red-500">{% if stream.has_paid_tickets %}Arquivar{% else %}Apagar{% endif %}</button>
               </form>
             </div>
           </div>

@@ -491,6 +491,32 @@ class LiveStreamAccessAndEmbedTests(TestCase):
         self.assertContains(response, 'Evento comprado passado')
         self.assertContains(response, 'Entrar na sala')
 
+    def test_paid_event_is_archived_instead_of_deleted(self):
+        stream = self.create_paid_stream()
+        StreamTicketPurchase.objects.create(
+            fan=self.fan,
+            stream=stream,
+            stripe_session_id='cs_test_paid_delete',
+            paid=True,
+        )
+        self.client.force_login(self.artist_user)
+
+        response = self.client.post(f'/dashboard/streams/{stream.id}/apagar/')
+        stream.refresh_from_db()
+
+        self.assertRedirects(response, f'/dashboard/?artist={self.artist.id}')
+        self.assertFalse(stream.is_active)
+        self.assertTrue(LiveStream.objects.filter(pk=stream.pk).exists())
+
+    def test_unpaid_event_can_be_deleted(self):
+        stream = self.create_paid_stream()
+        self.client.force_login(self.artist_user)
+
+        response = self.client.post(f'/dashboard/streams/{stream.id}/apagar/')
+
+        self.assertRedirects(response, f'/dashboard/?artist={self.artist.id}')
+        self.assertFalse(LiveStream.objects.filter(pk=stream.pk).exists())
+
     def test_pending_direct_upload_requires_recorded_video_and_upload_url(self):
         stream = LiveStream.objects.create(
             artist=self.artist,
@@ -674,6 +700,53 @@ class PhotoGalleryAccessTests(TestCase):
         self.assertFalse(PhotoGallery.objects.filter(pk=gallery.pk).exists())
         response = self.client.get(reverse('streams:home'))
         self.assertNotContains(response, 'Galeria para apagar')
+
+    def test_paid_gallery_is_retired_instead_of_deleted(self):
+        gallery = self.create_gallery(title='Galeria comprada')
+        PhotoGalleryPurchase.objects.create(
+            fan=self.fan,
+            gallery=gallery,
+            amount=Decimal('5.00'),
+            paid=True,
+        )
+        self.client.force_login(self.artist_user)
+
+        response = self.client.post(f'/dashboard/galerias/{gallery.id}/apagar/')
+        gallery.refresh_from_db()
+
+        self.assertRedirects(response, f'/dashboard/?artist={self.artist.id}')
+        self.assertFalse(gallery.is_active)
+        self.assertTrue(PhotoGallery.objects.filter(pk=gallery.pk).exists())
+
+    def test_paid_gallery_image_cannot_be_removed(self):
+        gallery = self.create_gallery()
+        image = PhotoGalleryImage.objects.create(gallery=gallery, image='private/foto-secreta.jpg')
+        PhotoGalleryPurchase.objects.create(
+            fan=self.fan,
+            gallery=gallery,
+            amount=Decimal('5.00'),
+            paid=True,
+        )
+        self.client.force_login(self.artist_user)
+
+        response = self.client.post(f'/dashboard/galerias/fotos/{image.id}/remover/')
+
+        self.assertRedirects(response, f'/dashboard/galerias/{gallery.id}/editar/')
+        self.assertTrue(PhotoGalleryImage.objects.filter(pk=image.pk).exists())
+
+    def test_purchased_retired_gallery_remains_visible_to_buyer_home(self):
+        gallery = self.create_gallery(title='Galeria comprada retirada', is_active=False)
+        PhotoGalleryPurchase.objects.create(
+            fan=self.fan,
+            gallery=gallery,
+            amount=Decimal('5.00'),
+            paid=True,
+        )
+        self.client.force_login(self.fan_user)
+
+        response = self.client.get(reverse('streams:home'))
+
+        self.assertContains(response, 'Galeria comprada retirada')
 
     def test_pending_gallery_does_not_show_to_public_on_artist_page(self):
         self.create_gallery(moderation_status=PhotoGallery.PENDING)

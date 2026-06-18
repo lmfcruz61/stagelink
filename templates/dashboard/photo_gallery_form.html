@@ -107,11 +107,17 @@
           <h2 class="text-xl font-semibold">Capa publica</h2>
           <img src="{{ gallery.public_cover.url }}" alt="{{ gallery.title }}" class="mt-4 aspect-video w-full rounded object-cover">
         </div>
-        <form method="post" action="{% url 'streams:photo_gallery_delete' gallery.id %}" class="rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('Apagar esta galeria? Esta acao nao pode ser desfeita.');">
+        <form method="post" action="{% url 'streams:photo_gallery_delete' gallery.id %}" class="rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('{% if gallery.has_paid_purchases %}Retirar esta galeria de venda? Quem ja comprou continua com acesso.{% else %}Apagar esta galeria? Esta acao nao pode ser desfeita.{% endif %}');">
           {% csrf_token %}
-          <h2 class="text-lg font-semibold text-red-200">Apagar galeria</h2>
-          <p class="mt-2 text-sm text-red-100/80">Remove a galeria e as fotos associadas.</p>
-          <button class="mt-4 rounded-full border border-red-700 bg-red-950/60 px-4 py-3 font-semibold text-red-100 hover:border-red-500">Apagar definitivamente</button>
+          <h2 class="text-lg font-semibold text-red-200">{% if gallery.has_paid_purchases %}Retirar de venda{% else %}Apagar galeria{% endif %}</h2>
+          <p class="mt-2 text-sm text-red-100/80">
+            {% if gallery.has_paid_purchases %}
+              Esta galeria ja teve compras. Nao sera apagada; deixa de aparecer para novas compras e compradores continuam com acesso.
+            {% else %}
+              Remove a galeria e as fotos associadas.
+            {% endif %}
+          </p>
+          <button class="mt-4 rounded-full border border-red-700 bg-red-950/60 px-4 py-3 font-semibold text-red-100 hover:border-red-500">{% if gallery.has_paid_purchases %}Retirar de venda{% else %}Apagar definitivamente{% endif %}</button>
         </form>
       {% else %}
         <div class="sl-card p-5">

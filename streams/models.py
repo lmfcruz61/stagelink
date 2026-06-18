@@ -82,6 +82,10 @@ class LiveStream(models.Model):
         return self.is_active or self.scheduled_at >= timezone.now()
 
     @property
+    def has_paid_tickets(self):
+        return self.ticket_purchases.filter(paid=True).exists()
+
+    @property
     def visual_state(self):
         return self.display_status['code']
 
@@ -402,6 +406,10 @@ class PhotoGallery(models.Model):
     @property
     def is_publicly_available(self):
         return self.is_active and self.moderation_status == self.APPROVED and self.access_price >= self.MIN_PRICE
+
+    @property
+    def has_paid_purchases(self):
+        return self.purchases.filter(paid=True).exists()
 
     @property
     def image_count(self):
