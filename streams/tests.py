@@ -3,9 +3,10 @@ from decimal import Decimal
 import json
 from unittest.mock import patch
 
+from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import override_settings
+from django.test import override_settings, RequestFactory
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -13,6 +14,7 @@ from django.utils import timezone
 from accounts.models import Artist, Fan
 from payments.models import PhotoGalleryPurchase, StreamTicketPurchase, Subscription
 
+from .admin import PhotoGalleryAdmin
 from .forms import LiveStreamForm, PhotoGalleryForm, PhotoGalleryImageUploadForm
 from .cloudflare import create_direct_upload_for_stream
 from .models import LiveStream, PhotoGallery, PhotoGalleryImage, Tip
@@ -519,6 +521,32 @@ class PhotoGalleryAccessTests(TestCase):
         self.assertContains(response, '10 fotos por envio')
         self.assertContains(response, '3 MB por foto')
         self.assertContains(response, '30 MB por envio')
+
+    def test_home_shows_active_approved_photo_gallery(self):
+        self.create_gallery(title='Galeria na entrada')
+
+        response = self.client.get(reverse('streams:home'))
+
+        self.assertContains(response, 'Galeria na entrada')
+        self.assertContains(response, 'Galerias de fotos')
+
+    def test_admin_approval_publishes_photo_gallery(self):
+        admin_user = User.objects.create_user(username='admin_gallery', is_staff=True, is_superuser=True)
+        gallery = self.create_gallery(
+            title='Galeria pendente',
+            is_active=False,
+            moderation_status=PhotoGallery.PENDING,
+        )
+        request = RequestFactory().post('/admin/streams/photogallery/')
+        request.user = admin_user
+        gallery_admin = PhotoGalleryAdmin(PhotoGallery, AdminSite())
+
+        gallery_admin.approve_galleries(request, PhotoGallery.objects.filter(pk=gallery.pk))
+        gallery.refresh_from_db()
+
+        self.assertEqual(gallery.moderation_status, PhotoGallery.APPROVED)
+        self.assertTrue(gallery.is_active)
+        self.assertEqual(gallery.reviewed_by, admin_user)
 
     def test_pending_gallery_does_not_show_to_public_on_artist_page(self):
         self.create_gallery(moderation_status=PhotoGallery.PENDING)

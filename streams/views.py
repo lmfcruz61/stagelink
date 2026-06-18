@@ -125,6 +125,11 @@ def home(request):
 
     artists = Artist.objects.prefetch_related(visible_artist_streams)
     concert_streams = LiveStream.objects.filter(visible_streams_filter).select_related('artist')
+    public_photo_galleries = PhotoGallery.objects.filter(
+        is_active=True,
+        moderation_status=PhotoGallery.APPROVED,
+        access_price__gte=PhotoGallery.MIN_PRICE,
+    ).select_related('artist')
 
     if query:
         artist_filter = (
@@ -142,6 +147,14 @@ def home(request):
         )
         artists = artists.filter(artist_filter)
         concert_streams = concert_streams.filter(stream_filter)
+        public_photo_galleries = public_photo_galleries.filter(
+            Q(title__icontains=query)
+            | Q(description__icontains=query)
+            | Q(artist__name__icontains=query)
+            | Q(artist__bio__icontains=query)
+            | Q(artist__headline__icontains=query)
+            | Q(artist__location__icontains=query)
+        )
 
     if favorite_artist_ids:
         artists = artists.annotate(
@@ -158,9 +171,19 @@ def home(request):
                 output_field=IntegerField(),
             ),
         )
+        public_photo_galleries = public_photo_galleries.annotate(
+            favorite_rank=Case(
+                When(artist_id__in=favorite_artist_ids, then=Value(0)),
+                default=Value(1),
+                output_field=IntegerField(),
+            ),
+        )
     else:
         artists = artists.order_by('name')
         concert_streams = concert_streams.annotate(
+            favorite_rank=Value(1, output_field=IntegerField()),
+        )
+        public_photo_galleries = public_photo_galleries.annotate(
             favorite_rank=Value(1, output_field=IntegerField()),
         )
 
@@ -171,6 +194,7 @@ def home(request):
             output_field=IntegerField(),
         ),
     ).order_by('favorite_rank', 'active_rank', 'scheduled_at')
+    public_photo_galleries = public_photo_galleries.order_by('favorite_rank', '-created_at')
 
     return render(request, 'streams/home.html', {
         'artists': artists,
@@ -178,6 +202,7 @@ def home(request):
         'favorite_artists': favorite_artists,
         'favorite_artist_ids': favorite_artist_ids,
         'newsletter_form': newsletter_form,
+        'public_photo_galleries': public_photo_galleries,
         'purchased_stream_ids': purchased_stream_ids,
         'search_query': query,
     })
