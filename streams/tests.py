@@ -619,6 +619,62 @@ class PhotoGalleryAccessTests(TestCase):
         self.assertTrue(gallery.is_active)
         self.assertEqual(gallery.reviewed_by, admin_user)
 
+    def test_admin_home_shows_pending_photo_gallery_notification(self):
+        User.objects.create_user(
+            username='admin_pending',
+            password='pass12345',
+            is_staff=True,
+            is_superuser=True,
+        )
+        self.create_gallery(
+            title='Galeria por aprovar',
+            is_active=False,
+            moderation_status=PhotoGallery.PENDING,
+        )
+        self.client.login(username='admin_pending', password='pass12345')
+
+        response = self.client.get('/admin/')
+
+        self.assertContains(response, 'Aprovacoes pendentes')
+        self.assertContains(response, 'Abrir galerias pendentes')
+
+    def test_approved_gallery_edit_page_does_not_show_submit_review_button(self):
+        gallery = self.create_gallery()
+        self.client.force_login(self.artist_user)
+
+        response = self.client.get(f'/dashboard/galerias/{gallery.id}/editar/')
+
+        self.assertContains(response, 'Galeria aprovada')
+        self.assertNotContains(response, 'Enviar para validacao')
+
+    def test_changing_approved_gallery_moves_it_back_to_draft(self):
+        gallery = self.create_gallery()
+        self.client.force_login(self.artist_user)
+
+        response = self.client.post(f'/dashboard/galerias/{gallery.id}/editar/', {
+            'action': 'save_gallery',
+            'title': gallery.title,
+            'description': 'Descricao alterada',
+            'access_price': '5.00',
+            'is_active': 'on',
+        })
+        gallery.refresh_from_db()
+
+        self.assertRedirects(response, f'/dashboard/galerias/{gallery.id}/editar/')
+        self.assertEqual(gallery.moderation_status, PhotoGallery.DRAFT)
+        self.assertFalse(gallery.is_active)
+
+    def test_deleting_gallery_removes_it_from_public_pages(self):
+        gallery = self.create_gallery(title='Galeria para apagar')
+        self.client.force_login(self.artist_user)
+
+        response = self.client.post(f'/dashboard/galerias/{gallery.id}/apagar/')
+
+        self.assertRedirects(response, f'/dashboard/?artist={self.artist.id}')
+        self.assertFalse(PhotoGallery.objects.filter(pk=gallery.pk).exists())
+        response = self.client.get(reverse('streams:home'))
+        self.assertNotContains(response, 'Galeria para apagar')
+
     def test_pending_gallery_does_not_show_to_public_on_artist_page(self):
         self.create_gallery(moderation_status=PhotoGallery.PENDING)
 

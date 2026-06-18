@@ -1,0 +1,18 @@
+{% extends "admin/index.html" %}
+{% load stagehub_admin %}
+
+{% block content %}
+  {% stagehub_pending_approvals as pending %}
+  {% if pending.photo_galleries %}
+    <div style="margin-bottom: 20px; padding: 15px; border-radius: 4px; border: 1px solid #f59e0b; background: #451a03; color: #fffbeb;">
+      <h2 style="margin: 0 0 8px;">Aprovacoes pendentes</h2>
+      <p style="margin: 0 0 12px;">
+        Existem {{ pending.photo_galleries }} galeria{{ pending.photo_galleries|pluralize }} de fotos para validar.
+      </p>
+      <a href="{% url 'admin:streams_photogallery_changelist' %}?moderation_status__exact=pending" style="color: #fde68a; font-weight: 700;">
+        Abrir galerias pendentes
+      </a>
+    </div>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

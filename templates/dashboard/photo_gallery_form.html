@@ -24,11 +24,19 @@
           {% endif %}
           <p class="mt-2 text-xs text-zinc-500">So galerias aprovadas e ativas aparecem ao publico.</p>
         </div>
-        <form method="post">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="submit_review">
-          <button class="sl-primary" {% if gallery.moderation_status == gallery.PENDING %}disabled{% endif %}>Enviar para validacao</button>
-        </form>
+        {% if gallery.moderation_status == gallery.APPROVED %}
+          <div class="rounded border border-[#10B981]/50 bg-[#10B981]/10 px-4 py-3 text-sm text-emerald-100">
+            Galeria aprovada. Se alterares conteudo ou fotos, volta a rascunho e pede nova validacao.
+          </div>
+        {% elif gallery.moderation_status == gallery.PENDING %}
+          <button class="sl-primary" disabled>A aguardar validacao</button>
+        {% else %}
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="submit_review">
+            <button class="sl-primary">Enviar para validacao</button>
+          </form>
+        {% endif %}
       </div>
     </section>
   {% endif %}

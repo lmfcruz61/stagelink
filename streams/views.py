@@ -795,12 +795,17 @@ def photo_gallery_update(request, gallery_id):
             image_form = PhotoGalleryImageUploadForm(gallery=gallery)
             if form.is_valid():
                 gallery = form.save(commit=False)
-                if gallery.moderation_status in {PhotoGallery.APPROVED, PhotoGallery.SUSPENDED}:
-                    gallery.save()
-                else:
+                if form.has_changed() and gallery.moderation_status == PhotoGallery.APPROVED:
                     gallery.moderation_status = PhotoGallery.DRAFT
+                    gallery.is_active = False
                     gallery.rejection_reason = ''
                     gallery.save()
+                    messages.success(request, 'Galeria atualizada. Envia novamente para validacao antes de voltar a ficar publica.')
+                    return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
+                if gallery.moderation_status not in {PhotoGallery.APPROVED, PhotoGallery.SUSPENDED}:
+                    gallery.moderation_status = PhotoGallery.DRAFT
+                    gallery.rejection_reason = ''
+                gallery.save()
                 messages.success(request, 'Galeria atualizada.')
                 return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
             messages.error(request, 'Nao foi possivel guardar a galeria.')
@@ -811,10 +816,13 @@ def photo_gallery_update(request, gallery_id):
                 start_position = gallery.images.count()
                 for index, image in enumerate(image_form.cleaned_data['images'], start=start_position):
                     PhotoGalleryImage.objects.create(gallery=gallery, image=image, position=index)
-                if gallery.moderation_status == PhotoGallery.REJECTED:
+                if gallery.moderation_status in {PhotoGallery.APPROVED, PhotoGallery.REJECTED}:
                     gallery.moderation_status = PhotoGallery.DRAFT
+                    gallery.is_active = False
                     gallery.rejection_reason = ''
-                    gallery.save(update_fields=['moderation_status', 'rejection_reason'])
+                    gallery.save(update_fields=['moderation_status', 'is_active', 'rejection_reason'])
+                    messages.success(request, 'Fotos adicionadas. Envia novamente para validacao antes de voltar a ficar publica.')
+                    return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
                 messages.success(request, 'Fotos adicionadas a galeria.')
                 return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
             messages.error(request, 'Nao foi possivel adicionar as fotos.')
@@ -825,8 +833,9 @@ def photo_gallery_update(request, gallery_id):
                 messages.error(request, 'O preco minimo de acesso a galerias na StageHub e 2 EUR.')
             else:
                 gallery.moderation_status = PhotoGallery.PENDING
+                gallery.is_active = False
                 gallery.rejection_reason = ''
-                gallery.save(update_fields=['moderation_status', 'rejection_reason'])
+                gallery.save(update_fields=['moderation_status', 'is_active', 'rejection_reason'])
                 messages.success(request, 'Galeria enviada para validacao StageHub.')
             return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
     else:

@@ -4,6 +4,8 @@ from django.utils import timezone
 
 from .models import ChatMessage, LiveStream, PhotoGallery, PhotoGalleryImage, Tip
 
+admin.site.index_template = 'admin/stagehub_index.html'
+
 
 @admin.register(LiveStream)
 class LiveStreamAdmin(admin.ModelAdmin):
