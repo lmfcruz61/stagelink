@@ -18,7 +18,7 @@ def register(request):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             if next_url and url_has_allowed_host_and_scheme(next_url, {request.get_host()}):
                 return redirect(next_url)
-            if user.profile.role in ('musician', 'manager'):
+            if user.profile.role == 'musician':
                 return redirect('streams:dashboard')
             return redirect('streams:home')
     else:

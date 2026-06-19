@@ -12,10 +12,6 @@
         <p class="mt-1">Cria a tua pagina de artista individual.</p>
       </div>
       <div class="sl-card p-4 text-sm text-zinc-300">
-        <p class="font-semibold text-zinc-100">Manager / equipa</p>
-        <p class="mt-1">Cria uma empresa, agencia ou equipa para gerir varios artistas.</p>
-      </div>
-      <div class="sl-card p-4 text-sm text-zinc-300">
         <p class="font-semibold text-zinc-100">Publico</p>
         <p class="mt-1">Segue artistas, compra acesso e participa nos eventos.</p>
       </div>
@@ -35,19 +31,4 @@
     <p class="text-xs text-zinc-500">Escolhe uma password forte e unica. Os pagamentos sao tratados pela Stripe em ambiente seguro.</p>
   </form>
 </section>
-<script>
-  const roleField = document.querySelector('#id_role');
-  const organizationField = document.querySelector('#id_organization_name');
-  const organizationWrapper = organizationField ? organizationField.closest('p') : null;
-
-  function syncOrganizationField() {
-    if (!roleField || !organizationWrapper) return;
-    const isManager = roleField.value === 'manager';
-    organizationWrapper.classList.toggle('hidden', !isManager);
-    organizationField.required = isManager;
-  }
-
-  roleField?.addEventListener('change', syncOrganizationField);
-  syncOrganizationField();
-</script>
 {% endblock %}

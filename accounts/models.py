@@ -9,7 +9,6 @@ class Profile(models.Model):
     ROLE_CHOICES = (
         (MUSICIAN, 'Artista'),
         (FAN, 'Público'),
-        (MANAGER, 'Manager / equipa'),
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')

@@ -362,7 +362,7 @@ def can_access_dashboard(user):
         return True
     if Artist.objects.filter(user=user).exists():
         return True
-    return OrganizationMember.objects.filter(user=user).exists()
+    return False
 
 
 def prepare_cloudflare_direct_upload(stream):
@@ -385,11 +385,7 @@ def prepare_cloudflare_direct_upload(stream):
 
 
 def can_manage_organizations(user):
-    if user.is_staff or user.is_superuser:
-        return True
-    if getattr(getattr(user, 'profile', None), 'role', '') == 'manager':
-        return True
-    return OrganizationMember.objects.filter(user=user, role__in=OrganizationMember.EDIT_ROLES).exists()
+    return False
 
 
 def artist_payment_summary(artist, subscribers):
@@ -517,7 +513,7 @@ def dashboard(request):
     can_manage_orgs = can_manage_organizations(request.user)
 
     if not artist:
-        messages.info(request, 'Cria uma equipa ou um perfil de artista para comecar a gerir eventos.')
+        messages.info(request, 'Cria um perfil de artista para comecar a gerir eventos.')
         return render(request, 'dashboard/index.html', {
             'artist': None,
             'artists': artists,
@@ -550,7 +546,7 @@ def dashboard(request):
 @login_required
 def organization_create(request):
     if not can_manage_organizations(request.user):
-        messages.error(request, 'Esta area e para managers, equipas ou administradores.')
+        messages.error(request, 'Esta area esta indisponivel nesta fase.')
         return redirect('streams:dashboard')
 
     if request.method == 'POST':
@@ -564,7 +560,7 @@ def organization_create(request):
                 user=request.user,
                 role=OrganizationMember.OWNER,
             )
-            messages.success(request, 'Equipa criada. Agora podes adicionar artistas e membros.')
+            messages.success(request, 'Area criada.')
             return redirect('streams:dashboard')
     else:
         form = OrganizationForm()
@@ -573,6 +569,10 @@ def organization_create(request):
 
 @login_required
 def organization_update(request, organization_id):
+    if not can_manage_organizations(request.user):
+        messages.error(request, 'Esta area esta indisponivel nesta fase.')
+        return redirect('streams:dashboard')
+
     membership = get_object_or_404(
         OrganizationMember,
         organization_id=organization_id,
@@ -588,7 +588,7 @@ def organization_update(request, organization_id):
 
         if action == 'save_organization' and form.is_valid():
             form.save()
-            messages.success(request, 'Equipa atualizada.')
+            messages.success(request, 'Area atualizada.')
             return redirect('streams:organization_update', organization_id=organization.id)
 
         if action == 'add_member' and member_form.is_valid():
@@ -615,6 +615,9 @@ def organization_update(request, organization_id):
 
 @login_required
 def managed_artist_create(request):
+    messages.error(request, 'Esta area esta indisponivel nesta fase.')
+    return redirect('streams:dashboard')
+
     organizations = Organization.objects.filter(
         members__user=request.user,
         members__role__in=OrganizationMember.EDIT_ROLES,
@@ -623,8 +626,8 @@ def managed_artist_create(request):
         organizations = Organization.objects.all()
 
     if not organizations.exists():
-        messages.error(request, 'Cria primeiro uma equipa para adicionar artistas geridos.')
-        return redirect('streams:organization_create')
+        messages.error(request, 'Esta area esta indisponivel nesta fase.')
+        return redirect('streams:dashboard')
 
     if request.method == 'POST':
         form = ManagedArtistForm(request.POST, request.FILES)
@@ -633,7 +636,7 @@ def managed_artist_create(request):
             artist = form.save(commit=False)
             artist.organization = organization
             artist.save()
-            messages.success(request, 'Artista adicionado a equipa.')
+            messages.success(request, 'Artista criado.')
             return redirect(f"{reverse('streams:dashboard')}?artist={artist.id}")
     else:
         form = ManagedArtistForm()
@@ -759,7 +762,7 @@ def photo_gallery_detail(request, gallery_id):
 def photo_gallery_create(request):
     artists = editable_artists_for(request.user).order_by('name')
     if not artists.exists():
-        messages.error(request, 'Precisas de um artista ou equipa para criar galerias.')
+        messages.error(request, 'Precisas de um artista para criar galerias.')
         return redirect('streams:home')
 
     selected_artist_id = request.GET.get('artist') or request.POST.get('artist')
@@ -909,7 +912,7 @@ def photo_gallery_delete(request, gallery_id):
 def stream_create(request):
     artists = editable_artists_for(request.user).order_by('name')
     if not artists.exists():
-        messages.error(request, 'Precisas de um artista ou equipa para criar eventos.')
+        messages.error(request, 'Precisas de um artista para criar eventos.')
         return redirect('streams:home')
 
     selected_artist_id = request.GET.get('artist') or request.POST.get('artist')

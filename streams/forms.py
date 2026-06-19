@@ -19,12 +19,12 @@ class LiveStreamForm(forms.ModelForm):
         label='Ligacao de video StageHub',
         max_length=120,
         required=False,
-        help_text='Normalmente fica preenchido automaticamente. Usa apenas se a equipa StageHub te indicar um codigo de video.',
+        help_text='Normalmente fica preenchido automaticamente. Usa apenas se o suporte StageHub te indicar um codigo de video.',
     )
     cloudflare_playback_url = forms.URLField(
         label='Ligacao manual do player',
         required=False,
-        help_text='Uso interno da equipa StageHub quando for necessario configurar o player manualmente.',
+        help_text='Uso interno do suporte StageHub quando for necessario configurar o player manualmente.',
     )
     youtube_video_id = forms.CharField(
         label='Video externo legado',
@@ -156,7 +156,7 @@ class LiveStreamForm(forms.ModelForm):
         if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE_WEBRTC and not cloudflare_playback_url:
             self.add_error(
                 'cloudflare_playback_url',
-                'Este modo ainda esta reservado para configuracao tecnica da equipa StageHub.',
+                'Este modo ainda esta reservado para configuracao tecnica do suporte StageHub.',
             )
 
         if (

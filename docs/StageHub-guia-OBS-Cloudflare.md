@@ -1,10 +1,10 @@
 # StageHub - Guia OBS para transmitir ao vivo
 
-Este guia serve para artistas, managers ou equipa tecnica transmitirem um evento ao vivo para a StageHub usando OBS.
+Este guia serve para artistas transmitirem um evento ao vivo para a StageHub usando OBS.
 
 ## 1. O que precisas antes de abrir o OBS
 
-1. Uma conta de artista/equipa no StageHub.
+1. Uma conta de artista no StageHub.
 2. Um canal ao vivo criado pela StageHub no perfil do artista.
 3. Estes dados privados fornecidos pela StageHub:
    - `Servidor OBS`;
@@ -114,7 +114,7 @@ Se continuar a falhar:
 1. Confirmar que o `Servidor OBS` esta correto.
 2. Confirmar que a `Chave de transmissao` esta correta.
 3. Reiniciar o OBS.
-4. Pedir a equipa StageHub para recriar o canal ao vivo do artista, se necessario.
+4. Pedir ao suporte StageHub para recriar o canal ao vivo do artista, se necessario.
 
 ## 9. Se nao houver audio na sala
 

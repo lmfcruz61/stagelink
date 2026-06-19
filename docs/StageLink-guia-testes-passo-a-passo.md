@@ -15,17 +15,16 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 
 1. Entrar como admin.
 2. Abrir a homepage e confirmar header, logo, fundo e imagem de perfil.
-3. Abrir `/admin/` e verificar Users, Artists, Organizations, Organization Members, Eventos, Subscriptions, Tips e Site Appearance.
-4. Criar ou rever uma equipa/empresa.
-5. Criar ou rever artistas associados a essa equipa.
-6. Abrir uma sala de evento como admin. O admin deve entrar sem bilhete nem subscricao.
-7. Confirmar que uploads de imagens aparecem no site publico.
+3. Abrir `/admin/` e verificar Users, Artists, Eventos, Subscriptions, Tips e Site Appearance.
+4. Criar ou rever artistas.
+5. Abrir uma sala de evento como admin. O admin deve entrar sem bilhete nem subscricao.
+6. Confirmar que uploads de imagens aparecem no site publico.
 
 ## 3. Teste como artista individual
 
 1. Criar conta nova como artista.
 2. Entrar no dashboard.
-3. Confirmar que nao aparecem botoes de equipa como `Nova equipa` ou `Novo artista gerido`.
+3. Confirmar que aparecem apenas opcoes normais de artista.
 4. Abrir o `Guia rapido`.
 5. Editar pagina publica: nome artistico, frase, cidade, bio, foto principal, capa e links.
 6. Adicionar varias fotos a galeria.
@@ -37,20 +36,15 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 12. Abrir a pagina publica do artista e confirmar capa, foto, bio, links, galeria, evento agendado e evento ativo.
 13. Entrar na sala como artista e confirmar countdown, player, badge do estado, marca do artista no video, chat, contador `a ver` e botoes de apoio.
 
-## 4. Teste como manager / equipa
+## 4. Teste de dashboard do artista
 
-1. Criar conta de manager.
-2. Entrar no dashboard.
-3. Confirmar que aparecem `Nova equipa` e `Novo artista gerido`.
-4. Criar `Nova equipa`.
-5. Abrir a equipa e adicionar membros por username: Dono, Manager, Editor e Leitor.
-6. Criar `Novo artista gerido` associado a equipa.
-7. Selecionar o artista no dashboard.
-8. Editar pagina publica desse artista.
-9. Criar evento para esse artista e escolher o tipo correto: `Ao vivo`, `Estreia`, `Video gravado` ou `Replay`.
-10. Depois de um evento terminado, editar o evento e mudar para `Replay` se o video continuar disponivel.
-11. Entrar com outro membro da equipa e confirmar permissoes.
-12. Confirmar que o manager consegue entrar na sala do evento para operar/testar.
+1. Entrar como artista.
+2. Abrir o dashboard.
+3. Confirmar que aparecem apenas opcoes do artista: editar pagina, nova galeria, novo video e novo evento.
+4. Confirmar que o dashboard esta focado apenas no artista.
+5. Criar evento para esse artista e escolher o tipo correto: `Ao vivo`, `Estreia`, `Video gravado` ou `Replay`.
+6. Depois de um evento terminado, editar o evento e mudar para `Replay` se o video continuar disponivel.
+7. Confirmar que o dashboard mostra apenas conteudos desse artista.
 
 ## 5. Teste como publico
 
@@ -68,7 +62,7 @@ Ambiente sugerido para este ciclo: Fly.io em `https://stagelink.fly.dev/`, Strip
 12. Enviar mensagem no chat e confirmar que aparece imediatamente.
 13. Usar os botoes rapidos de emoji do chat.
 14. Enviar gorjeta em modo teste.
-15. Confirmar que a gorjeta aparece no dashboard do artista/manager.
+15. Confirmar que a gorjeta aparece no dashboard do artista.
 
 ## 6. Teste de pagamentos Stripe
 
@@ -125,7 +119,7 @@ Nota: nesta fase piloto, o contador mede ligacoes ativas na sala. Em escala com 
 
 Avancar para um artista piloto quando:
 
-1. Registo de artista, manager e publico nao tiver erros 500.
+1. Registo de artista e publico nao tiver erros 500.
 2. Pagamentos Stripe em modo teste estiverem completos.
 3. Chat funcionar entre pelo menos dois utilizadores.
 4. Contador `a ver` atualizar ao abrir/fechar uma segunda janela.
@@ -138,4 +132,4 @@ Avancar para um artista piloto quando:
 
 No fim deste teste, deves conseguir provar o ciclo completo:
 
-Empresa/manager cria artista, artista tem pagina publica, evento com tipo correto e acesso pago; publico entra, ve countdown/player com marca do artista, conversa no chat, usa emojis, ve a contagem de espectadores, subscreve e envia gorjeta; admin consegue supervisionar tudo.
+Artista tem pagina publica, evento com tipo correto e acesso pago; publico entra, ve countdown/player com marca do artista, conversa no chat, usa emojis, ve a contagem de espectadores, subscreve e envia gorjeta; admin consegue supervisionar tudo.

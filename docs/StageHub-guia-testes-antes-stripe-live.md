@@ -11,7 +11,7 @@ Durante estes testes:
 1. Manter Stripe em modo teste.
 2. Nao usar cartoes reais.
 3. Nao divulgar ainda o site como venda publica final.
-4. Testar a experiencia como artista, publico e equipa.
+4. Testar a experiencia como artista e publico.
 5. So mudar para Stripe live depois de tudo o resto estar validado.
 
 Dominio oficial:
@@ -116,7 +116,7 @@ Resultado esperado:
 
 ## 6. Teste de criacao de evento pago
 
-Entrar como artista ou equipa.
+Entrar como artista.
 
 Criar um evento ao vivo:
 
@@ -144,7 +144,7 @@ Resultado esperado:
 
 ## 7. Teste de configuracao OBS
 
-Entrar como artista ou equipa.
+Entrar como artista.
 
 Testar:
 
@@ -188,7 +188,7 @@ Resultado esperado:
 
 ## 9. Teste de video gravado
 
-Entrar como artista ou equipa.
+Entrar como artista.
 
 Criar video gravado:
 
@@ -236,7 +236,7 @@ Resultado esperado:
 
 ## 11. Teste de galerias de fotos pagas
 
-Entrar como artista ou equipa.
+Entrar como artista.
 
 Criar galeria:
 
@@ -337,13 +337,13 @@ Resultado esperado:
 
 1. Gorjeta de teste confirma.
 2. Valor fica registado.
-3. Artista/equipa consegue ver impacto no dashboard, se aplicavel.
+3. Artista consegue ver impacto no dashboard, se aplicavel.
 
 ## 15. Teste Stripe Connect em modo teste
 
 Antes de live, validar Connect em teste:
 
-1. Entrar como artista/equipa.
+1. Entrar como artista.
 2. Abrir `Editar pagina`.
 3. Clicar em `Ligar Stripe`.
 4. Completar onboarding de teste.
@@ -432,7 +432,7 @@ Quando tudo estiver aprovado:
 6. Fazer deploy/restart se necessario.
 7. Fazer pagamento real pequeno.
 
-Importante: contas conectadas reais sao criadas/completadas pelo artista ou pela equipa responsavel pelo artista, nao por uma conta falsa de teste.
+Importante: contas conectadas reais sao criadas/completadas pelo artista responsavel, nao por uma conta falsa de teste.
 
 ## 19. Decisao final
 
@@ -442,7 +442,7 @@ So considerar a StageHub pronta para pagamentos live quando:
 2. A experiencia com pagamentos de teste esta estavel.
 3. O artista sabe ligar Stripe.
 4. O publico sabe comprar e entrar.
-5. A equipa sabe verificar problemas.
+5. O suporte sabe verificar problemas.
 6. A comissao esta confirmada.
 7. Existe plano claro para suporte no primeiro evento real.
 

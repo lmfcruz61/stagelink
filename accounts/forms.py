@@ -7,27 +7,19 @@ from .models import Artist, ArtistPhoto, Fan, NewsletterSubscriber, Organization
 
 
 class SignUpForm(UserCreationForm):
-    role = forms.ChoiceField(choices=Profile.ROLE_CHOICES, label='Tipo de conta')
-    display_name = forms.CharField(max_length=120, label='Nome público')
-    organization_name = forms.CharField(
-        max_length=140,
-        required=False,
-        label='Nome da equipa/empresa',
-        help_text='Obrigatorio apenas para managers, agencias, produtoras ou empresas.',
+    role = forms.ChoiceField(
+        choices=(
+            (Profile.MUSICIAN, 'Artista'),
+            (Profile.FAN, 'Publico'),
+        ),
+        label='Tipo de conta',
     )
+    display_name = forms.CharField(max_length=120, label='Nome público')
     email = forms.EmailField(required=True)
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'display_name', 'role', 'organization_name', 'password1', 'password2')
-
-    def clean(self):
-        cleaned_data = super().clean()
-        role = cleaned_data.get('role')
-        organization_name = cleaned_data.get('organization_name', '').strip()
-        if role == Profile.MANAGER and not organization_name:
-            self.add_error('organization_name', 'Indica o nome da equipa ou empresa.')
-        return cleaned_data
+        fields = ('username', 'email', 'display_name', 'role', 'password1', 'password2')
 
     @transaction.atomic
     def save(self, commit=True):
@@ -40,16 +32,6 @@ class SignUpForm(UserCreationForm):
             Profile.objects.create(user=user, role=role)
             if role == Profile.MUSICIAN:
                 Artist.objects.create(user=user, name=display_name)
-            elif role == Profile.MANAGER:
-                organization = Organization.objects.create(
-                    name=self.cleaned_data['organization_name'],
-                    created_by=user,
-                )
-                OrganizationMember.objects.create(
-                    organization=organization,
-                    user=user,
-                    role=OrganizationMember.OWNER,
-                )
             else:
                 Fan.objects.create(user=user, display_name=display_name)
         return user
@@ -112,7 +94,7 @@ class OrganizationForm(forms.ModelForm):
         model = Organization
         fields = ('name', 'description', 'website', 'logo')
         labels = {
-            'name': 'Nome da equipa/empresa',
+            'name': 'Nome',
             'description': 'Descricao',
             'website': 'Site',
             'logo': 'Logotipo',

@@ -17,7 +17,7 @@ Na pratica:
 
 ## 2. Conta e pagina do artista
 
-No dashboard, o artista ou a equipa deve completar a pagina publica:
+No dashboard, o artista deve completar a pagina publica:
 
 1. Nome artistico.
 2. Frase curta de apresentacao.
@@ -163,7 +163,7 @@ Se o computador for fraco, escolher codificador `Software (x264)`.
 
 Antes de divulgar:
 
-1. Entrar na sala como artista ou equipa.
+1. Entrar na sala como artista.
 2. Confirmar que o video aparece.
 3. Confirmar que o audio funciona.
 4. Confirmar que o chat funciona.
@@ -284,6 +284,6 @@ Se algo falhar:
 1. Nao apagar o evento.
 2. Tirar screenshot do erro.
 3. Dizer qual artista, evento e hora do problema.
-4. Contactar a equipa StageHub.
+4. Contactar o suporte StageHub.
 
-A equipa StageHub consegue rever configuracao, pagamentos, estado do video e acesso ao evento.
+O suporte StageHub consegue rever configuracao, pagamentos, estado do video e acesso ao evento.

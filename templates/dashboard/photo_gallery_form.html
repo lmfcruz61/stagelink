@@ -51,7 +51,7 @@
             <span>Artista</span>
             <select name="artist" required>
               {% for artist in artists %}
-                <option value="{{ artist.id }}"{% if selected_artist_id == artist.id %} selected{% endif %}>{{ artist.name }}{% if artist.organization %} - {{ artist.organization.name }}{% endif %}</option>
+                <option value="{{ artist.id }}"{% if selected_artist_id == artist.id %} selected{% endif %}>{{ artist.name }}</option>
               {% endfor %}
             </select>
           </label>

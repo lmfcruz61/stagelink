@@ -72,6 +72,47 @@
       transform: translateY(-2px);
     }
 
+    .sl-spotlight-card {
+      border: 1px solid rgba(63, 63, 70, 0.92);
+      border-radius: 1rem;
+      background: rgba(9, 9, 11, 0.72);
+      backdrop-filter: blur(16px);
+      transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+    }
+
+    .sl-spotlight-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(37, 150, 190, 0.85);
+      background: rgba(24, 24, 27, 0.88);
+    }
+
+    .sl-reveal {
+      animation: slReveal 520ms ease both;
+    }
+
+    .sl-reveal-delay-1 {
+      animation-delay: 90ms;
+    }
+
+    .sl-reveal-delay-2 {
+      animation-delay: 170ms;
+    }
+
+    .sl-reveal-delay-3 {
+      animation-delay: 250ms;
+    }
+
+    @keyframes slReveal {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .sl-thumb {
       aspect-ratio: 16 / 9;
       background: rgb(39 39 42);
@@ -206,7 +247,7 @@
               <span class="hidden sm:inline">{{ user.username }}</span>
             {% endif %}
           </a>
-          {% if user.is_staff or user.is_superuser or user.artist_profile or user.organization_memberships.exists %}
+          {% if user.is_staff or user.is_superuser or user.artist_profile %}
             <a class="text-zinc-300 hover:text-white" href="{% url 'streams:dashboard' %}">Dashboard</a>
           {% endif %}
           <form method="post" action="{% url 'accounts:logout' %}">

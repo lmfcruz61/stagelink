@@ -169,7 +169,7 @@ Se tiveres um problema:
 2. Confirma se o pagamento aparece como concluido na Stripe.
 3. Nao compres novamente sem verificar primeiro.
 4. Guarda o email/recibo da Stripe.
-5. Contacta a equipa StageHub com o email da conta, nome do evento e hora do problema.
+5. Contacta o suporte StageHub com o email da conta, nome do evento e hora do problema.
 
 Pedidos de reembolso podem depender do caso, do evento e das regras definidas pela plataforma ou pelo artista.
 
@@ -225,4 +225,4 @@ Para pedir ajuda, envia:
 5. Screenshot, se existir.
 6. Recibo Stripe, se o problema for de pagamento.
 
-A equipa StageHub consegue verificar acesso, pagamento e estado do evento.
+O suporte StageHub consegue verificar acesso, pagamento e estado do evento.

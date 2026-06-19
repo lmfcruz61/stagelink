@@ -8,8 +8,6 @@ from .models import (
     ArtistPhoto,
     Fan,
     NewsletterSubscriber,
-    Organization,
-    OrganizationMember,
     Profile,
     SiteAppearance,
 )
@@ -17,15 +15,13 @@ from .models import (
 admin.site.register(Profile)
 @admin.register(Artist)
 class ArtistAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'organization', 'cloudflare_live_input_uid', 'stripe_account_id', 'stripe_charges_enabled', 'stripe_payouts_enabled')
-    search_fields = ('name', 'user__username', 'organization__name', 'cloudflare_live_input_uid', 'stripe_account_id')
+    list_display = ('name', 'user', 'cloudflare_live_input_uid', 'stripe_account_id', 'stripe_charges_enabled', 'stripe_payouts_enabled')
+    search_fields = ('name', 'user__username', 'cloudflare_live_input_uid', 'stripe_account_id')
     readonly_fields = ('cloudflare_rtmps_url', 'cloudflare_stream_key')
 
 
 admin.site.register(ArtistPhoto)
 admin.site.register(Fan)
-admin.site.register(Organization)
-admin.site.register(OrganizationMember)
 
 
 @admin.action(description='Exportar selecionados para CSV')
