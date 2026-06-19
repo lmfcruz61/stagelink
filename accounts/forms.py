@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import transaction
 
-from .models import Artist, ArtistPhoto, Fan, NewsletterSubscriber, Organization, OrganizationMember, Profile
+from .models import Artist, ArtistPhoto, ContactMessage, Fan, NewsletterSubscriber, Organization, OrganizationMember, Profile
 
 
 class SignUpForm(UserCreationForm):
@@ -197,3 +197,45 @@ class NewsletterSubscriberForm(forms.ModelForm):
         if NewsletterSubscriber.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError('Este email ja esta subscrito na newsletter.')
         return email
+
+
+class ContactForm(forms.ModelForm):
+    website = forms.CharField(required=False, widget=forms.HiddenInput)
+
+    class Meta:
+        model = ContactMessage
+        fields = ('name', 'email', 'contact_type', 'subject', 'message')
+        labels = {
+            'name': 'Nome',
+            'email': 'Email',
+            'contact_type': 'Tipo de contacto',
+            'subject': 'Assunto',
+            'message': 'Mensagem',
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'O teu nome'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'email@exemplo.com'}),
+            'subject': forms.TextInput(attrs={'placeholder': 'Resumo do pedido'}),
+            'message': forms.Textarea(attrs={'rows': 7, 'placeholder': 'Escreve a tua mensagem'}),
+        }
+
+    def clean_website(self):
+        value = self.cleaned_data.get('website', '')
+        if value:
+            raise forms.ValidationError('Mensagem bloqueada.')
+        return value
+
+    def clean_name(self):
+        return self.cleaned_data['name'].strip()
+
+    def clean_subject(self):
+        subject = self.cleaned_data['subject'].strip()
+        if len(subject) < 3:
+            raise forms.ValidationError('Escreve um assunto um pouco mais claro.')
+        return subject
+
+    def clean_message(self):
+        message = self.cleaned_data['message'].strip()
+        if len(message) < 10:
+            raise forms.ValidationError('Escreve uma mensagem com mais detalhe.')
+        return message

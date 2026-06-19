@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.mail import EmailMessage
 from django.http import JsonResponse
 from django.db.models import Case, Count, IntegerField, Prefetch, Q, Sum, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
@@ -16,6 +17,7 @@ from django.views.decorators.http import require_POST
 
 from accounts.forms import (
     ArtistGalleryUploadForm,
+    ContactForm,
     ArtistProfileForm,
     ManagedArtistForm,
     NewsletterSubscriberForm,
@@ -228,6 +230,63 @@ def cookie_policy(request):
 
 def terms_conditions(request):
     return render(request, 'legal/terms_conditions.html')
+
+
+def client_ip_address(request):
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    if forwarded_for:
+        return forwarded_for.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR') or None
+
+
+def contact_email_subject(contact_message):
+    prefixes = {
+        'general': 'GERAL',
+        'finance': 'FINANCEIRO',
+        'technical': 'TÉCNICO',
+    }
+    prefix = prefixes.get(contact_message.contact_type, contact_message.get_contact_type_display().upper())
+    return f'[STAGEHUB - {prefix}] {contact_message.subject}'
+
+
+def contact_email_body(contact_message):
+    return (
+        f'Nome:\n{contact_message.name}\n\n'
+        f'Email:\n{contact_message.email}\n\n'
+        f'Tipo de Contacto:\n{contact_message.get_contact_type_display()}\n\n'
+        f'Assunto:\n{contact_message.subject}\n\n'
+        f'Mensagem:\n{contact_message.message}\n\n'
+        f'Data:\n{timezone.localtime(contact_message.created_at).strftime("%d/%m/%Y %H:%M")}\n\n'
+        f'IP:\n{contact_message.ip_address or "Nao disponivel"}\n'
+    )
+
+
+def contact(request):
+    form = ContactForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            contact_message = form.save(commit=False)
+            contact_message.ip_address = client_ip_address(request)
+            contact_message.user_agent = request.META.get('HTTP_USER_AGENT', '')[:255]
+            contact_message.save()
+
+            email = EmailMessage(
+                subject=contact_email_subject(contact_message),
+                body=contact_email_body(contact_message),
+                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
+                to=['stagehub.platform@gmail.com'],
+                reply_to=[contact_message.email],
+            )
+            try:
+                email.send(fail_silently=False)
+            except Exception:
+                messages.error(request, 'A mensagem foi guardada, mas nao foi possivel enviar o email agora. Vamos rever o pedido no painel interno.')
+            else:
+                messages.success(request, 'Mensagem enviada com sucesso. Obrigado por contactares a StageHub.')
+            return redirect('streams:contact')
+        messages.error(request, 'Nao foi possivel enviar a mensagem. Confirma os campos assinalados.')
+
+    return render(request, 'contact/contact.html', {'form': form})
 
 
 def artist_detail(request, artist_id):

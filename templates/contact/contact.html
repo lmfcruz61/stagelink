@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Contactar-nos - StageHub{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl">
+  <div class="mb-8">
+    <p class="text-sm font-semibold uppercase tracking-wide text-[#2596BE]">Suporte StageHub</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight">Contactar-nos</h1>
+    <p class="mt-3 max-w-3xl text-zinc-300">
+      Fala connosco sobre a tua conta, pagamentos, eventos, galerias ou problemas tecnicos. A tua mensagem fica registada e sera encaminhada para a equipa certa.
+    </p>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+    <aside class="space-y-4">
+      <article class="sl-card p-5">
+        <p class="text-sm font-semibold text-[#2596BE]">Geral</p>
+        <h2 class="mt-2 text-xl font-semibold">Informacao e conta</h2>
+        <p class="mt-2 text-sm text-zinc-400">Perguntas sobre a plataforma, artistas, publico, acesso e funcionamento geral.</p>
+      </article>
+      <article class="sl-card p-5">
+        <p class="text-sm font-semibold text-[#2596BE]">Financeiro</p>
+        <h2 class="mt-2 text-xl font-semibold">Pagamentos e faturacao</h2>
+        <p class="mt-2 text-sm text-zinc-400">Duvidas sobre bilhetes, galerias, subscricoes, Stripe, comissoes ou pagamentos ao artista.</p>
+      </article>
+      <article class="sl-card p-5">
+        <p class="text-sm font-semibold text-[#2596BE]">Tecnico</p>
+        <h2 class="mt-2 text-xl font-semibold">Erros e configuracao</h2>
+        <p class="mt-2 text-sm text-zinc-400">Problemas com login, upload, video, OBS, imagens, paginas ou acesso a eventos.</p>
+      </article>
+    </aside>
+
+    <form method="post" class="sl-card space-y-5 p-6">
+      {% csrf_token %}
+      {{ form.website }}
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <label>
+          <span>{{ form.name.label }}</span>
+          {{ form.name }}
+          {% for error in form.name.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+        </label>
+        <label>
+          <span>{{ form.email.label }}</span>
+          {{ form.email }}
+          {% for error in form.email.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+        </label>
+      </div>
+
+      <label>
+        <span>{{ form.contact_type.label }}</span>
+        {{ form.contact_type }}
+        {% for error in form.contact_type.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </label>
+
+      <label>
+        <span>{{ form.subject.label }}</span>
+        {{ form.subject }}
+        {% for error in form.subject.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </label>
+
+      <label>
+        <span>{{ form.message.label }}</span>
+        {{ form.message }}
+        {% for error in form.message.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </label>
+
+      {% for error in form.non_field_errors %}
+        <p class="rounded border border-red-800 bg-red-950/40 p-3 text-sm text-red-200">{{ error }}</p>
+      {% endfor %}
+
+      <p class="text-xs text-zinc-500">
+        Usa este formulario apenas para pedidos reais. Nao incluas passwords, dados completos de cartao ou informacao sensivel desnecessaria.
+      </p>
+      <button class="sl-primary w-full" type="submit">Enviar mensagem</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

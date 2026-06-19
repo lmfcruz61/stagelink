@@ -151,6 +151,45 @@ class NewsletterSubscriber(models.Model):
         return self.email
 
 
+class ContactMessage(models.Model):
+    GENERAL = 'general'
+    FINANCE = 'finance'
+    TECHNICAL = 'technical'
+    CONTACT_TYPE_CHOICES = (
+        (GENERAL, 'Geral'),
+        (FINANCE, 'Financeiro'),
+        (TECHNICAL, 'Tecnico'),
+    )
+
+    NEW = 'new'
+    IN_REVIEW = 'in_review'
+    RESOLVED = 'resolved'
+    STATUS_CHOICES = (
+        (NEW, 'Novo'),
+        (IN_REVIEW, 'Em analise'),
+        (RESOLVED, 'Resolvido'),
+    )
+
+    name = models.CharField(max_length=120)
+    email = models.EmailField()
+    contact_type = models.CharField(max_length=20, choices=CONTACT_TYPE_CHOICES)
+    subject = models.CharField(max_length=160)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=NEW)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    user_agent = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Mensagem de contacto'
+        verbose_name_plural = 'Mensagens de contacto'
+
+    def __str__(self):
+        return f'{self.get_contact_type_display()} - {self.subject}'
+
+
 class SiteAppearance(models.Model):
     name = models.CharField(max_length=80, default='StageHub')
     logo = models.ImageField(

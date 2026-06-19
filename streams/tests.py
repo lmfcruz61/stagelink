@@ -5,13 +5,14 @@ from unittest.mock import patch
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings, RequestFactory
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from accounts.models import Artist, Fan
+from accounts.models import Artist, ContactMessage, Fan
 from payments.models import PhotoGalleryPurchase, StreamTicketPurchase, Subscription
 
 from .admin import PhotoGalleryAdmin
@@ -41,7 +42,74 @@ class LegalPageTests(TestCase):
         self.assertContains(response, reverse('streams:privacy_policy'))
         self.assertContains(response, reverse('streams:cookie_policy'))
         self.assertContains(response, reverse('streams:terms_conditions'))
+        self.assertContains(response, reverse('streams:contact'))
         self.assertContains(response, 'Gerir cookies')
+
+
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+class ContactPageTests(TestCase):
+    def test_contact_page_is_public(self):
+        response = self.client.get(reverse('streams:contact'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Contactar-nos')
+        self.assertContains(response, 'Geral')
+        self.assertContains(response, 'Financeiro')
+        self.assertContains(response, 'Tecnico')
+
+    def test_contact_form_saves_message_and_sends_categorized_email(self):
+        response = self.client.post(
+            reverse('streams:contact'),
+            {
+                'name': 'Luis Cruz',
+                'email': 'luis@example.com',
+                'contact_type': ContactMessage.FINANCE,
+                'subject': 'Duvida sobre faturacao',
+                'message': 'Gostava de esclarecer uma duvida sobre uma compra feita na plataforma.',
+            },
+            HTTP_X_FORWARDED_FOR='203.0.113.10, 10.0.0.1',
+            HTTP_USER_AGENT='StageHub Test Browser',
+        )
+
+        self.assertRedirects(response, reverse('streams:contact'))
+        contact_message = ContactMessage.objects.get()
+        self.assertEqual(contact_message.name, 'Luis Cruz')
+        self.assertEqual(contact_message.email, 'luis@example.com')
+        self.assertEqual(contact_message.contact_type, ContactMessage.FINANCE)
+        self.assertEqual(contact_message.status, ContactMessage.NEW)
+        self.assertEqual(contact_message.ip_address, '203.0.113.10')
+        self.assertEqual(contact_message.user_agent, 'StageHub Test Browser')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['stagehub.platform@gmail.com'])
+        self.assertEqual(mail.outbox[0].reply_to, ['luis@example.com'])
+        self.assertEqual(mail.outbox[0].subject, '[STAGEHUB - FINANCEIRO] Duvida sobre faturacao')
+        self.assertIn('Nome:\nLuis Cruz', mail.outbox[0].body)
+        self.assertIn('IP:\n203.0.113.10', mail.outbox[0].body)
+
+    def test_contact_form_blocks_honeypot_spam(self):
+        response = self.client.post(reverse('streams:contact'), {
+            'name': 'Spam',
+            'email': 'spam@example.com',
+            'contact_type': ContactMessage.GENERAL,
+            'subject': 'Spam',
+            'message': 'Esta mensagem tem tamanho suficiente.',
+            'website': 'https://spam.example.com',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ContactMessage.objects.count(), 0)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_technical_contact_email_uses_expected_subject_prefix(self):
+        self.client.post(reverse('streams:contact'), {
+            'name': 'Ana',
+            'email': 'ana@example.com',
+            'contact_type': ContactMessage.TECHNICAL,
+            'subject': 'Erro ao carregar imagem',
+            'message': 'Tenho um erro ao carregar uma imagem na galeria.',
+        })
+
+        self.assertEqual(mail.outbox[0].subject, '[STAGEHUB - TÉCNICO] Erro ao carregar imagem')
 
 
 class DashboardPaymentPanelTests(TestCase):

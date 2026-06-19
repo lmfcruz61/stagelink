@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from .models import (
     Artist,
     ArtistPhoto,
+    ContactMessage,
     Fan,
     NewsletterSubscriber,
     Profile,
@@ -48,6 +49,26 @@ class NewsletterSubscriberAdmin(admin.ModelAdmin):
     search_fields = ('email', 'name')
     ordering = ('-subscribed_at',)
     actions = (export_newsletter_csv,)
+
+
+@admin.action(description='Marcar como em analise')
+def mark_contact_in_review(modeladmin, request, queryset):
+    queryset.update(status=ContactMessage.IN_REVIEW)
+
+
+@admin.action(description='Marcar como resolvido')
+def mark_contact_resolved(modeladmin, request, queryset):
+    queryset.update(status=ContactMessage.RESOLVED)
+
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('subject', 'name', 'email', 'contact_type', 'status', 'created_at')
+    list_filter = ('contact_type', 'status', 'created_at')
+    search_fields = ('name', 'email', 'subject', 'message')
+    readonly_fields = ('name', 'email', 'contact_type', 'subject', 'message', 'ip_address', 'user_agent', 'created_at', 'updated_at')
+    ordering = ('-created_at',)
+    actions = (mark_contact_in_review, mark_contact_resolved)
 
 
 @admin.register(SiteAppearance)

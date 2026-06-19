@@ -9,6 +9,7 @@ urlpatterns = [
     path('politica-privacidade/', views.privacy_policy, name='privacy_policy'),
     path('politica-cookies/', views.cookie_policy, name='cookie_policy'),
     path('termos-condicoes/', views.terms_conditions, name='terms_conditions'),
+    path('contacto/', views.contact, name='contact'),
     path('artistas/<int:artist_id>/', views.artist_detail, name='artist_detail'),
     path('artistas/<int:artist_id>/favorito/', views.favorite_artist_toggle, name='favorite_artist_toggle'),
     path('galerias/<int:gallery_id>/', views.photo_gallery_detail, name='photo_gallery_detail'),
