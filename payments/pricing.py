@@ -9,17 +9,25 @@ from .models import Subscription
 PRO_TICKET_DISCOUNT_PERCENT = 50
 
 
-def stagehub_commission_percent():
+def stagehub_commission_percent(artist=None):
+    configured_value = getattr(artist, 'commission_rate', None)
+    if configured_value is None:
+        configured_value = settings.STAGEHUB_COMMISSION_PERCENT
     try:
-        value = Decimal(str(settings.STAGEHUB_COMMISSION_PERCENT))
+        value = Decimal(str(configured_value))
     except (InvalidOperation, TypeError):
         value = Decimal('20.00')
     return min(max(value, Decimal('0.00')), Decimal('100.00')).quantize(Decimal('0.01'))
 
 
-def split_platform_fee(amount):
+def split_platform_fee(amount, artist=None, commission_percent=None):
     amount = Decimal(amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-    percent = stagehub_commission_percent()
+    percent = (
+        Decimal(str(commission_percent)).quantize(Decimal('0.01'))
+        if commission_percent is not None
+        else stagehub_commission_percent(artist)
+    )
+    percent = min(max(percent, Decimal('0.00')), Decimal('100.00'))
     platform_fee = (amount * percent / Decimal('100')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     artist_net = (amount - platform_fee).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     return {

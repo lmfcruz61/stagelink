@@ -1,4 +1,7 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -93,6 +96,13 @@ class Artist(models.Model):
     stripe_details_submitted = models.BooleanField(default=False)
     stripe_charges_enabled = models.BooleanField(default=False)
     stripe_payouts_enabled = models.BooleanField(default=False)
+    commission_rate = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal('20.00'),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('100.00'))],
+        help_text='Percentagem da comissao StageHub aplicada as vendas deste artista.',
+    )
 
     def __str__(self):
         return self.name

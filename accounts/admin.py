@@ -16,7 +16,15 @@ from .models import (
 admin.site.register(Profile)
 @admin.register(Artist)
 class ArtistAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'cloudflare_live_input_uid', 'stripe_account_id', 'stripe_charges_enabled', 'stripe_payouts_enabled')
+    list_display = (
+        'name',
+        'user',
+        'commission_rate',
+        'cloudflare_live_input_uid',
+        'stripe_account_id',
+        'stripe_charges_enabled',
+        'stripe_payouts_enabled',
+    )
     search_fields = ('name', 'user__username', 'cloudflare_live_input_uid', 'stripe_account_id')
     readonly_fields = ('cloudflare_rtmps_url', 'cloudflare_stream_key')
 

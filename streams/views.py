@@ -488,7 +488,11 @@ def artist_payment_summary(artist, subscribers):
         Subscription.price_for_tier(subscription.tier)
         for subscription in live_subscribers
     )
-    subscriber_monthly_fee = subscriber_monthly_gross * artist_commission_decimal()
+    subscriber_monthly_fee = sum(
+        Subscription.price_for_tier(subscription.tier)
+        * artist_commission_decimal(subscription.commission_percent)
+        for subscription in live_subscribers
+    )
     subscriber_monthly_net = subscriber_monthly_gross - subscriber_monthly_fee
 
     total_gross = (
@@ -525,8 +529,10 @@ def artist_payment_summary(artist, subscribers):
     }
 
 
-def artist_commission_decimal():
-    return Decimal(str(getattr(settings, 'STAGEHUB_COMMISSION_PERCENT', '20.00'))) / Decimal('100')
+def artist_commission_decimal(commission_rate=None):
+    if commission_rate is None:
+        commission_rate = getattr(settings, 'STAGEHUB_COMMISSION_PERCENT', '20.00')
+    return Decimal(str(commission_rate)) / Decimal('100')
 
 
 def money(value):

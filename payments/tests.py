@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.test import override_settings, TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -117,6 +118,43 @@ class SubscriptionTierRulesTests(TestCase):
         self.assertEqual(stagehub_commission_percent(), Decimal('20.00'))
         self.assertEqual(split['platform_fee_amount'], Decimal('2.00'))
         self.assertEqual(split['artist_net_amount'], Decimal('8.00'))
+
+    def test_split_platform_fee_uses_default_artist_commission(self):
+        split = split_platform_fee(Decimal('10.00'), artist=self.artist)
+
+        self.assertEqual(stagehub_commission_percent(self.artist), Decimal('20.00'))
+        self.assertEqual(split['commission_percent'], Decimal('20.00'))
+        self.assertEqual(split['platform_fee_amount'], Decimal('2.00'))
+        self.assertEqual(split['artist_net_amount'], Decimal('8.00'))
+
+    def test_split_platform_fee_uses_reduced_artist_commission(self):
+        self.artist.commission_rate = Decimal('10.00')
+        self.artist.save(update_fields=['commission_rate'])
+
+        split = split_platform_fee(Decimal('10.00'), artist=self.artist)
+
+        self.assertEqual(split['commission_percent'], Decimal('10.00'))
+        self.assertEqual(split['platform_fee_amount'], Decimal('1.00'))
+        self.assertEqual(split['artist_net_amount'], Decimal('9.00'))
+
+    def test_split_platform_fee_allows_zero_artist_commission(self):
+        self.artist.commission_rate = Decimal('0.00')
+        self.artist.save(update_fields=['commission_rate'])
+
+        split = split_platform_fee(Decimal('10.00'), artist=self.artist)
+
+        self.assertEqual(split['commission_percent'], Decimal('0.00'))
+        self.assertEqual(split['platform_fee_amount'], Decimal('0.00'))
+        self.assertEqual(split['artist_net_amount'], Decimal('10.00'))
+
+    def test_artist_commission_rate_must_be_between_zero_and_one_hundred(self):
+        self.artist.commission_rate = Decimal('-1.00')
+        with self.assertRaises(ValidationError):
+            self.artist.full_clean()
+
+        self.artist.commission_rate = Decimal('100.01')
+        with self.assertRaises(ValidationError):
+            self.artist.full_clean()
 
     @override_settings(STRIPE_SECRET_KEY='sk_live_xxx')
     @patch('payments.views.stripe.AccountLink.create')

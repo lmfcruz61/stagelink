@@ -149,7 +149,7 @@ def _payment_artist_or_redirect(request, artist):
 
 
 def _connect_payment_intent_data(artist, amount):
-    fee_split = split_platform_fee(amount)
+    fee_split = split_platform_fee(amount, artist=artist)
     return fee_split, {
         'application_fee_amount': _amount_to_cents(fee_split['platform_fee_amount']),
         'transfer_data': {
@@ -352,7 +352,7 @@ def subscribe_artist(request, artist_id):
     tier = _subscription_tier_from_request(request)
     tier_label = Subscription.label_for_tier(tier)
     tier_price = Subscription.price_for_tier(tier)
-    commission_percent = stagehub_commission_percent()
+    commission_percent = stagehub_commission_percent(artist)
 
     session = stripe.checkout.Session.create(
         mode='subscription',
