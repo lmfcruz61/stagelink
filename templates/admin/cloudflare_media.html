@@ -1,0 +1,217 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .cf-panel {
+      background: var(--darkened-bg);
+      border: 1px solid var(--hairline-color);
+      border-radius: 8px;
+      margin: 0 0 18px;
+      padding: 16px;
+    }
+
+    .cf-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .cf-actions {
+      align-items: end;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .cf-table {
+      width: 100%;
+    }
+
+    .cf-thumb {
+      background: #111827;
+      border: 1px solid var(--hairline-color);
+      border-radius: 6px;
+      height: 64px;
+      object-fit: cover;
+      width: 112px;
+    }
+
+    .cf-muted {
+      color: var(--body-quiet-color);
+      font-size: 0.82rem;
+    }
+
+    .cf-danger {
+      border-color: #b91c1c;
+    }
+
+    .cf-confirm {
+      max-width: 120px;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div id="content-main">
+    <h1>Media Cloudflare</h1>
+    <p class="cf-muted">{{ service_summary }}</p>
+
+    <div class="cf-panel">
+      <form method="get">
+        <div class="cf-grid">
+          <div>
+            <label for="id_q">Pesquisa</label>
+            <input id="id_q" type="search" name="q" value="{{ query }}" placeholder="Nome, utilizador, evento ou ID">
+          </div>
+          <div>
+            <label for="id_type">Tipo</label>
+            <select id="id_type" name="type">
+              <option value="">Todos</option>
+              <option value="video"{% if media_type == "video" %} selected{% endif %}>Videos</option>
+              <option value="live_input"{% if media_type == "live_input" %} selected{% endif %}>Canais ao vivo</option>
+              <option value="image"{% if media_type == "image" %} selected{% endif %}>Imagens</option>
+              <option value="other"{% if media_type == "other" %} selected{% endif %}>Outros ficheiros</option>
+            </select>
+          </div>
+          <div>
+            <label for="id_user">Utilizador/artista</label>
+            <select id="id_user" name="user">
+              <option value="">Todos</option>
+              {% for artist in users %}
+                <option value="{{ artist.user_id }}"{% if user_id == artist.user_id|stringformat:"s" %} selected{% endif %}>{{ artist.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="id_event">Evento</label>
+            <select id="id_event" name="event">
+              <option value="">Todos</option>
+              {% for event in events %}
+                <option value="{{ event.id }}"{% if event_id == event.id|stringformat:"s" %} selected{% endif %}>{{ event.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="id_date_from">Data desde</label>
+            <input id="id_date_from" type="date" name="date_from" value="{{ date_from }}">
+          </div>
+          <div>
+            <label for="id_date_to">Data ate</label>
+            <input id="id_date_to" type="date" name="date_to" value="{{ date_to }}">
+          </div>
+        </div>
+        <div class="cf-actions">
+          <label>
+            <input type="checkbox" name="remote" value="1"{% if include_remote_details %} checked{% endif %}>
+            Consultar detalhes remotos na Cloudflare
+          </label>
+          <button type="submit" class="button default">Filtrar</button>
+          <a class="button" href="{% url 'admin:cloudflare_media' %}">Limpar</a>
+          <a class="button" href="{{ deletion_logs_url }}">Ver logs de eliminacao</a>
+        </div>
+      </form>
+    </div>
+
+    <form method="post" class="cf-panel cf-danger">
+      {% csrf_token %}
+      <h2>Eliminacao em massa</h2>
+      <p class="cf-muted">Para confirmar qualquer eliminacao, escreve <strong>APAGAR</strong>. A operacao apaga na Cloudflare, limpa referencias locais e cria log.</p>
+      <div class="cf-actions">
+        <input class="cf-confirm" type="text" name="confirm" placeholder="APAGAR">
+        <button class="button deletelink" type="submit" name="action" value="delete_selected">Apagar selecionados</button>
+        <select name="target_user">
+          <option value="">Utilizador</option>
+          {% for artist in users %}
+            <option value="{{ artist.user_id }}">{{ artist.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="button deletelink" type="submit" name="action" value="delete_user">Apagar ficheiros do utilizador</button>
+        <select name="target_event">
+          <option value="">Evento</option>
+          {% for event in events %}
+            <option value="{{ event.id }}">{{ event.title }}</option>
+          {% endfor %}
+        </select>
+        <button class="button deletelink" type="submit" name="action" value="delete_event">Apagar ficheiros do evento</button>
+        <button class="button deletelink" type="submit" name="action" value="delete_orphans">Apagar ficheiros orfaos</button>
+        <button class="button deletelink" type="submit" name="action" value="delete_removed">Apagar marcados como removidos</button>
+      </div>
+
+      <table class="cf-table">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="cf-select-all"></th>
+            <th>Preview</th>
+            <th>Nome</th>
+            <th>Tipo</th>
+            <th>Tamanho</th>
+            <th>Data de upload</th>
+            <th>Proprietario</th>
+            <th>Evento</th>
+            <th>URL</th>
+            <th>ID Cloudflare</th>
+            <th>Estado remoto</th>
+            <th>Acao</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+            <tr>
+              <td><input type="checkbox" name="selected" value="{{ item.key }}"></td>
+              <td>
+                {% if item.thumbnail_url %}
+                  <img class="cf-thumb" src="{{ item.thumbnail_url }}" alt="{{ item.name }}">
+                {% else %}
+                  <span class="cf-muted">Sem preview</span>
+                {% endif %}
+              </td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.type_label }}</td>
+              <td>{{ item.size|default:"-" }}</td>
+              <td>{{ item.uploaded_at|default:"-" }}</td>
+              <td>{{ item.owner|default:"-" }}</td>
+              <td>{{ item.event|default:"-" }}</td>
+              <td>
+                {% if item.url %}
+                  <a href="{{ item.url }}" target="_blank" rel="noopener">Abrir</a>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td><code>{{ item.cloudflare_id }}</code></td>
+              <td>
+                {% if item.remote_error %}
+                  <span style="color:#fca5a5;">{{ item.remote_error }}</span>
+                {% elif include_remote_details %}
+                  OK
+                {% else %}
+                  <span class="cf-muted">Nao consultado</span>
+                {% endif %}
+              </td>
+              <td>
+                <button class="button deletelink" type="submit" name="delete_one_key" value="{{ item.key }}">
+                  Apagar da Cloudflare
+                </button>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="12">Nao foram encontrados ficheiros Cloudflare referenciados pela StageHub.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+
+  <script>
+    const selectAll = document.querySelector('#cf-select-all');
+    selectAll?.addEventListener('change', function () {
+      document.querySelectorAll('input[name="selected"]').forEach(function (input) {
+        input.checked = selectAll.checked;
+      });
+    });
+  </script>
+{% endblock %}

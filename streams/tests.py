@@ -18,7 +18,7 @@ from payments.models import PhotoGalleryPurchase, StreamTicketPurchase, Subscrip
 from .admin import PhotoGalleryAdmin
 from .forms import LiveStreamForm, PhotoGalleryForm, PhotoGalleryImageUploadForm
 from .cloudflare import create_direct_upload_for_stream
-from .models import LiveStream, PhotoGallery, PhotoGalleryImage, Tip
+from .models import LiveStream, MediaDeletionLog, PhotoGallery, PhotoGalleryImage, Tip
 
 
 class LegalPageTests(TestCase):
@@ -110,6 +110,57 @@ class ContactPageTests(TestCase):
         })
 
         self.assertEqual(mail.outbox[0].subject, '[STAGEHUB - TÉCNICO] Erro ao carregar imagem')
+
+
+class CloudflareMediaAdminTests(TestCase):
+    def setUp(self):
+        self.admin_user = User.objects.create_superuser(
+            username='admin_media',
+            email='admin@example.com',
+            password='pass12345',
+        )
+        self.artist_user = User.objects.create_user(username='artist_media', password='pass12345')
+        self.artist = Artist.objects.create(user=self.artist_user, name='Artista Media')
+        self.stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Evento com video',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            event_type=LiveStream.RECORDED,
+            cloudflare_video_uid='video-cloudflare-123',
+            access_price=Decimal('2.00'),
+            scheduled_at=timezone.now(),
+        )
+
+    def test_cloudflare_media_admin_lists_referenced_video(self):
+        self.client.login(username='admin_media', password='pass12345')
+
+        response = self.client.get(reverse('admin:cloudflare_media'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Media Cloudflare')
+        self.assertContains(response, 'Evento com video')
+        self.assertContains(response, 'video-cloudflare-123')
+
+    @patch('streams.admin.delete_stream_video')
+    def test_cloudflare_media_admin_deletes_selected_video_and_logs(self, delete_stream_video):
+        self.client.login(username='admin_media', password='pass12345')
+        key = f'video:stream:{self.stream.id}:video-cloudflare-123'
+
+        response = self.client.post(reverse('admin:cloudflare_media'), {
+            'action': 'delete_selected',
+            'confirm': 'APAGAR',
+            'selected': [key],
+        })
+
+        self.assertEqual(response.status_code, 302)
+        delete_stream_video.assert_called_once_with('video-cloudflare-123')
+        self.stream.refresh_from_db()
+        self.assertEqual(self.stream.cloudflare_video_uid, '')
+        self.assertEqual(self.stream.cloudflare_upload_status, LiveStream.UPLOAD_NOT_REQUESTED)
+        log = MediaDeletionLog.objects.get()
+        self.assertEqual(log.admin_user, self.admin_user)
+        self.assertEqual(log.cloudflare_id, 'video-cloudflare-123')
+        self.assertEqual(log.status, MediaDeletionLog.STATUS_SUCCESS)
 
 
 class DashboardPaymentPanelTests(TestCase):

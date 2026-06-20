@@ -3,6 +3,15 @@
 
 {% block content %}
   {% stagehub_pending_approvals as pending %}
+  <div style="margin-bottom: 20px; padding: 15px; border-radius: 4px; border: 1px solid #2563eb; background: #0f172a; color: #eff6ff;">
+    <h2 style="margin: 0 0 8px;">Media Cloudflare</h2>
+    <p style="margin: 0 0 12px;">
+      Gere videos e canais ao vivo guardados na Cloudflare Stream, com eliminacao registada em log.
+    </p>
+    <a href="{% url 'admin:cloudflare_media' %}" style="color: #bfdbfe; font-weight: 700;">
+      Abrir Media Cloudflare
+    </a>
+  </div>
   {% if pending.photo_galleries %}
     <div style="margin-bottom: 20px; padding: 15px; border-radius: 4px; border: 1px solid #f59e0b; background: #451a03; color: #fffbeb;">
       <h2 style="margin: 0 0 8px;">Aprovacoes pendentes</h2>

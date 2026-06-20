@@ -477,3 +477,45 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f'{self.user.username}: {self.message[:40]}'
+
+
+class MediaDeletionLog(models.Model):
+    ACTION_DELETE_ONE = 'delete_one'
+    ACTION_DELETE_SELECTED = 'delete_selected'
+    ACTION_DELETE_USER = 'delete_user'
+    ACTION_DELETE_EVENT = 'delete_event'
+    ACTION_DELETE_ORPHAN = 'delete_orphan'
+    ACTION_DELETE_REMOVED = 'delete_removed'
+    ACTION_CHOICES = (
+        (ACTION_DELETE_ONE, 'Apagar ficheiro'),
+        (ACTION_DELETE_SELECTED, 'Apagar selecionados'),
+        (ACTION_DELETE_USER, 'Apagar por utilizador'),
+        (ACTION_DELETE_EVENT, 'Apagar por evento'),
+        (ACTION_DELETE_ORPHAN, 'Apagar orfao'),
+        (ACTION_DELETE_REMOVED, 'Apagar marcados como removidos'),
+    )
+
+    STATUS_SUCCESS = 'success'
+    STATUS_FAILED = 'failed'
+    STATUS_SKIPPED = 'skipped'
+    STATUS_CHOICES = (
+        (STATUS_SUCCESS, 'Sucesso'),
+        (STATUS_FAILED, 'Falhou'),
+        (STATUS_SKIPPED, 'Ignorado'),
+    )
+
+    admin_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True)
+    file_name = models.CharField(max_length=255)
+    cloudflare_id = models.CharField(max_length=160)
+    action = models.CharField(max_length=40, choices=ACTION_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    details = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Log de eliminacao de media'
+        verbose_name_plural = 'Logs de eliminacao de media'
+
+    def __str__(self):
+        return f'{self.cloudflare_id} - {self.get_status_display()}'
