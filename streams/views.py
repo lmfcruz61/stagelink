@@ -313,8 +313,15 @@ def artist_detail(request, artist_id):
         event_type__in=(LiveStream.RECORDED, LiveStream.REPLAY),
     ).order_by('-scheduled_at')
     is_favorite = False
+    has_active_subscription = False
     if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
         is_favorite = request.user.fan_profile.favorite_artists.filter(pk=artist.pk).exists()
+        has_active_subscription = Subscription.objects.filter(
+            fan=request.user.fan_profile,
+            artist=artist,
+            status=Subscription.ACTIVE,
+            current_period_end__gte=timezone.now(),
+        ).exists()
     artist_url = artist_public_url(request, artist)
 
     return render(request, 'streams/artist_detail.html', {
@@ -324,6 +331,7 @@ def artist_detail(request, artist_id):
         'gallery_photos': artist.gallery_photos.all(),
         'featured_stream': upcoming_streams.first(),
         'is_favorite': is_favorite,
+        'has_active_subscription': has_active_subscription,
         'og': artist_og_context(request, artist, artist_url),
         'share_text': f'Descobre {artist.name} na StageHub.',
         'share_url': artist_url,
@@ -341,6 +349,7 @@ def stream_detail(request, stream_id):
     event_url = request.build_absolute_uri(event_path)
     access = None
     has_access = False
+    has_active_subscription = False
     ticket_pricing = None
     if request.user.is_authenticated:
         access = stream.access_decision(request.user)
@@ -348,12 +357,21 @@ def stream_detail(request, stream_id):
         fan = getattr(request.user, 'fan_profile', None)
         if fan:
             ticket_pricing = ticket_checkout_pricing(stream, fan)
+            has_active_subscription = bool(stream.active_subscription_for_user(request.user))
+    can_buy_ticket = (
+        request.user.is_authenticated
+        and hasattr(request.user, 'fan_profile')
+        and stream.artist.allows_paid_content
+        and (not stream.artist.paid_content_requires_subscription or has_active_subscription)
+    )
 
     return render(request, 'streams/event_detail.html', {
         'access': access,
+        'can_buy_ticket': can_buy_ticket,
         'event_path': event_path,
         'event_url': event_url,
         'has_access': has_access,
+        'has_active_subscription': has_active_subscription,
         'og': event_og_context(request, stream, event_url),
         'scheduled_at_iso': stream.scheduled_at.isoformat(),
         'server_now_iso': now.isoformat(),
@@ -813,11 +831,27 @@ def photo_gallery_detail(request, gallery_id):
             'gallery': gallery,
         })
     has_access = gallery.user_has_access(request.user)
+    has_active_subscription = False
+    if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
+        has_active_subscription = Subscription.objects.filter(
+            fan=request.user.fan_profile,
+            artist=gallery.artist,
+            status=Subscription.ACTIVE,
+            current_period_end__gte=timezone.now(),
+        ).exists()
+    can_buy_gallery = (
+        request.user.is_authenticated
+        and hasattr(request.user, 'fan_profile')
+        and gallery.artist.allows_paid_content
+        and (not gallery.artist.paid_content_requires_subscription or has_active_subscription)
+    )
     gallery_url = photo_gallery_public_url(request, gallery)
     return render(request, 'streams/photo_gallery_detail.html', {
         'gallery': gallery,
         'gallery_url': gallery_url,
         'has_access': has_access,
+        'has_active_subscription': has_active_subscription,
+        'can_buy_gallery': can_buy_gallery,
         'share_text': f'Descobre {gallery.title} de {gallery.artist.name} na StageHub.',
         'share_url': gallery_url,
     })

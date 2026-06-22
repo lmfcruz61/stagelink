@@ -19,12 +19,14 @@ class ArtistAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'user',
+        'monetization_mode',
         'commission_rate',
         'cloudflare_live_input_uid',
         'stripe_account_id',
         'stripe_charges_enabled',
         'stripe_payouts_enabled',
     )
+    list_filter = ('monetization_mode', 'stripe_charges_enabled', 'stripe_payouts_enabled')
     search_fields = ('name', 'user__username', 'cloudflare_live_input_uid', 'stripe_account_id')
     readonly_fields = ('cloudflare_rtmps_url', 'cloudflare_stream_key')
 

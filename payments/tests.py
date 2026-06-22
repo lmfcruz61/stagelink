@@ -77,7 +77,9 @@ class SubscriptionTierRulesTests(TestCase):
         self.assertEqual(pricing['discount_percent'], 0)
         self.assertFalse(pricing['has_discount'])
 
-    def test_subscription_allows_recent_recorded_archive(self):
+    def test_subscription_only_allows_recorded_content_for_active_subscriber(self):
+        self.artist.monetization_mode = Artist.SUBSCRIPTION_ONLY
+        self.artist.save(update_fields=['monetization_mode'])
         self.create_subscription(Subscription.SUBSCRIBER)
         stream = self.create_stream(
             event_type=LiveStream.RECORDED,
@@ -87,9 +89,11 @@ class SubscriptionTierRulesTests(TestCase):
         decision = stream.access_decision(self.fan_user)
 
         self.assertTrue(decision['allowed'])
-        self.assertEqual(decision['reason'], 'subscription_recent_archive')
+        self.assertEqual(decision['reason'], 'subscription_included_content')
 
-    def test_subscription_does_not_allow_old_recorded_archive(self):
+    def test_subscription_only_allows_old_recorded_content_for_active_subscriber(self):
+        self.artist.monetization_mode = Artist.SUBSCRIPTION_ONLY
+        self.artist.save(update_fields=['monetization_mode'])
         self.create_subscription(Subscription.SUBSCRIBER_PRO)
         stream = self.create_stream(
             event_type=LiveStream.RECORDED,
@@ -98,10 +102,12 @@ class SubscriptionTierRulesTests(TestCase):
 
         decision = stream.access_decision(self.fan_user)
 
-        self.assertFalse(decision['allowed'])
-        self.assertEqual(decision['reason'], 'missing_paid_access')
+        self.assertTrue(decision['allowed'])
+        self.assertEqual(decision['reason'], 'subscription_included_content')
 
     def test_subscription_does_not_grant_paid_live_video_access(self):
+        self.artist.monetization_mode = Artist.SUBSCRIPTION_AND_PAID_EXCLUSIVE
+        self.artist.save(update_fields=['monetization_mode'])
         self.create_subscription(Subscription.SUBSCRIBER_PRO)
         stream = self.create_stream(event_type=LiveStream.LIVE, access_price=Decimal('20.00'))
 
@@ -110,6 +116,74 @@ class SubscriptionTierRulesTests(TestCase):
         self.assertFalse(decision['allowed'])
         self.assertEqual(decision['reason'], 'subscription_chat_only_live')
         self.assertTrue(stream.user_can_chat(self.fan_user))
+
+    def test_paid_content_only_does_not_allow_new_subscriptions(self):
+        self.artist.monetization_mode = Artist.PAID_CONTENT_ONLY
+        self.artist.save(update_fields=['monetization_mode'])
+        self.client.force_login(self.fan_user)
+
+        response = self.client.get(reverse('payments:subscribe_artist', args=[self.artist.id]))
+
+        self.assertRedirects(response, reverse('streams:artist_detail', args=[self.artist.id]))
+
+    @override_settings(STRIPE_SECRET_KEY='sk_test_xxx')
+    @patch('payments.views.stripe.checkout.Session.create')
+    @patch('payments.views.stripe.Account.retrieve')
+    def test_subscription_exclusive_ticket_requires_active_subscription(self, mock_retrieve, mock_session_create):
+        self.artist.monetization_mode = Artist.SUBSCRIPTION_AND_PAID_EXCLUSIVE
+        self.artist.save(update_fields=['monetization_mode'])
+        self.mark_artist_stripe_ready()
+        stream = self.create_stream(access_price=Decimal('10.00'))
+        mock_retrieve.return_value = {
+            'details_submitted': True,
+            'charges_enabled': True,
+            'payouts_enabled': True,
+        }
+
+        self.client.force_login(self.fan_user)
+        response = self.client.get(f'/pagamentos/streams/{stream.id}/bilhete/')
+
+        self.assertRedirects(response, reverse('streams:artist_detail', args=[self.artist.id]))
+        mock_session_create.assert_not_called()
+
+    @override_settings(STRIPE_SECRET_KEY='sk_test_xxx')
+    @patch('payments.views.stripe.checkout.Session.create')
+    @patch('payments.views.stripe.Account.retrieve')
+    def test_subscription_exclusive_ticket_allows_active_subscriber(self, mock_retrieve, mock_session_create):
+        self.artist.monetization_mode = Artist.SUBSCRIPTION_AND_PAID_EXCLUSIVE
+        self.artist.save(update_fields=['monetization_mode'])
+        self.create_subscription(Subscription.SUBSCRIBER)
+        self.mark_artist_stripe_ready()
+        stream = self.create_stream(access_price=Decimal('10.00'))
+        mock_retrieve.return_value = {
+            'details_submitted': True,
+            'charges_enabled': True,
+            'payouts_enabled': True,
+        }
+        mock_session_create.return_value = SimpleNamespace(id='cs_test_ticket', url='https://stripe.test/checkout')
+
+        self.client.force_login(self.fan_user)
+        response = self.client.get(f'/pagamentos/streams/{stream.id}/bilhete/')
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, 'https://stripe.test/checkout')
+        mock_session_create.assert_called_once()
+
+    @override_settings(STRIPE_SECRET_KEY='sk_test_xxx')
+    @patch('payments.views.stripe.checkout.Session.create')
+    @patch('payments.views.stripe.Account.retrieve')
+    def test_subscription_only_blocks_ticket_purchase(self, mock_retrieve, mock_session_create):
+        self.artist.monetization_mode = Artist.SUBSCRIPTION_ONLY
+        self.artist.save(update_fields=['monetization_mode'])
+        self.mark_artist_stripe_ready()
+        stream = self.create_stream(access_price=Decimal('10.00'))
+
+        self.client.force_login(self.fan_user)
+        response = self.client.get(f'/pagamentos/streams/{stream.id}/bilhete/')
+
+        self.assertRedirects(response, reverse('streams:event_detail', args=[stream.id]))
+        mock_retrieve.assert_not_called()
+        mock_session_create.assert_not_called()
 
     @override_settings(STAGEHUB_COMMISSION_PERCENT='20.00')
     def test_split_platform_fee_uses_configured_commission(self):
@@ -153,6 +227,16 @@ class SubscriptionTierRulesTests(TestCase):
             self.artist.full_clean()
 
         self.artist.commission_rate = Decimal('100.01')
+        with self.assertRaises(ValidationError):
+            self.artist.full_clean()
+
+    def test_artist_with_active_subscriptions_cannot_switch_to_paid_content_only(self):
+        self.artist.monetization_mode = Artist.SUBSCRIPTION_ONLY
+        self.artist.save(update_fields=['monetization_mode'])
+        self.create_subscription(Subscription.SUBSCRIBER)
+
+        self.artist.monetization_mode = Artist.PAID_CONTENT_ONLY
+
         with self.assertRaises(ValidationError):
             self.artist.full_clean()
 

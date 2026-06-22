@@ -44,7 +44,9 @@
               <button class="sl-secondary bg-zinc-950/80">Adicionar aos favoritos</button>
             {% endif %}
           </form>
-          <a class="sl-primary" href="#subscricoes">Subscrever</a>
+          {% if artist.allows_subscriptions %}
+            <a class="sl-primary" href="#subscricoes">Subscrever</a>
+          {% endif %}
         {% endif %}
         {% if featured_stream %}
           <a class="sl-secondary bg-zinc-950/80" href="{% url 'streams:event_detail' featured_stream.id %}">Proximo evento</a>
@@ -76,9 +78,17 @@
           <p class="mt-2 text-zinc-400">{{ featured_stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ featured_stream.access_price }} EUR</p>
           <div class="mt-5 flex flex-wrap gap-3">
             {% if user.is_authenticated and user.fan_profile %}
-              <a class="sl-primary" href="{% url 'payments:buy_ticket' featured_stream.id %}">
-                Comprar bilhete
-              </a>
+              {% if artist.allows_paid_content %}
+                {% if artist.paid_content_requires_subscription and not has_active_subscription %}
+                  <a class="sl-primary" href="#subscricoes">Subscrever para comprar</a>
+                {% else %}
+                  <a class="sl-primary" href="{% url 'payments:buy_ticket' featured_stream.id %}">
+                    Comprar acesso
+                  </a>
+                {% endif %}
+              {% else %}
+                <a class="sl-primary" href="{% url 'streams:event_detail' featured_stream.id %}">Ver conteudo</a>
+              {% endif %}
             {% elif user.is_authenticated %}
               <a class="sl-primary" href="{% url 'streams:event_detail' featured_stream.id %}">Ver evento</a>
             {% else %}
@@ -94,9 +104,16 @@
   </div>
 
   <aside class="space-y-5">
+    {% if artist.allows_subscriptions %}
     <div class="sl-card p-5">
       <h2 class="text-xl font-semibold">Apoiar artista</h2>
-      <p class="mt-2 text-sm text-zinc-400">Escolhe um plano mensal por artista. Nenhum plano substitui bilhetes de lives pagas.</p>
+      <p class="mt-2 text-sm text-zinc-400">
+        {% if artist.subscription_includes_content %}
+          Escolhe um plano mensal para aceder aos conteudos deste artista.
+        {% else %}
+          Escolhe um plano mensal. Os conteudos pagos deste artista sao exclusivos para subscritores ativos.
+        {% endif %}
+      </p>
       {% if user.is_authenticated and user.fan_profile %}
         <div class="mt-4 grid gap-3">
           <a class="rounded border border-zinc-800 bg-zinc-950 p-4 hover:border-[#5230EF]" href="{% url 'payments:subscribe_artist' artist.id %}?tier=subscriber">
@@ -112,6 +129,12 @@
         </div>
       {% endif %}
     </div>
+    {% else %}
+    <div class="sl-card p-5">
+      <h2 class="text-xl font-semibold">Conteudos pagos</h2>
+      <p class="mt-2 text-sm text-zinc-400">Este artista vende eventos, videos e galerias individualmente, sem subscricao mensal ativa.</p>
+    </div>
+    {% endif %}
 
     {% if artist.contact_email or artist.contact_phone %}
       <div class="sl-card p-5">
@@ -171,11 +194,18 @@
   </div>
 </section>
 
+{% if artist.allows_subscriptions %}
 <section id="subscricoes" class="mb-10 rounded-xl border border-[#5230EF] bg-[#5230EF]/12 p-6">
   <div class="mb-5">
     <p class="text-sm font-semibold text-[#2596BE]">Subscricoes</p>
     <h2 class="text-2xl font-semibold">Apoiar {{ artist.name }}</h2>
-    <p class="mt-2 max-w-2xl text-sm text-zinc-300">Escolhe um plano mensal para acompanhar o artista, ver o arquivo recente e participar mais de perto na comunidade.</p>
+    <p class="mt-2 max-w-2xl text-sm text-zinc-300">
+      {% if artist.subscription_includes_content %}
+        Escolhe um plano mensal para aceder aos conteudos deste artista e acompanhar a comunidade.
+      {% else %}
+        Escolhe um plano mensal para desbloquear a possibilidade de comprar conteudos exclusivos deste artista.
+      {% endif %}
+    </p>
   </div>
   <div class="grid gap-4 md:grid-cols-2">
     <article class="sl-card p-5">
@@ -204,6 +234,7 @@
     </article>
   </div>
 </section>
+{% endif %}
 
 <section class="mb-10">
   <div class="mb-4 flex items-center justify-between">

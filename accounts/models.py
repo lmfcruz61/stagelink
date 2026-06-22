@@ -1,8 +1,10 @@
 from decimal import Decimal
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 
 class Profile(models.Model):
@@ -67,6 +69,15 @@ class OrganizationMember(models.Model):
 
 
 class Artist(models.Model):
+    SUBSCRIPTION_ONLY = 'subscription_only'
+    SUBSCRIPTION_AND_PAID_EXCLUSIVE = 'subscription_paid_exclusive'
+    PAID_CONTENT_ONLY = 'paid_content_only'
+    MONETIZATION_MODE_CHOICES = (
+        (SUBSCRIPTION_ONLY, 'Somente subscricao'),
+        (SUBSCRIPTION_AND_PAID_EXCLUSIVE, 'Subscricao e material pago exclusivo'),
+        (PAID_CONTENT_ONLY, 'Somente material pago'),
+    )
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='artist_profile', blank=True, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name='artists', blank=True, null=True)
     name = models.CharField(max_length=120)
@@ -103,13 +114,66 @@ class Artist(models.Model):
         validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('100.00'))],
         help_text='Percentagem da comissao StageHub aplicada as vendas deste artista.',
     )
+    monetization_mode = models.CharField(
+        max_length=40,
+        choices=MONETIZATION_MODE_CHOICES,
+        default=PAID_CONTENT_ONLY,
+        help_text='Define se o artista usa subscricao, material pago exclusivo para subscritores ou material pago aberto a todos.',
+    )
 
     def __str__(self):
         return self.name
 
+    def clean(self):
+        super().clean()
+        if self.pk and self.monetization_mode == self.PAID_CONTENT_ONLY:
+            previous_mode = type(self).objects.filter(pk=self.pk).values_list('monetization_mode', flat=True).first()
+            if previous_mode == self.PAID_CONTENT_ONLY:
+                return
+            from payments.models import Subscription
+
+            has_active_subscriptions = Subscription.objects.filter(
+                artist=self,
+                status=Subscription.ACTIVE,
+                current_period_end__gte=timezone.now(),
+            ).exists()
+            if has_active_subscriptions:
+                raise ValidationError({
+                    'monetization_mode': (
+                        'Este artista tem subscricoes ativas. Cancela ou deixa terminar as subscricoes '
+                        'antes de mudar para somente material pago.'
+                    ),
+                })
+
     @property
     def stripe_connect_ready(self):
         return bool(self.stripe_account_id and self.stripe_charges_enabled and self.stripe_payouts_enabled)
+
+    @property
+    def allows_subscriptions(self):
+        return self.monetization_mode in {
+            self.SUBSCRIPTION_ONLY,
+            self.SUBSCRIPTION_AND_PAID_EXCLUSIVE,
+        }
+
+    @property
+    def allows_paid_content(self):
+        return self.monetization_mode in {
+            self.SUBSCRIPTION_AND_PAID_EXCLUSIVE,
+            self.PAID_CONTENT_ONLY,
+        }
+
+    @property
+    def paid_content_requires_subscription(self):
+        return self.monetization_mode == self.SUBSCRIPTION_AND_PAID_EXCLUSIVE
+
+    @property
+    def paid_content_is_open_to_all(self):
+        return self.monetization_mode == self.PAID_CONTENT_ONLY
+
+    @property
+    def subscription_includes_content(self):
+        return self.monetization_mode == self.SUBSCRIPTION_ONLY
 
 
 class ArtistPhoto(models.Model):

@@ -338,6 +338,9 @@ def _complete_checkout_session(session):
 @login_required
 def subscribe_artist(request, artist_id):
     artist = get_object_or_404(Artist, pk=artist_id)
+    if not artist.allows_subscriptions:
+        messages.error(request, 'Este artista escolheu vender apenas material pago, sem subscricao ativa.')
+        return redirect('streams:artist_detail', artist_id=artist.id)
     fan = getattr(request.user, 'fan_profile', None)
     if fan is None:
         messages.error(request, 'Só contas de público podem subscrever artistas.')
@@ -394,6 +397,9 @@ def subscribe_artist(request, artist_id):
 @login_required
 def buy_ticket(request, stream_id):
     stream = get_object_or_404(LiveStream, pk=stream_id)
+    if not stream.artist.allows_paid_content:
+        messages.error(request, 'Este artista disponibiliza conteudo atraves de subscricao, sem compra avulsa.')
+        return redirect('streams:event_detail', stream_id=stream.id)
     fan = getattr(request.user, 'fan_profile', None)
     if fan is None:
         messages.error(request, 'Só contas de público podem comprar bilhetes.')
@@ -402,6 +408,10 @@ def buy_ticket(request, stream_id):
     access = stream.log_access_decision(request.user, 'buy_ticket')
     if access['allowed']:
         return redirect('streams:room', stream_id=stream.id)
+
+    if stream.artist.paid_content_requires_subscription and not stream.active_subscription_for_user(request.user):
+        messages.error(request, 'Este conteudo pago e exclusivo para subscritores ativos deste artista.')
+        return redirect('streams:artist_detail', artist_id=stream.artist_id)
 
     if stream.access_price < Decimal('2.00'):
         messages.error(request, 'O preco minimo de bilhete na StageHub e 2 EUR.')
@@ -489,6 +499,9 @@ def buy_ticket(request, stream_id):
 @login_required
 def buy_photo_gallery(request, gallery_id):
     gallery = get_object_or_404(PhotoGallery.objects.select_related('artist'), pk=gallery_id)
+    if not gallery.artist.allows_paid_content:
+        messages.error(request, 'Este artista disponibiliza galerias atraves de subscricao, sem compra avulsa.')
+        return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
     fan = getattr(request.user, 'fan_profile', None)
     if fan is None:
         messages.error(request, 'So contas de publico podem comprar galerias.')
@@ -496,6 +509,15 @@ def buy_photo_gallery(request, gallery_id):
 
     if gallery.user_has_access(request.user):
         return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
+
+    if gallery.artist.paid_content_requires_subscription and not Subscription.objects.filter(
+        fan=fan,
+        artist=gallery.artist,
+        status=Subscription.ACTIVE,
+        current_period_end__gte=timezone.now(),
+    ).exists():
+        messages.error(request, 'Esta galeria paga e exclusiva para subscritores ativos deste artista.')
+        return redirect('streams:artist_detail', artist_id=gallery.artist_id)
 
     if not gallery.is_publicly_available:
         messages.error(request, 'Esta galeria ainda nao esta disponivel para compra.')
@@ -566,6 +588,9 @@ def buy_photo_gallery(request, gallery_id):
 @login_required
 def create_tip(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
+    if stream.artist.paid_content_requires_subscription and not stream.active_subscription_for_user(request.user):
+        messages.error(request, 'As gorjetas neste artista estao disponiveis apenas para subscritores ativos.')
+        return redirect('streams:room', stream_id=stream.id)
     if stream.access_price <= 0:
         messages.error(request, 'Este evento nao esta disponivel para gorjetas.')
         return redirect('streams:room', stream_id=stream.id)

@@ -65,12 +65,18 @@
       {% if user.is_authenticated %}
         {% if has_access %}
           <a class="sl-primary w-full" href="{% url 'streams:room' stream.id %}">Entrar na sala</a>
-        {% else %}
+        {% elif can_buy_ticket %}
           <a class="sl-primary w-full" href="{% url 'payments:buy_ticket' stream.id %}">Comprar acesso</a>
+        {% elif stream.artist.paid_content_requires_subscription %}
+          <a class="sl-primary w-full" href="{% url 'streams:artist_detail' stream.artist.id %}#subscricoes">Subscrever para comprar</a>
+        {% elif stream.artist.subscription_includes_content %}
+          <a class="sl-primary w-full" href="{% url 'streams:artist_detail' stream.artist.id %}#subscricoes">Subscrever para aceder</a>
+        {% else %}
+          <a class="sl-secondary w-full" href="{% url 'streams:artist_detail' stream.artist.id %}">Ver artista</a>
         {% endif %}
       {% else %}
         <a class="sl-primary w-full" href="{% url 'accounts:login' %}?next={{ event_path|urlencode }}">
-          Comprar acesso
+          Entrar
         </a>
         <a class="sl-secondary w-full" href="{% url 'accounts:register' %}?next={{ event_path|urlencode }}">Criar conta</a>
       {% endif %}

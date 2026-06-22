@@ -54,6 +54,7 @@ class ArtistProfileForm(forms.ModelForm):
         fields = (
             'name',
             'headline',
+            'monetization_mode',
             'location',
             'bio',
             'contact_email',
@@ -68,6 +69,7 @@ class ArtistProfileForm(forms.ModelForm):
         labels = {
             'name': 'Nome artistico',
             'headline': 'Frase de destaque',
+            'monetization_mode': 'Modo de monetizacao',
             'location': 'Cidade / pais',
             'bio': 'Bio',
             'contact_email': 'Email de contacto',
@@ -81,6 +83,12 @@ class ArtistProfileForm(forms.ModelForm):
         }
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 6}),
+        }
+        help_texts = {
+            'monetization_mode': (
+                'Escolhe como este artista ganha dinheiro: somente subscricao, '
+                'subscricao com material pago exclusivo para subscritores, ou material pago aberto a todos.'
+            ),
         }
 
 

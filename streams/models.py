@@ -286,7 +286,7 @@ class LiveStream(models.Model):
         if decision['allowed']:
             return True
         subscription = self.active_subscription_for_user(user)
-        return bool(subscription and self.event_type == self.LIVE and self.is_active)
+        return bool(self.artist.allows_subscriptions and subscription and self.event_type == self.LIVE and self.is_active)
 
     def access_decision(self, user):
         # Centraliza a regra de acesso usada pelas views e pelo WebSocket.
@@ -317,19 +317,22 @@ class LiveStream(models.Model):
         from payments.models import StreamTicketPurchase
 
         active_subscription = self.active_subscription_for_user(user)
+        has_required_subscription = bool(active_subscription) if self.artist.paid_content_requires_subscription else True
 
         has_paid_ticket = StreamTicketPurchase.objects.filter(
             fan__user=user,
             stream=self,
             paid=True,
         ).exclude(stripe_session_id='').exists()
-        if has_paid_ticket:
+        if has_paid_ticket and has_required_subscription:
             return {**base, 'allowed': True, 'reason': 'paid_ticket'}
+        if has_paid_ticket and not has_required_subscription:
+            return {**base, 'allowed': False, 'reason': 'subscription_required_for_paid_content'}
 
-        if active_subscription and self.is_recent_recorded_content:
-            return {**base, 'allowed': True, 'reason': 'subscription_recent_archive'}
+        if active_subscription and self.artist.subscription_includes_content:
+            return {**base, 'allowed': True, 'reason': 'subscription_included_content'}
 
-        if active_subscription and self.event_type == self.LIVE and self.is_active:
+        if active_subscription and self.artist.allows_subscriptions and self.event_type == self.LIVE and self.is_active:
             return {**base, 'allowed': False, 'reason': 'subscription_chat_only_live'}
 
         has_stale_free_ticket = StreamTicketPurchase.objects.filter(
@@ -427,6 +430,18 @@ class PhotoGallery(models.Model):
                 return True
         fan = getattr(user, 'fan_profile', None)
         if not fan:
+            return False
+        from payments.models import Subscription
+
+        active_subscription = Subscription.objects.filter(
+            fan=fan,
+            artist=self.artist,
+            status=Subscription.ACTIVE,
+            current_period_end__gte=timezone.now(),
+        ).exists()
+        if active_subscription and self.artist.subscription_includes_content:
+            return True
+        if self.artist.paid_content_requires_subscription and not active_subscription:
             return False
         return self.purchases.filter(fan=fan, paid=True).exists()
 

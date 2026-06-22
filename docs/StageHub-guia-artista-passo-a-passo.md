@@ -10,10 +10,11 @@ Na pratica:
 
 1. O artista cria ou recebe uma pagina publica.
 2. Liga a sua conta Stripe para receber pagamentos.
-3. Cria eventos pagos.
-4. Transmite ao vivo pelo OBS ou envia videos gravados.
-5. O publico compra acesso, subscreve ou envia gorjetas.
-6. A StageHub retira a comissao da plataforma e o restante fica para o artista.
+3. Escolhe o modo de monetizacao.
+4. Cria eventos, videos, galerias ou planos de subscricao conforme o modo escolhido.
+5. Transmite ao vivo pelo OBS ou envia videos gravados.
+6. O publico compra acesso, subscreve ou envia gorjetas.
+7. A StageHub retira a comissao da plataforma e o restante fica para o artista.
 
 ## 2. Conta e pagina do artista
 
@@ -30,7 +31,30 @@ No dashboard, o artista deve completar a pagina publica:
 
 Esta pagina e o espaco publico onde o publico ve os eventos, videos, links e planos de subscricao.
 
-## 3. Configurar pagamentos com Stripe
+## 3. Escolher o modo de monetizacao
+
+Antes de divulgar a pagina, o artista deve escolher como quer monetizar.
+
+Existem 3 modos:
+
+1. `Somente subscricao`
+   - O publico paga uma subscricao mensal.
+   - Os conteudos do artista ficam associados a essa subscricao.
+   - Nao existe compra avulsa de material.
+
+2. `Subscricao e material pago exclusivo`
+   - O publico pode subscrever mensalmente.
+   - O material pago fica exclusivo para subscritores ativos.
+   - Ou seja, para comprar certos conteudos, a pessoa tem primeiro de ser subscritora.
+
+3. `Somente material pago`
+   - Nao existe subscricao ativa.
+   - O publico compra apenas eventos, videos, galerias ou outros conteudos individualmente.
+   - Este modo e indicado para fotografos, workshops, concertos pontuais ou vendas avulsas.
+
+O modo pode ser alterado mais tarde, mas se existirem subscritores ativos nao se deve mudar para `Somente material pago` sem resolver primeiro essas subscricoes.
+
+## 4. Configurar pagamentos com Stripe
 
 Antes de vender bilhetes, receber subscricoes ou gorjetas, o artista tem de ligar pagamentos.
 
@@ -48,7 +72,7 @@ A StageHub cria o caminho de ligacao com a Stripe. O artista completa a conta co
 
 Se a conta Stripe do artista ainda nao estiver ativa, a StageHub bloqueia vendas pagas para esse artista.
 
-## 4. Como os pagamentos sao divididos
+## 5. Como os pagamentos sao divididos
 
 A StageHub usa Stripe Connect para dividir pagamentos automaticamente.
 
@@ -71,7 +95,7 @@ Exemplos:
 
 Os valores podem ter arredondamentos normais da Stripe.
 
-## 5. Quando e como o artista recebe
+## 6. Quando e como o artista recebe
 
 O pagamento ao artista e gerido pela Stripe.
 
@@ -85,7 +109,7 @@ O calendario de pagamento depende da Stripe, do pais, do tipo de conta e das ver
 
 A StageHub nao paga manualmente cada evento. A divisao e feita pela Stripe automaticamente.
 
-## 6. Preco minimo dos eventos
+## 7. Preco minimo dos eventos
 
 Na StageHub, todos os eventos publicados sao pagos.
 
@@ -99,7 +123,7 @@ Recomendacao:
 2. Concertos online curtos: 5 EUR a 10 EUR.
 3. Concertos especiais, estreias ou acesso exclusivo: 10 EUR ou mais.
 
-## 7. Criar um evento pago
+## 8. Criar um evento pago
 
 No dashboard:
 
@@ -122,7 +146,7 @@ No dashboard:
 
 Eventos gratuitos nao estao disponiveis na StageHub.
 
-## 8. Transmitir ao vivo com OBS
+## 9. Transmitir ao vivo com OBS
 
 Para eventos ao vivo, o artista usa OBS.
 
@@ -142,7 +166,7 @@ Preparacao:
 
 Importante: o servidor e a chave nao devem ser partilhados publicamente.
 
-## 9. Definicoes recomendadas no OBS
+## 10. Definicoes recomendadas no OBS
 
 Para reduzir problemas, usar definicoes simples:
 
@@ -159,7 +183,7 @@ Audio:
 
 Se o computador for fraco, escolher codificador `Software (x264)`.
 
-## 10. Antes de abrir o evento ao publico
+## 11. Antes de abrir o evento ao publico
 
 Antes de divulgar:
 
@@ -174,7 +198,7 @@ Antes de divulgar:
 
 So depois disso o link deve ser partilhado.
 
-## 11. Videos gravados
+## 12. Videos gravados
 
 A StageHub tambem permite videos gravados.
 
@@ -191,7 +215,7 @@ Passos:
 9. Entrar em `Ver sala` para testar.
 10. Ativar o video quando estiver pronto.
 
-## 12. Limite de duracao dos videos
+## 13. Limite de duracao dos videos
 
 Videos gravados e replays nao podem ultrapassar 1 hora.
 
@@ -203,9 +227,9 @@ Regra:
 
 Este limite ajuda a controlar custos, qualidade da experiencia e rentabilidade da plataforma.
 
-## 13. Subscricoes
+## 14. Subscricoes
 
-O publico pode apoiar um artista com subscricao mensal.
+O publico pode apoiar um artista com subscricao mensal quando o artista escolhe um modo que inclui subscricoes.
 
 Planos atuais:
 
@@ -220,7 +244,9 @@ Beneficios:
 
 As subscricoes tambem passam pela Stripe e seguem a mesma regra de comissao da StageHub.
 
-## 14. Gorjetas
+Se o artista escolher `Somente material pago`, a area de subscricao fica desativada.
+
+## 15. Gorjetas
 
 Em eventos pagos, o publico pode enviar gorjetas.
 
@@ -232,14 +258,14 @@ O processo e simples:
 4. A StageHub retira a comissao.
 5. O restante fica para o artista.
 
-## 15. Galerias de fotos pagas
+## 16. Galerias de fotos pagas
 
 A StageHub tambem permite galerias de fotos pagas para fotografos, artistas e conteudo exclusivo.
 
 Regras principais:
 
 1. A galeria tem uma capa publica discreta.
-2. As fotos privadas so aparecem depois de compra/acesso.
+2. As fotos privadas so aparecem depois de compra, subscricao ou acesso permitido pelo modo do artista.
 3. O preco minimo e 2 EUR.
 4. Cada galeria pode ter no maximo 30 fotos.
 5. Cada envio pode ter no maximo 10 fotos de cada vez.
@@ -261,23 +287,24 @@ Passos:
 7. Aguardar aprovacao StageHub.
 8. Ativar quando estiver pronta para venda.
 
-## 16. Checklist rapido do artista
+## 17. Checklist rapido do artista
 
 Antes do primeiro evento, confirmar:
 
 1. Pagina publica completa.
-2. Stripe ligado e ativo.
-3. Evento criado com preco minimo de 2 EUR.
-4. Video StageHub configurado.
-5. OBS testado, se for ao vivo.
-6. Video enviado, se for gravado.
-7. Galeria paga validada, se houver fotos exclusivas.
-8. Sala testada.
-9. Chat testado.
-10. Link publico copiado.
-11. Evento ativado.
+2. Modo de monetizacao escolhido.
+3. Stripe ligado e ativo.
+4. Evento criado com preco minimo de 2 EUR, quando houver compra avulsa.
+5. Video StageHub configurado.
+6. OBS testado, se for ao vivo.
+7. Video enviado, se for gravado.
+8. Galeria validada, se houver fotos exclusivas.
+9. Sala testada.
+10. Chat testado.
+11. Link publico copiado.
+12. Evento ativado.
 
-## 17. Suporte
+## 18. Suporte
 
 Se algo falhar:
 

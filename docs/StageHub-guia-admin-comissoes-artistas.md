@@ -1,8 +1,37 @@
-# StageHub - Guia admin de comissoes por artista
+# StageHub - Guia admin de monetizacao e comissoes por artista
 
-Este guia explica como configurar comissoes personalizadas para artistas na administracao da StageHub.
+Este guia explica como configurar o modo de monetizacao e as comissoes personalizadas dos artistas na administracao da StageHub.
 
 ## Objetivo
+
+A StageHub permite definir, por artista, como o artista monetiza a sua pagina e qual a comissao da plataforma.
+
+## Modos de monetizacao
+
+Cada artista tem um campo `Monetization mode`.
+
+Existem 3 modos:
+
+1. `Somente subscricao`
+   - O publico subscreve o artista mensalmente.
+   - O conteudo fica associado a subscricao.
+   - A compra avulsa de material fica desativada.
+
+2. `Subscricao e material pago exclusivo`
+   - O publico pode subscrever o artista.
+   - Apenas subscritores ativos podem comprar material pago.
+   - Bom para conteudo premium e comunidade fechada.
+
+3. `Somente material pago`
+   - Nao ha subscricao ativa.
+   - O publico compra eventos, videos ou galerias individualmente.
+   - Bom para fotografos, eventos pontuais e vendas avulsas.
+
+Por compatibilidade, artistas existentes ficam em `Somente material pago`, para nao bloquear vendas que ja estavam abertas.
+
+Se um artista tiver subscricoes ativas, nao deve ser mudado para `Somente material pago` sem resolver primeiro essas subscricoes.
+
+## Comissao StageHub
 
 A StageHub tem uma comissao padrao de 20% sobre vendas. Em casos especiais, como o programa Artistas Fundadores, um artista pode ter uma comissao reduzida ou 0%.
 
@@ -17,9 +46,11 @@ Exemplos:
 1. Entrar no painel de administracao.
 2. Abrir `Accounts` > `Artists`.
 3. Escolher o artista.
-4. Procurar o campo `Commission rate`.
-5. Definir a percentagem pretendida.
-6. Guardar.
+4. Procurar `Monetization mode`.
+5. Escolher o modo correto.
+6. Procurar `Commission rate`.
+7. Definir a percentagem pretendida.
+8. Guardar.
 
 O campo aceita valores entre `0.00` e `100.00`.
 

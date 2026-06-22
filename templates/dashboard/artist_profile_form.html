@@ -36,6 +36,17 @@
       <strong>Transmissao ao vivo:</strong> a StageHub prepara o canal do artista. Para transmitir, o artista so precisa dos dados de OBS mostrados abaixo.
     </div>
     <div class="mb-5 rounded border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-200">
+      <h3 class="font-semibold">Modo de monetizacao atual</h3>
+      <p class="mt-2 text-zinc-400">{{ artist.get_monetization_mode_display }}</p>
+      {% if artist.subscription_includes_content %}
+        <p class="mt-2 text-xs text-zinc-500">Os conteudos ficam associados a subscricao. A compra avulsa fica desativada.</p>
+      {% elif artist.paid_content_requires_subscription %}
+        <p class="mt-2 text-xs text-zinc-500">O material pago fica exclusivo para subscritores ativos.</p>
+      {% else %}
+        <p class="mt-2 text-xs text-zinc-500">O artista vende material pago individualmente, sem subscricao mensal.</p>
+      {% endif %}
+    </div>
+    <div class="mb-5 rounded border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-200">
       <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
           <h3 class="font-semibold">Pagamentos Stripe Connect</h3>

@@ -72,19 +72,31 @@
 </section>
 
 {% if artist %}
+<section class="mb-8 rounded-xl border border-[#5230EF]/60 bg-[#5230EF]/10 p-5">
+  <p class="text-sm font-semibold text-[#2596BE]">Modo de monetizacao</p>
+  <h2 class="mt-1 text-2xl font-semibold">{{ artist.get_monetization_mode_display }}</h2>
+  {% if artist.subscription_includes_content %}
+    <p class="mt-2 text-sm text-zinc-300">Os conteudos deste artista devem ser apresentados como incluidos na subscricao. A compra avulsa fica desativada.</p>
+  {% elif artist.paid_content_requires_subscription %}
+    <p class="mt-2 text-sm text-zinc-300">O artista pode vender conteudos pagos, mas apenas a subscritores ativos.</p>
+  {% else %}
+    <p class="mt-2 text-sm text-zinc-300">O artista vende conteudos individualmente. A subscricao esta desativada.</p>
+  {% endif %}
+</section>
+
 <section class="mb-8 rounded-xl border {% if artist.stripe_connect_ready %}border-[#10B981]/70 bg-[#10B981]/10{% elif artist.stripe_account_id %}border-amber-500/60 bg-amber-500/10{% else %}border-zinc-800 bg-zinc-900/80{% endif %} p-5">
   <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
     <div class="max-w-3xl">
       <p class="text-sm font-semibold {% if artist.stripe_connect_ready %}text-emerald-200{% elif artist.stripe_account_id %}text-amber-100{% else %}text-[#2596BE]{% endif %}">Pagamentos</p>
       {% if artist.stripe_connect_ready %}
         <h2 class="mt-1 text-2xl font-semibold">Pagamentos ativos</h2>
-        <p class="mt-2 text-sm text-zinc-300">Este artista ja pode vender bilhetes, galerias, subscricoes e receber gorjetas. O saldo real, pagamentos ao banco e verificacoes continuam no painel Stripe.</p>
+        <p class="mt-2 text-sm text-zinc-300">Este artista ja pode receber pagamentos conforme o modo de monetizacao escolhido. O saldo real, pagamentos ao banco e verificacoes continuam no painel Stripe.</p>
       {% elif artist.stripe_account_id %}
         <h2 class="mt-1 text-2xl font-semibold">Stripe em validacao</h2>
         <p class="mt-2 text-sm text-zinc-300">A conta Stripe deste artista ja foi criada, mas ainda falta a Stripe confirmar todos os dados para permitir cobrancas e pagamentos.</p>
       {% else %}
         <h2 class="mt-1 text-2xl font-semibold">Pagamentos ainda nao ligados</h2>
-        <p class="mt-2 text-sm text-zinc-300">Liga o Stripe para este artista poder vender conteudos pagos. Enquanto nao estiver ativo, o publico nao consegue comprar bilhetes, galerias, subscricoes ou gorjetas deste artista.</p>
+        <p class="mt-2 text-sm text-zinc-300">Liga o Stripe para este artista poder receber pagamentos. Enquanto nao estiver ativo, o publico nao consegue pagar subscricoes, conteudos ou gorjetas deste artista.</p>
       {% endif %}
     </div>
     <a class="sl-primary whitespace-nowrap" href="{% url 'payments:stripe_connect_start' artist.id %}">
@@ -165,8 +177,13 @@
     </div>
     <div class="rounded border border-zinc-800 bg-zinc-950/70 p-3">
       <p class="text-zinc-500">Subscritores</p>
-      <p class="mt-1 font-semibold">{{ payment_summary.subscriber_count }} ativos</p>
-      <p class="text-zinc-400">{{ payment_summary.subscriber_monthly_gross }} EUR / mes</p>
+      {% if artist.allows_subscriptions %}
+        <p class="mt-1 font-semibold">{{ payment_summary.subscriber_count }} ativos</p>
+        <p class="text-zinc-400">{{ payment_summary.subscriber_monthly_gross }} EUR / mes</p>
+      {% else %}
+        <p class="mt-1 font-semibold">Desativado</p>
+        <p class="text-zinc-400">Modo somente material pago</p>
+      {% endif %}
     </div>
   </div>
 
@@ -246,6 +263,9 @@
   </div>
   <div>
     <h2 class="mb-4 text-xl font-semibold">Subscritores</h2>
+    {% if not artist.allows_subscriptions %}
+      <p class="mb-3 text-sm text-zinc-400">Este modo nao aceita subscricoes novas.</p>
+    {% endif %}
     <div class="space-y-2">
       {% for subscription in subscribers %}
         <div class="sl-card p-3 text-sm">
