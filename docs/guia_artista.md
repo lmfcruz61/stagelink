@@ -1,65 +1,58 @@
-# Guia do artista StageHub
+# StageHub - Guia rapido para artistas
 
-Este guia explica como funcionam subscrições, lives, arquivo e monetização para artistas na StageHub.
+Este guia resume como publicar e monetizar conteudos na StageHub.
 
-## Planos de subscrição
+## O que o artista pode vender
 
-A StageHub tem dois planos fixos por artista. Os artistas não criam escalões personalizados.
+- Videos gravados.
+- Replays.
+- Galerias de fotos.
+- Subscricoes, quando o modo do artista permitir.
+- Gorjetas e apoios diretos.
 
-### Subscritor - 5 EUR/mês
+## Passos principais
 
-Inclui:
+1. Completar a pagina publica do artista.
+2. Ligar a conta Stripe.
+3. Escolher o modo de monetizacao.
+4. Criar um video ou galeria.
+5. Fazer upload dos ficheiros na StageHub.
+6. Testar o acesso.
+7. Ativar o conteudo para venda.
 
-- acesso ao conteúdo gravado do artista publicado nos últimos 30 dias;
-- acesso ao chat durante lives do artista;
-- apoio mensal direto ao artista.
+## Videos
 
-Não inclui:
+Para publicar um video:
 
-- entrada gratuita em lives pagas;
-- descontos em bilhetes pagos;
-- acesso a conteúdos com mais de 30 dias.
+1. Clicar em `Novo video`.
+2. Preencher titulo, descricao, capa, preco e data.
+3. Guardar.
+4. Fazer upload do ficheiro na area `Upload do video`.
+5. Confirmar `Upload recebido`.
+6. Testar e ativar.
 
-### Subscritor Pro - 10 EUR/mês
+Videos devem ter no maximo 1 hora.
 
-Inclui:
+## Galerias
 
-- acesso ao conteúdo gravado do artista publicado nos últimos 30 dias;
-- acesso ao chat durante lives do artista;
-- 50% de desconto automático em bilhetes de lives pagas desse artista;
-- apoio mensal direto ao artista.
+Para publicar uma galeria:
 
-Não inclui:
+1. Clicar em `Nova galeria`.
+2. Usar uma capa publica discreta.
+3. Carregar fotos privadas.
+4. Enviar para validacao StageHub.
+5. Ativar depois de aprovada.
 
-- entrada gratuita em lives pagas;
-- acesso a conteúdos com mais de 30 dias;
-- benefícios noutros artistas.
+## Pagamentos
 
-## Regras das lives
+Os pagamentos sao processados pela Stripe. A StageHub aplica a comissao configurada para o artista e o restante fica destinado a conta Stripe ligada.
 
-As lives pagas precisam sempre de bilhete. Mesmo um Subscritor Pro deve comprar bilhete, mas recebe 50% de desconto automaticamente no checkout.
+## Antes de divulgar
 
-Eventos gratuitos ja nao estao disponiveis na StageHub. Todos os eventos publicados devem ter bilhete pago e usar o sistema de video configurado pela StageHub.
+Confirmar:
 
-## Arquivo e vídeos gravados
-
-Subscritores e Subscritores Pro podem ver conteúdo gravado do artista durante 30 dias após a data do evento. Depois desse prazo, a subscrição deixa de dar acesso automático.
-
-## Comissão e pagamentos
-
-A StageHub gere a infraestrutura técnica, sala, chat, pagamentos, bilhetes, subscrições e gorjetas quando aplicável. As comissões e margens devem ser confirmadas nas condições comerciais em vigor antes de lançar campanhas públicas.
-
-## O que a plataforma cobre
-
-A plataforma cobre:
-
-- página pública do artista;
-- criação e gestão de eventos;
-- venda de bilhetes;
-- subscrições por artista;
-- desconto automático para Subscritor Pro;
-- chat em tempo real;
-- arquivo recente para subscritores;
-- guias técnicos para transmissão.
-
-Antes de divulgar uma live paga, confirma sempre a imagem, título, preço, data, hora, estado ativo e configuração de vídeo.
+1. Stripe ativo.
+2. Conteudo ativo.
+3. Preco correto.
+4. Upload recebido.
+5. Pagina publica testada.

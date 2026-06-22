@@ -775,6 +775,8 @@ def artist_profile_edit(request):
                 ArtistPhoto.objects.create(artist=artist, image=image, caption=caption)
             messages.success(request, 'Foto adicionada a galeria.')
             return redirect(f"{reverse('streams:artist_profile_edit')}?artist={artist.id}")
+        if action == 'add_photo':
+            messages.error(request, 'Nao foi possivel carregar as fotos. Confirma formato, quantidade e tamanho dos ficheiros.')
     else:
         profile_form = ArtistProfileForm(instance=artist)
         gallery_form = ArtistGalleryUploadForm()
@@ -785,6 +787,9 @@ def artist_profile_edit(request):
         'profile_form': profile_form,
         'gallery_form': gallery_form,
         'gallery_photos': artist.gallery_photos.all(),
+        'artist_gallery_max_upload_images': ArtistGalleryUploadForm.MAX_UPLOAD_IMAGES,
+        'artist_gallery_max_upload_image_size': ArtistGalleryUploadForm.MAX_IMAGE_SIZE,
+        'artist_gallery_max_upload_total_size': ArtistGalleryUploadForm.MAX_TOTAL_SIZE,
     })
 
 

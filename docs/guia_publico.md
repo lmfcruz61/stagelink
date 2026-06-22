@@ -1,52 +1,36 @@
-# Guia do público StageHub
+# StageHub - Guia rapido para o publico
 
-Este guia explica como apoiar artistas, comprar bilhetes e usar subscrições na StageHub.
+Este guia resume como o publico usa a StageHub.
 
-## Tipos de apoio
+## O que podes encontrar
 
-Podes apoiar cada artista de forma independente:
+- Videos gravados.
+- Replays.
+- Galerias de fotos.
+- Subscricoes de artistas.
+- Apoios diretos e gorjetas.
 
-- comprando bilhetes para eventos pagos;
-- subscrevendo mensalmente esse artista;
-- enviando gorjetas quando a sala permitir.
+## Como aceder a conteudo pago
 
-Subscrever um artista não dá acesso a outros artistas.
+1. Entra ou cria conta.
+2. Abre a pagina do artista.
+3. Escolhe o video, replay ou galeria.
+4. Se for pago, segue para checkout Stripe.
+5. Depois do pagamento, volta a StageHub e abre o conteudo.
 
-## Planos de subscrição
+## Subscricoes
 
-### Subscritor - 5 EUR/mês
+Alguns artistas podem ter subscricao mensal. Quando estiver ativa, a pagina do artista mostra os planos disponiveis e as vantagens associadas.
 
-Inclui:
+## Galerias sensiveis
 
-- acesso ao conteúdo gravado desse artista nos últimos 30 dias;
-- acesso ao chat durante lives desse artista.
+Galerias marcadas como sensiveis podem mostrar capa discreta ou imagens protegidas antes do acesso. As fotos privadas so ficam disponiveis depois de compra, subscricao ou permissao adequada.
 
-Não inclui entrada gratuita em lives pagas.
+## Ajuda
 
-### Subscritor Pro - 10 EUR/mês
+Se tiveres problemas:
 
-Inclui:
-
-- acesso ao conteúdo gravado desse artista nos últimos 30 dias;
-- acesso ao chat durante lives desse artista;
-- 50% de desconto automático em bilhetes de lives pagas desse artista.
-
-Não inclui entrada gratuita em lives pagas.
-
-## Compra de bilhetes
-
-Quando um evento é pago, tens de comprar um bilhete para assistir ao vídeo da live. Se fores Subscritor Pro desse artista, o desconto de 50% aparece automaticamente antes do pagamento no Stripe.
-
-Depois do pagamento confirmado, a sala fica disponível na tua conta.
-
-## Conteúdo gravado e arquivo
-
-Os planos de subscrição dão acesso ao conteúdo gravado recente do artista durante 30 dias. Conteúdos com mais de 30 dias não ficam incluídos pela subscrição.
-
-## Chat durante lives
-
-Subscritores e Subscritores Pro podem participar no chat durante lives do artista. Em lives pagas, a subscrição permite conversar, mas o vídeo continua a exigir bilhete.
-
-## Reembolsos
-
-Pedidos de reembolso devem ser analisados caso a caso, de acordo com as regras comerciais do evento, falhas técnicas confirmadas e política definida pela StageHub e pelo artista. Guarda sempre o email de confirmação do Stripe.
+1. Confirma se fizeste login.
+2. Confirma se o pagamento foi concluido.
+3. Tenta recarregar a pagina.
+4. Usa `Contactar-nos` e indica artista, conteudo e email usado na compra.

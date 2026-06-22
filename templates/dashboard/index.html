@@ -14,7 +14,7 @@
       <a class="sl-secondary" href="{% url 'streams:artist_profile_edit' %}?artist={{ artist.id }}">Editar pagina</a>
       <a class="sl-secondary" href="{% url 'streams:photo_gallery_create' %}?artist={{ artist.id }}">Nova galeria</a>
       <a class="sl-secondary" href="{% url 'streams:stream_create' %}?artist={{ artist.id }}&type=recorded">Novo video</a>
-      <a class="sl-primary" href="{% url 'streams:stream_create' %}">Novo evento</a>
+      <a class="sl-primary" href="{% url 'streams:stream_create' %}?artist={{ artist.id }}&type=recorded">Novo video</a>
     {% endif %}
   </div>
 </section>
@@ -41,7 +41,7 @@
   <div class="flex items-start justify-between gap-4">
     <div>
       <h2 class="text-xl font-semibold">Guia rapido de operacao</h2>
-      <p class="mt-1 text-sm text-zinc-300">Usa este guia para preparar eventos, galerias e pagamentos do artista.</p>
+      <p class="mt-1 text-sm text-zinc-300">Usa este guia para preparar videos, galerias e pagamentos do artista.</p>
     </div>
     <button id="quick-guide-close" type="button" class="rounded-full bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800">Fechar</button>
   </div>
@@ -51,9 +51,9 @@
       <ol class="mt-3 space-y-3 text-sm text-zinc-200">
         <li><strong>1. Completa a pagina.</strong><br>Adiciona capa, foto principal, frase de destaque, cidade, bio e links.</li>
         <li><strong>2. Cria a galeria.</strong><br>Mostra palco, bastidores, ensaios, cartazes ou momentos com o público.</li>
-        <li><strong>3. Escolhe o tipo.</strong><br>Marca o evento como ao vivo, estreia, video gravado ou replay para nao mostrar "Ao vivo" quando nao for direto.</li>
-          <li><strong>4. Agenda o evento.</strong><br>Usa uma capa 16:9, data, preco e a origem de video StageHub quando for pago.</li>
-        <li><strong>5. Testa a sala.</strong><br>Confirma countdown, player, badge do estado, marca do artista, chat e botoes de apoio.</li>
+        <li><strong>3. Cria videos.</strong><br>Clica em Novo video, preenche capa, descricao, preco e prepara o upload.</li>
+        <li><strong>4. Envia o ficheiro.</strong><br>Carrega o video na area Upload do video e confirma o estado Upload recebido.</li>
+        <li><strong>5. Publica.</strong><br>Testa a pagina ou sala, confirma pagamentos e ativa o conteudo quando estiver pronto.</li>
       </ol>
     </article>
 
@@ -146,7 +146,7 @@
 
   <div class="mt-5 grid gap-4 md:grid-cols-3">
     <div class="rounded border border-zinc-800 bg-zinc-950/70 p-4">
-      <p class="text-sm text-zinc-400">Receita bruta live registada</p>
+      <p class="text-sm text-zinc-400">Receita bruta registada</p>
       <p class="mt-2 text-3xl font-semibold">{{ payment_summary.total_gross }} EUR</p>
     </div>
     <div class="rounded border border-zinc-800 bg-zinc-950/70 p-4">
@@ -187,12 +187,12 @@
     </div>
   </div>
 
-  <p class="mt-4 text-xs text-zinc-500">Estes valores contam apenas pagamentos Stripe em modo live registados na StageHub. O saldo disponivel, saldo pendente e transferencias bancarias devem ser confirmados no painel Stripe do artista.</p>
+  <p class="mt-4 text-xs text-zinc-500">Estes valores contam apenas pagamentos Stripe reais registados na StageHub. O saldo disponivel, saldo pendente e transferencias bancarias devem ser confirmados no painel Stripe do artista.</p>
 </section>
 
 <section class="grid gap-8 lg:grid-cols-[1fr_320px]">
   <div>
-    <h2 class="mb-4 text-xl font-semibold">Eventos</h2>
+    <h2 class="mb-4 text-xl font-semibold">Videos e conteudos</h2>
     <div class="space-y-3">
       {% for stream in streams %}
         <article class="sl-card p-4">
@@ -230,7 +230,7 @@
           </div>
         </article>
       {% empty %}
-        <p class="text-zinc-400">Cria o teu primeiro evento.</p>
+        <p class="text-zinc-400">Cria o teu primeiro video.</p>
       {% endfor %}
     </div>
 

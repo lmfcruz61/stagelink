@@ -33,7 +33,7 @@
   <div class="sl-card p-6">
     <h2 class="mb-5 text-xl font-semibold">Conteudo principal</h2>
     <div class="mb-5 rounded border border-[#5230EF] bg-[#5230EF]/15 p-4 text-sm text-zinc-200">
-      <strong>Transmissao ao vivo:</strong> a StageHub prepara o canal do artista. Para transmitir, o artista so precisa dos dados de OBS mostrados abaixo.
+      <strong>Conteudo simples:</strong> o artista prepara a pagina, cria galerias e envia videos gravados diretamente pela StageHub. Nao precisa de ferramentas tecnicas externas.
     </div>
     <div class="mb-5 rounded border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-200">
       <h3 class="font-semibold">Modo de monetizacao atual</h3>
@@ -72,27 +72,6 @@
         </a>
       </div>
     </div>
-    <div class="mb-5 rounded border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-200">
-      <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div>
-          <h3 class="font-semibold">Dados de transmissao para OBS</h3>
-          {% if artist.cloudflare_live_input_uid %}
-            <p class="mt-2 text-zinc-400">Servidor OBS: <span class="font-mono text-zinc-100">{{ artist.cloudflare_rtmps_url|default:"Nao disponivel" }}</span></p>
-            <p class="mt-1 text-zinc-400">Chave de transmissao: <span class="font-mono text-zinc-100">{{ artist.cloudflare_stream_key|default:"Nao disponivel" }}</span></p>
-            <p class="mt-2 text-xs text-zinc-500">Estes dados sao privados do artista. Nao aparecem na pagina publica.</p>
-          {% else %}
-            <p class="mt-2 text-zinc-400">Ainda nao existe canal de transmissao para este artista. Cria um para transmitir ao vivo por OBS.</p>
-          {% endif %}
-        </div>
-        {% if not artist.cloudflare_live_input_uid %}
-          <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="create_cloudflare_live_input">
-            <button class="sl-primary whitespace-nowrap" type="submit">Criar canal ao vivo</button>
-          </form>
-        {% endif %}
-      </div>
-    </div>
     <form method="post" enctype="multipart/form-data" class="space-y-4">
       {% csrf_token %}
       <input type="hidden" name="action" value="save_profile">
@@ -118,11 +97,12 @@
 
     <div class="sl-card p-6">
       <h2 class="text-xl font-semibold">Adicionar fotos a galeria</h2>
-      <p class="mt-1 mb-5 text-sm text-zinc-400">Estas fotos aparecem na secao Galeria da pagina publica.</p>
-      <form method="post" enctype="multipart/form-data" class="space-y-4">
+      <p class="mt-1 mb-5 text-sm text-zinc-400">Estas fotos aparecem na secao Galeria da pagina publica. Maximo {{ artist_gallery_max_upload_images }} fotos por envio, 5 MB por foto e 30 MB no total.</p>
+      <form method="post" enctype="multipart/form-data" class="space-y-4" data-artist-photo-upload-form data-max-files="{{ artist_gallery_max_upload_images }}" data-max-image-size="{{ artist_gallery_max_upload_image_size }}" data-max-total-size="{{ artist_gallery_max_upload_total_size }}">
         {% csrf_token %}
         <input type="hidden" name="action" value="add_photo">
         {{ gallery_form.as_p }}
+        <p class="hidden rounded border border-red-500/50 bg-red-950/40 p-3 text-sm text-red-100" data-artist-photo-upload-error></p>
         <button class="sl-primary w-full">Adicionar a galeria</button>
       </form>
     </div>
@@ -148,4 +128,80 @@
     {% endfor %}
   </div>
 </section>
+<script>
+  (function () {
+    const form = document.querySelector('[data-artist-photo-upload-form]');
+    if (!form) return;
+
+    const input = form.querySelector('input[type="file"][name="images"]');
+    const errorBox = form.querySelector('[data-artist-photo-upload-error]');
+    const submitButton = form.querySelector('button[type="submit"], button:not([type])');
+    const maxFiles = Number(form.dataset.maxFiles || 10);
+    const maxImageSize = Number(form.dataset.maxImageSize || 5242880);
+    const maxTotalSize = Number(form.dataset.maxTotalSize || 31457280);
+    const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+    function formatMb(bytes) {
+      return (bytes / 1024 / 1024).toFixed(1).replace('.', ',') + ' MB';
+    }
+
+    function showError(message) {
+      if (!errorBox) return;
+      errorBox.textContent = message;
+      errorBox.classList.remove('hidden');
+    }
+
+    function clearError() {
+      if (!errorBox) return;
+      errorBox.textContent = '';
+      errorBox.classList.add('hidden');
+    }
+
+    function validateFiles() {
+      clearError();
+      if (!input || !input.files.length) {
+        showError('Escolhe pelo menos uma foto para adicionar.');
+        return false;
+      }
+
+      const files = Array.from(input.files);
+      if (files.length > maxFiles) {
+        showError('Podes enviar no maximo ' + maxFiles + ' fotos de cada vez.');
+        return false;
+      }
+
+      let totalSize = 0;
+      for (const file of files) {
+        totalSize += file.size;
+        if (!allowedTypes.has(file.type)) {
+          showError('Usa apenas imagens JPG, PNG ou WebP.');
+          return false;
+        }
+        if (file.size > maxImageSize) {
+          showError('A foto "' + file.name + '" tem ' + formatMb(file.size) + '. Cada foto pode ter no maximo ' + formatMb(maxImageSize) + '.');
+          return false;
+        }
+      }
+
+      if (totalSize > maxTotalSize) {
+        showError('Este envio tem ' + formatMb(totalSize) + '. O maximo por envio e ' + formatMb(maxTotalSize) + '.');
+        return false;
+      }
+
+      return true;
+    }
+
+    input?.addEventListener('change', validateFiles);
+    form.addEventListener('submit', function (event) {
+      if (!validateFiles()) {
+        event.preventDefault();
+        return;
+      }
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'A enviar...';
+      }
+    });
+  })();
+</script>
 {% endblock %}

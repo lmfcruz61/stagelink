@@ -1,25 +1,24 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% block title %}Evento - StageHub{% endblock %}
 {% block content %}
 <section class="mx-auto max-w-3xl">
-  <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar evento{% else %}Novo evento{% endif %}</h1>
+  <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar video{% else %}Novo video{% endif %}</h1>
   <div class="mb-5 rounded border border-[#5230EF] bg-[#5230EF]/15 p-4 text-sm text-zinc-200">
-    Todos os eventos publicados na StageHub sao pagos e usam video StageHub. Define sempre um preco de bilhete igual ou superior a 2 EUR.
+    Cria um video pago simples: preenche os dados, guarda, envia o ficheiro e publica quando estiver pronto. Define sempre um preco igual ou superior a 2 EUR.
   </div>
 
   <details class="mb-5 rounded-xl border border-zinc-800 bg-zinc-900/90 p-5" open>
-    <summary class="cursor-pointer text-lg font-semibold text-zinc-100">Guia passo a passo para criar o evento</summary>
+    <summary class="cursor-pointer text-lg font-semibold text-zinc-100">Guia passo a passo para publicar um video</summary>
     <ol class="mt-4 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Prepara o canal uma vez.</strong><br>No perfil do artista, cria os dados de transmissão StageHub para usar no OBS.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>2. Configura o OBS.</strong><br>Cola o servidor e a chave de transmissão nos campos certos do OBS.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Define o tipo.</strong><br>Escolhe ao vivo, estreia, video gravado ou replay. Todos usam video StageHub.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Confirma a origem do video.</strong><br>Ao vivo/estreia usam o canal do artista. Video gravado/replay podem receber upload nesta pagina.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>5. Agenda e guarda.</strong><br>Define data, preço, duração estimada e capa 16:9. Guarda o evento ainda inativo.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>6. Testa antes de divulgar.</strong><br>Entra na sala como artista/admin, confirma player, áudio, chat, contador e pagamento.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>7. Publica o evento.</strong><br>Quando estiver tudo pronto, usa o botao verde para ativar o evento nesta pagina.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>8. Partilha o evento.</strong><br>No dashboard, usa `Copiar link` para divulgar a página pública do evento.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Preenche os dados.</strong><br>Adiciona titulo, descricao, capa horizontal, preco, data e duracao estimada.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>2. Mantem upload preparado.</strong><br>Para videos gravados, a StageHub prepara automaticamente a zona de envio.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Guarda.</strong><br>Depois de guardar, aparece a area Upload do video nesta pagina.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Envia o ficheiro.</strong><br>Escolhe o video no computador e clica Enviar video. O limite e 1 hora.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>5. Confirma o estado.</strong><br>Quando aparecer Upload recebido, o ficheiro ficou associado a este video.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>6. Testa e publica.</strong><br>Abre a sala para testar e ativa o conteudo quando estiver pronto.</li>
     </ol>
   </details>
+
 
   {% if stream %}
     <form method="post" action="{% url 'streams:stream_toggle_active' stream.id %}" class="mb-5 rounded-xl border {% if stream.is_active %}border-red-800 bg-red-950/20{% else %}border-[#10B981] bg-[#10B981]/15{% endif %} p-5">
@@ -49,7 +48,7 @@
         <span>Artista</span>
         <select name="artist" required>
           {% for artist in artists %}
-            <option value="{{ artist.id }}" data-cloudflare-live-input="{{ artist.cloudflare_live_input_uid }}"{% if selected_artist_id == artist.id %} selected{% endif %}>{{ artist.name }}</option>
+            <option value="{{ artist.id }}"{% if selected_artist_id == artist.id %} selected{% endif %}>{{ artist.name }}</option>
           {% endfor %}
         </select>
       </label>
@@ -129,7 +128,7 @@
     <input type="hidden" name="{{ form.youtube_video_id.name }}" value="{{ form.youtube_video_id.value|default_if_none:'' }}">
 
     <details class="rounded border border-zinc-800 bg-zinc-950 p-4">
-      <summary class="cursor-pointer font-semibold text-zinc-100">Opções avançadas</summary>
+      <summary class="cursor-pointer font-semibold text-zinc-100">OpÃ§Ãµes avanÃ§adas</summary>
       <div class="mt-4">
         <label>
           {% if user.is_staff or user.is_superuser %}
@@ -188,7 +187,7 @@
   {% elif stream and stream.cloudflare_upload_status == stream.UPLOAD_UPLOADED %}
     <section class="mt-6 rounded-xl border border-[#10B981] bg-[#10B981]/15 p-5">
       <h2 class="text-lg font-semibold">Upload recebido</h2>
-      <p class="mt-1 text-sm text-zinc-300">O ficheiro foi recebido pela StageHub. Quando o processamento terminar, usa "Ver sala" para testar e ativa o evento para publicar.</p>
+      <p class="mt-1 text-sm text-zinc-300">O ficheiro foi recebido pela StageHub. Quando o processamento terminar, usa "Ver sala" para testar e ativa o video para publicar.</p>
       {% if stream.cloudflare_video_uid %}
         <p class="mt-3 rounded border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-300">
           Codigo do video:
@@ -198,14 +197,14 @@
     </section>
   {% endif %}
   {% if stream %}
-    <form method="post" action="{% url 'streams:stream_delete' stream.id %}" class="mt-6 rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('{% if stream.has_paid_tickets %}Arquivar este evento? Quem ja comprou continua com acesso.{% else %}Apagar este evento? Esta acao nao pode ser desfeita.{% endif %}');">
+    <form method="post" action="{% url 'streams:stream_delete' stream.id %}" class="mt-6 rounded-xl border border-red-900 bg-red-950/20 p-5" onsubmit="return confirm('{% if stream.has_paid_tickets %}Arquivar este conteudo? Quem ja comprou continua com acesso.{% else %}Apagar este conteudo? Esta acao nao pode ser desfeita.{% endif %}');">
       {% csrf_token %}
-      <h2 class="text-lg font-semibold text-red-200">{% if stream.has_paid_tickets %}Arquivar evento{% else %}Apagar evento{% endif %}</h2>
+      <h2 class="text-lg font-semibold text-red-200">{% if stream.has_paid_tickets %}Arquivar conteudo{% else %}Apagar conteudo{% endif %}</h2>
       <p class="mt-2 text-sm text-red-100/80">
         {% if stream.has_paid_tickets %}
-          Este evento ja teve bilhetes pagos. Nao sera apagado; deixa de estar ativo para novas vendas e compradores continuam com acesso.
+          Este conteudo ja teve compras. Nao sera apagado; deixa de estar ativo para novas vendas e compradores continuam com acesso.
         {% else %}
-          Remove este evento, incluindo mensagens de chat associadas a ele.
+          Remove este conteudo, incluindo mensagens de chat associadas a ele.
         {% endif %}
       </p>
       <button class="mt-4 rounded-full border border-red-700 bg-red-950/60 px-4 py-3 font-semibold text-red-100 hover:border-red-500">{% if stream.has_paid_tickets %}Arquivar / retirar de venda{% else %}Apagar definitivamente{% endif %}</button>
@@ -216,29 +215,13 @@
 <script>
   const eventTypeInput = document.querySelector('#id_event_type');
   const accessPriceInput = document.querySelector('#id_access_price');
-  const artistInput = document.querySelector('select[name="artist"]');
-  const cloudflareStreamInput = document.querySelector('#id_cloudflare_stream_id');
   const directUploadField = document.querySelector('#direct-upload-field');
   const cloudflareHelp = document.querySelector('#cloudflare-stream-help');
-  const liveHelp = 'Para eventos ao vivo, este campo fica normalmente preenchido com o canal do artista.';
-  const videoHelp = 'Para video gravado ou replay, podes preparar upload e enviar o ficheiro nesta pagina.';
-
-  function isLiveInputType() {
-    return ['live', 'premiere'].includes(eventTypeInput?.value);
-  }
+  const videoHelp = 'Normalmente fica preenchido automaticamente quando preparas o upload. Usa apenas se o suporte StageHub indicar um codigo.';
 
   function updateCloudflareHelp() {
     if (!cloudflareHelp) return;
-    cloudflareHelp.textContent = isLiveInputType() ? liveHelp : videoHelp;
-  }
-
-  function fillArtistLiveInput() {
-    if (!artistInput || !cloudflareStreamInput || !isLiveInputType() || cloudflareStreamInput.value.trim()) return;
-    const selected = artistInput.options[artistInput.selectedIndex];
-    const artistLiveInput = selected?.dataset.cloudflareLiveInput || '';
-    if (artistLiveInput) {
-      cloudflareStreamInput.value = artistLiveInput;
-    }
+    cloudflareHelp.textContent = videoHelp;
   }
 
   function updateDirectUploadVisibility() {
@@ -249,13 +232,11 @@
 
   function updateVideoFields() {
     updateCloudflareHelp();
-    fillArtistLiveInput();
     updateDirectUploadVisibility();
   }
 
   eventTypeInput?.addEventListener('change', updateVideoFields);
   accessPriceInput?.addEventListener('input', updateVideoFields);
-  artistInput?.addEventListener('change', updateVideoFields);
   updateVideoFields();
 </script>
 {% if stream and stream.has_pending_direct_upload %}

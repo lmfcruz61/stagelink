@@ -67,6 +67,17 @@ class LiveStreamForm(forms.ModelForm):
         self.fields['video_provider'].choices = (
             (LiveStream.VIDEO_PROVIDER_CLOUDFLARE, 'Video StageHub'),
         )
+        self.fields['event_type'].choices = (
+            (LiveStream.RECORDED, 'Video gravado'),
+            (LiveStream.REPLAY, 'Replay'),
+        )
+        if self.instance and self.instance.pk and self.instance.event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:
+            legacy_label = dict(LiveStream.EVENT_TYPE_CHOICES).get(self.instance.event_type, self.instance.event_type)
+            self.fields['event_type'].choices = (
+                (self.instance.event_type, f'{legacy_label} (legado)'),
+            ) + tuple(self.fields['event_type'].choices)
+        elif not self.initial.get('event_type'):
+            self.initial['event_type'] = LiveStream.RECORDED
         if self.instance and self.instance.pk:
             self.fields['create_upload_url'].initial = self.instance.has_pending_direct_upload
         elif self.initial.get('event_type') in {LiveStream.RECORDED, LiveStream.REPLAY}:
@@ -77,8 +88,6 @@ class LiveStreamForm(forms.ModelForm):
                 self.fields['cloudflare_stream_id'].initial = self.instance.cloudflare_live_input_uid
             else:
                 self.fields['cloudflare_stream_id'].initial = self.instance.cloudflare_video_uid
-        elif self.artist and self.artist.cloudflare_live_input_uid:
-            self.fields['cloudflare_stream_id'].initial = self.artist.cloudflare_live_input_uid
 
     def should_validate_video_rules(self):
         if not self.instance or not self.instance.pk:
@@ -107,7 +116,7 @@ class LiveStreamForm(forms.ModelForm):
         if cloudflare_stream_id.lower().startswith(('rtmp://', 'rtmps://')):
             self.add_error(
                 'cloudflare_stream_id',
-                'Este campo deve ter apenas o codigo de video indicado pela StageHub, nao o endereco do OBS.',
+                'Este campo deve ter apenas o codigo de video indicado pela StageHub, nao um endereco tecnico.',
             )
         else:
             normalized_cloudflare_stream_id = LiveStream.extract_cloudflare_identifier(cloudflare_stream_id)

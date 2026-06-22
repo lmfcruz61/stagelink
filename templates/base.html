@@ -219,7 +219,7 @@
           name="q"
           type="search"
           value="{{ search_query|default:'' }}"
-          placeholder="Pesquisar artistas, eventos e salas ao vivo"
+          placeholder="Pesquisar artistas, videos e galerias"
           class="mx-auto block max-w-xl rounded-full border-zinc-700 bg-zinc-900 px-4 py-2 text-sm text-zinc-100 placeholder:text-zinc-400"
         >
       </form>
@@ -272,17 +272,17 @@
     {% endif %}
     {% block content %}{% endblock %}
   </main>
-  <footer class="border-t border-zinc-900">
-    <div class="sl-shell mx-auto flex flex-col gap-2 px-4 py-6 text-xs text-zinc-500 md:flex-row md:items-center md:justify-between">
-      <p>StageHub usa ligacao segura. Pagamentos sao processados pela Stripe.</p>
-      <div class="flex flex-wrap gap-3">
-        <a class="hover:text-zinc-300" href="{% url 'accounts:password_reset' %}">Recuperar password</a>
-        <a class="hover:text-zinc-300" href="{% url 'streams:privacy_policy' %}">Privacidade</a>
-        <a class="hover:text-zinc-300" href="{% url 'streams:cookie_policy' %}">Cookies</a>
-        <a class="hover:text-zinc-300" href="{% url 'streams:terms_conditions' %}">Termos</a>
-        <a class="hover:text-zinc-300" href="{% url 'streams:contact' %}">Contactar-nos</a>
-        <button type="button" class="hover:text-zinc-300" data-cookie-settings>Gerir cookies</button>
-        <span>Nunca partilhes a tua password.</span>
+  <footer class="border-t border-zinc-800 bg-zinc-950/85">
+    <div class="sl-shell mx-auto flex flex-col gap-4 px-4 py-7 text-sm text-zinc-300 md:flex-row md:items-center md:justify-between">
+      <p class="max-w-xl font-medium text-zinc-200">StageHub usa ligacao segura. Pagamentos sao processados pela Stripe.</p>
+      <div class="flex flex-wrap gap-x-5 gap-y-3">
+        <a class="font-semibold text-zinc-100 hover:text-white" href="{% url 'accounts:password_reset' %}">Recuperar password</a>
+        <a class="font-semibold text-zinc-100 hover:text-white" href="{% url 'streams:privacy_policy' %}">Privacidade</a>
+        <a class="font-semibold text-zinc-100 hover:text-white" href="{% url 'streams:cookie_policy' %}">Cookies</a>
+        <a class="font-semibold text-zinc-100 hover:text-white" href="{% url 'streams:terms_conditions' %}">Termos</a>
+        <a class="font-semibold text-[#7DD3FC] hover:text-[#BAE6FD]" href="{% url 'streams:contact' %}">Contactar-nos</a>
+        <button type="button" class="font-semibold text-zinc-100 hover:text-white" data-cookie-settings>Gerir cookies</button>
+        <span class="text-zinc-400">Nunca partilhes a tua password.</span>
       </div>
     </div>
   </footer>

@@ -10,7 +10,7 @@
     </div>
     <div class="flex flex-wrap gap-3">
       <a class="sl-secondary" href="{% url 'streams:dashboard' %}">Dashboard</a>
-      <a class="sl-primary" href="{% url 'streams:stream_create' %}">Novo evento</a>
+      <a class="sl-primary" href="{% url 'streams:stream_create' %}?type=recorded">Novo video</a>
     </div>
   </section>
 {% elif user.is_authenticated and user.fan_profile %}
@@ -53,7 +53,7 @@
     <ol class="mt-5 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
       <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>1. Escolhe um artista.</strong><br>Abre a pagina de um artista para veres eventos futuros, eventos passados e opcoes de acesso.</li>
       <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>2. Guarda favoritos.</strong><br>Marca artistas como favoritos para criares a tua lista pessoal.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>3. Confirma o tipo.</strong><br>Os eventos podem aparecer como agendados, ao vivo, estreia, video gravado ou replay disponivel.</li>
+      <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>3. Confirma o tipo.</strong><br>Os conteudos podem aparecer como videos gravados, replays ou galerias.</li>
       <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>4. Garante o acesso.</strong><br>Subscreve mensalmente ou compra bilhete para um evento especifico.</li>
       <li class="rounded border border-zinc-800 bg-zinc-900 p-4"><strong>5. Entra na sala.</strong><br>Se o evento ainda nao comecou, acompanha a contagem; quando tiveres acesso, usa o player e participa no chat.</li>
     </ol>
@@ -256,7 +256,7 @@
       {% if user.is_authenticated and user.fan_profile %}
         <p class="text-sm text-zinc-400">Os eventos dos teus artistas favoritos aparecem primeiro e ficam marcados com estrela.</p>
       {% else %}
-        <p class="text-sm text-zinc-400">Eventos ao vivo e agendados na StageHub.</p>
+        <p class="text-sm text-zinc-400">Videos, replays e conteudos pagos na StageHub.</p>
       {% endif %}
     </div>
   </div>

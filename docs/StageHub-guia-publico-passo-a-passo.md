@@ -1,228 +1,85 @@
 # StageHub - Guia do Publico
 
-Este guia explica, passo a passo, como usar a StageHub para seguir artistas, comprar bilhetes, assistir a eventos, subscrever e apoiar com gorjetas.
+Este guia explica como o publico compra e acede a conteudos na StageHub.
 
-## 1. O que e a StageHub
+## 1. Criar conta ou entrar
 
-A StageHub e uma plataforma onde o publico pode assistir a eventos online pagos, ver videos gravados, seguir artistas e apoiar diretamente os seus projetos.
-
-Na pratica:
-
-1. Entras na StageHub.
-2. Criar ou usar a tua conta de publico.
-3. Escolhes um artista ou evento.
-4. Compras o bilhete, subscreves ou envias uma gorjeta.
-5. Assistes ao evento na sala StageHub.
-
-## 2. Criar conta de publico
-
-Para comprar bilhetes, subscrever artistas ou participar no chat, precisas de uma conta.
-
-Passos:
-
-1. Abrir `https://stagehub.pt/`.
+1. Abrir a StageHub.
 2. Clicar em `Entrar`.
-3. Criar uma conta, se ainda nao tiveres.
-4. Escolher conta de publico/fa.
-5. Confirmar os dados pedidos.
-6. Entrar na plataforma.
+3. Criar conta ou iniciar sessao.
+4. Confirmar email e nome publico no perfil, se necessario.
 
-Depois de entrares, consegues comprar bilhetes, ver eventos comprados e apoiar artistas.
+## 2. Encontrar artistas
 
-## 3. Encontrar artistas e eventos
+1. Usar a homepage.
+2. Pesquisar por artista, video ou galeria.
+3. Abrir a pagina publica do artista.
+4. Ver videos, galerias, subscricoes e links disponiveis.
 
-Na pagina inicial podes ver:
+## 3. Comprar um video
 
-1. Eventos em destaque.
-2. Artistas disponiveis.
-3. Eventos agendados.
-4. Videos gravados publicados.
+1. Abrir o video.
+2. Confirmar titulo, artista e informacao de acesso.
+3. Clicar para comprar, se estiver bloqueado.
+4. Pagar pela Stripe.
+5. Voltar a StageHub.
+6. Abrir o video.
 
-Tambem podes abrir a pagina de um artista para ver:
+## 4. Comprar uma galeria
 
-1. Biografia.
-2. Eventos futuros.
-3. Biblioteca de videos.
-4. Planos de subscricao.
-5. Links oficiais.
-6. Contactos publicos, quando o artista os disponibilizar.
+1. Abrir a galeria.
+2. Ver a capa publica e a descricao.
+3. Confirmar se existe aviso de conteudo sensivel.
+4. Comprar acesso pela Stripe.
+5. Voltar a galeria.
+6. Ver as fotos privadas quando o acesso estiver ativo.
 
-## 4. Comprar bilhete
+## 5. Subscricoes
 
-Todos os eventos na StageHub sao pagos.
-
-O preco minimo de bilhete e 2 EUR.
-
-Passos:
-
-1. Abrir a pagina do evento.
-2. Ver data, hora, artista e preco.
-3. Clicar em `Comprar bilhete`.
-4. Pagar de forma segura pela Stripe.
-5. Voltar automaticamente para a StageHub.
-6. Entrar na sala do evento.
-
-O bilhete fica associado a tua conta. Por isso, deves comprar sempre com a conta que vais usar para assistir.
-
-## 5. Como funciona o pagamento
-
-Os pagamentos sao processados pela Stripe.
-
-Quando compras um bilhete:
-
-1. Pagas na pagina segura da Stripe.
-2. A StageHub confirma o pagamento.
-3. O teu acesso ao evento fica ativo.
-4. O artista recebe a sua parte atraves da Stripe.
-
-A StageHub nao guarda os dados do teu cartao.
-
-## 6. Entrar num evento ao vivo
-
-No dia do evento:
-
-1. Entra em `https://stagehub.pt/`.
-2. Faz login com a mesma conta usada na compra.
-3. Abre o evento.
-4. Clica para entrar na sala.
-5. Aguarda o inicio da transmissao.
-
-Se o artista ainda nao tiver iniciado a transmissao, podes ver uma mensagem de espera. Mantem a pagina aberta ou atualiza perto da hora marcada.
-
-## 7. Chat durante o evento
-
-Quando o chat estiver disponivel:
-
-1. Entra na sala do evento.
-2. Escreve a tua mensagem.
-3. Participa com respeito pela comunidade e pelo artista.
-
-O chat pode estar limitado a pessoas com bilhete ou subscricao, dependendo do evento e das regras da plataforma.
-
-## 8. Ver videos gravados
-
-Alguns artistas disponibilizam videos gravados.
+Alguns artistas podem oferecer subscricoes mensais.
 
 Passos:
 
 1. Abrir a pagina do artista.
-2. Ir a `Biblioteca de videos`.
-3. Escolher o video.
-4. Comprar acesso, se necessario.
-5. Entrar na sala para assistir.
+2. Escolher o plano disponivel.
+3. Pagar pela Stripe.
+4. Confirmar que a subscricao aparece como ativa.
 
-Os videos gravados na StageHub têm duracao maxima de 1 hora.
+As vantagens dependem do modo escolhido pelo artista.
 
-## 9. Ver galerias de fotos
+## 6. Gorjetas
 
-Alguns artistas e fotografos podem publicar galerias de fotos pagas.
+Quando disponivel:
 
-Antes da compra, o publico ve apenas:
+1. Escolher valor.
+2. Escrever mensagem opcional.
+3. Pagar pela Stripe.
+4. Confirmar sucesso.
 
-1. Capa publica discreta.
-2. Titulo.
-3. Descricao.
-4. Preco.
-5. Numero de fotos.
-6. Aviso de conteudo sensivel/adulto, se aplicavel.
+## 7. Problemas comuns
 
-As fotos privadas so aparecem depois de comprares acesso com a tua conta.
+Se o conteudo nao abrir:
 
-Se a galeria estiver marcada como conteudo sensivel/adulto, confirma antes de comprar que queres aceder a esse tipo de conteudo.
+1. Confirma se estas com login feito.
+2. Confirma se usaste o mesmo email da compra.
+3. Confirma se o pagamento foi concluido.
+4. Recarrega a pagina.
+5. Contacta o suporte com o nome do artista, conteudo e email usado.
 
-## 10. Subscricoes mensais
+## 8. Recuperar password
 
-Podes apoiar artistas com uma subscricao mensal.
+1. Na pagina de login, clicar em recuperacao de password.
+2. Indicar o email da conta.
+3. Abrir o email recebido.
+4. Definir nova password.
 
-Planos atuais:
+## 9. Privacidade e cookies
 
-1. Subscritor: 5 EUR por mes.
-2. Subscritor Pro: 10 EUR por mes.
+No rodape existem links para:
 
-Beneficios:
+1. Politica de Privacidade.
+2. Politica de Cookies.
+3. Termos e Condicoes.
+4. Contactar-nos.
 
-1. Acesso ao arquivo recente dos ultimos 30 dias.
-2. Participacao no chat durante lives.
-3. No plano Pro, desconto em bilhetes de lives pagas, quando aplicavel.
-
-Importante: uma subscricao nao substitui automaticamente todos os bilhetes pagos. Alguns eventos continuam a precisar de bilhete proprio.
-
-## 11. Gorjetas
-
-Durante eventos pagos, podes apoiar o artista com uma gorjeta.
-
-Passos:
-
-1. Entrar na sala do evento.
-2. Escolher o valor da gorjeta.
-3. Escrever uma mensagem opcional.
-4. Pagar pela Stripe.
-5. Voltar ao evento.
-
-As gorjetas sao uma forma direta de apoiar o artista.
-
-## 12. Reembolsos e problemas de pagamento
-
-Se tiveres um problema:
-
-1. Confirma se estas na conta certa.
-2. Confirma se o pagamento aparece como concluido na Stripe.
-3. Nao compres novamente sem verificar primeiro.
-4. Guarda o email/recibo da Stripe.
-5. Contacta o suporte StageHub com o email da conta, nome do evento e hora do problema.
-
-Pedidos de reembolso podem depender do caso, do evento e das regras definidas pela plataforma ou pelo artista.
-
-## 13. Problemas de video ou som
-
-Se o video ou som nao funcionar:
-
-1. Atualiza a pagina.
-2. Confirma a ligacao a internet.
-3. Testa noutro browser, se possivel.
-4. Desliga bloqueadores que possam afetar video.
-5. Confirma se o evento ja comecou.
-6. Confirma se entraste com a conta que comprou o bilhete.
-
-Se o problema continuar, tira screenshot e contacta o suporte.
-
-## 14. Boas praticas
-
-Antes de um evento:
-
-1. Compra o bilhete com antecedencia.
-2. Guarda o email de confirmacao.
-3. Entra alguns minutos antes da hora.
-4. Usa uma ligacao estavel.
-5. Mantem o browser atualizado.
-
-Durante o evento:
-
-1. Respeita o artista e outros participantes.
-2. Nao partilhes acessos indevidamente.
-3. Usa o chat de forma construtiva.
-
-## 15. Checklist rapido
-
-Antes de assistir, confirma:
-
-1. Conta criada.
-2. Login feito.
-3. Bilhete comprado.
-4. Pagamento confirmado.
-5. Evento aberto na hora correta.
-6. Som do dispositivo ligado.
-7. Internet estavel.
-
-## 16. Suporte
-
-Para pedir ajuda, envia:
-
-1. Email da tua conta StageHub.
-2. Nome do artista.
-3. Nome do evento ou video.
-4. Hora aproximada do problema.
-5. Screenshot, se existir.
-6. Recibo Stripe, se o problema for de pagamento.
-
-O suporte StageHub consegue verificar acesso, pagamento e estado do evento.
+Podes alterar preferencias de cookies quando a opcao estiver disponivel no site.

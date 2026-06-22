@@ -170,13 +170,18 @@ class MultipleFileField(forms.FileField):
         single_file_clean = super().clean
         if isinstance(data, (list, tuple)):
             return [single_file_clean(file, initial) for file in data]
-        return single_file_clean(data, initial)
+        return [single_file_clean(data, initial)] if data else []
 
 
 class ArtistGalleryUploadForm(forms.Form):
+    MAX_UPLOAD_IMAGES = 10
+    MAX_IMAGE_SIZE = 5 * 1024 * 1024
+    MAX_TOTAL_SIZE = 30 * 1024 * 1024
+    ALLOWED_CONTENT_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
+
     images = MultipleFileField(
         label='Fotos para a galeria',
-        help_text='Podes escolher uma ou varias fotos. Recomendado: pelo menos 1200 px de largura, em JPG ou PNG.',
+        help_text='Maximo 10 fotos por envio, 5 MB por foto e 30 MB no total. Usa JPG, PNG ou WebP.',
     )
     caption = forms.CharField(
         label='Legenda comum',
@@ -184,6 +189,20 @@ class ArtistGalleryUploadForm(forms.Form):
         required=False,
         help_text='Opcional. Sera aplicada a todas as fotos deste envio.',
     )
+
+    def clean_images(self):
+        images = self.cleaned_data['images']
+        if len(images) > self.MAX_UPLOAD_IMAGES:
+            raise forms.ValidationError(f'Envia no maximo {self.MAX_UPLOAD_IMAGES} fotos de cada vez.')
+        if sum(image.size for image in images) > self.MAX_TOTAL_SIZE:
+            raise forms.ValidationError('Cada envio pode ter no maximo 30 MB no total.')
+        for image in images:
+            content_type = getattr(image, 'content_type', '')
+            if content_type not in self.ALLOWED_CONTENT_TYPES:
+                raise forms.ValidationError('Usa apenas imagens JPG, PNG ou WebP.')
+            if image.size > self.MAX_IMAGE_SIZE:
+                raise forms.ValidationError('Cada foto pode ter no maximo 5 MB.')
+        return images
 
 
 class NewsletterSubscriberForm(forms.ModelForm):
