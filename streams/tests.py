@@ -12,7 +12,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from accounts.models import Artist, ContactMessage, Fan
+from accounts.forms import ArtistGalleryUploadForm
+from accounts.models import Artist, ArtistPhoto, ContactMessage, Fan
 from payments.models import PhotoGalleryPurchase, StreamTicketPurchase, Subscription
 
 from .admin import PhotoGalleryAdmin
@@ -650,6 +651,61 @@ class LiveStreamAccessAndEmbedTests(TestCase):
         )
 
         self.assertTrue(stream.has_pending_direct_upload)
+
+
+class ArtistProfilePhotoUploadTests(TestCase):
+    def setUp(self):
+        self.artist_user = User.objects.create_user(username='profile_artist', password='pass12345')
+        self.artist = Artist.objects.create(user=self.artist_user, name='Artista Perfil')
+
+    def test_artist_profile_photo_upload_adds_gallery_photo(self):
+        self.client.force_login(self.artist_user)
+        image = SimpleUploadedFile('foto.jpg', b'foto-valida', content_type='image/jpeg')
+
+        response = self.client.post(
+            f"{reverse('streams:artist_profile_edit')}?artist={self.artist.id}",
+            {
+                'action': 'add_photo',
+                'caption': 'Foto do perfil',
+                'images': image,
+            },
+        )
+
+        self.assertRedirects(response, f"{reverse('streams:artist_profile_edit')}?artist={self.artist.id}")
+        photo = ArtistPhoto.objects.get(artist=self.artist)
+        self.assertEqual(photo.caption, 'Foto do perfil')
+
+    def test_artist_profile_photo_form_rejects_too_many_images(self):
+        images = [
+            SimpleUploadedFile(f'foto-{index}.jpg', b'foto', content_type='image/jpeg')
+            for index in range(11)
+        ]
+
+        form = ArtistGalleryUploadForm(files={'images': images})
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('images', form.errors)
+
+    def test_artist_profile_photo_form_rejects_large_image(self):
+        image = SimpleUploadedFile(
+            'foto-grande.jpg',
+            b'x' * ((5 * 1024 * 1024) + 1),
+            content_type='image/jpeg',
+        )
+
+        form = ArtistGalleryUploadForm(files={'images': image})
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('images', form.errors)
+
+    def test_artist_profile_page_shows_photo_upload_limits(self):
+        self.client.force_login(self.artist_user)
+
+        response = self.client.get(f"{reverse('streams:artist_profile_edit')}?artist={self.artist.id}")
+
+        self.assertContains(response, '10 fotos por envio')
+        self.assertContains(response, '5 MB por foto')
+        self.assertContains(response, '30 MB no total')
 
 
 class PhotoGalleryAccessTests(TestCase):

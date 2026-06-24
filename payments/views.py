@@ -122,6 +122,20 @@ def _stripe_account_payload(account):
     }
 
 
+def _sync_artist_from_stripe_account_payload(account):
+    stripe_account_id = account.get('id')
+    if not stripe_account_id:
+        return None
+    artist = Artist.objects.filter(stripe_account_id=stripe_account_id).first()
+    if not artist:
+        return None
+    payload = _stripe_account_payload(account)
+    for field, value in payload.items():
+        setattr(artist, field, value)
+    artist.save(update_fields=list(payload.keys()))
+    return artist
+
+
 def _sync_artist_stripe_account(artist):
     if not artist.stripe_account_id:
         return artist
@@ -795,5 +809,10 @@ def stripe_webhook(request):
                     'current_period_end': timezone.now() + timedelta(days=31),
                 },
             )
+
+    if event['type'] == 'account.updated':
+        account = event['data']['object']
+        _sync_artist_from_stripe_account_payload(account)
+        return HttpResponse(status=200)
 
     return HttpResponse(status=200)

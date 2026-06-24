@@ -331,3 +331,68 @@ class SubscriptionTierRulesTests(TestCase):
         purchase = PhotoGalleryPurchase.objects.get(fan=self.fan, gallery=gallery)
         self.assertFalse(purchase.paid)
         self.assertEqual(purchase.stripe_session_id, 'cs_test_gallery')
+
+
+class StripeConnectWebhookTests(TestCase):
+    def setUp(self):
+        self.artist_user = User.objects.create_user(username='connect_artist')
+        self.artist = Artist.objects.create(
+            user=self.artist_user,
+            name='Artista Connect',
+            stripe_account_id='acct_connect_artist',
+        )
+
+    @override_settings(STRIPE_WEBHOOK_SECRET='whsec_test')
+    @patch('payments.views.stripe.Webhook.construct_event')
+    def test_account_updated_webhook_marks_artist_stripe_ready(self, mock_construct_event):
+        mock_construct_event.return_value = {
+            'type': 'account.updated',
+            'data': {
+                'object': {
+                    'id': 'acct_connect_artist',
+                    'details_submitted': True,
+                    'charges_enabled': True,
+                    'payouts_enabled': True,
+                },
+            },
+        }
+
+        response = self.client.post(
+            reverse('payments:stripe_webhook'),
+            data=b'{}',
+            content_type='application/json',
+            HTTP_STRIPE_SIGNATURE='sig_test',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.artist.refresh_from_db()
+        self.assertTrue(self.artist.stripe_details_submitted)
+        self.assertTrue(self.artist.stripe_charges_enabled)
+        self.assertTrue(self.artist.stripe_payouts_enabled)
+        self.assertTrue(self.artist.stripe_connect_ready)
+
+    @override_settings(STRIPE_WEBHOOK_SECRET='whsec_test')
+    @patch('payments.views.stripe.Webhook.construct_event')
+    def test_account_updated_webhook_ignores_unknown_account(self, mock_construct_event):
+        mock_construct_event.return_value = {
+            'type': 'account.updated',
+            'data': {
+                'object': {
+                    'id': 'acct_unknown',
+                    'details_submitted': True,
+                    'charges_enabled': True,
+                    'payouts_enabled': True,
+                },
+            },
+        }
+
+        response = self.client.post(
+            reverse('payments:stripe_webhook'),
+            data=b'{}',
+            content_type='application/json',
+            HTTP_STRIPE_SIGNATURE='sig_test',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.artist.refresh_from_db()
+        self.assertFalse(self.artist.stripe_connect_ready)
