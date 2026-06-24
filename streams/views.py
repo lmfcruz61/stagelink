@@ -1096,6 +1096,7 @@ def stream_create(request):
             initial = {
                 'event_type': LiveStream.LIVE,
                 'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+                'access_price': '2.00',
                 'scheduled_at': timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M'),
                 'create_upload_url': False,
             }
@@ -1103,6 +1104,7 @@ def stream_create(request):
             initial = {
                 'event_type': LiveStream.RECORDED,
                 'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+                'access_price': '2.00',
                 'scheduled_at': timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M'),
                 'create_upload_url': True,
             }

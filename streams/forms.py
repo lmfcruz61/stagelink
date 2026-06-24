@@ -62,6 +62,10 @@ class LiveStreamForm(forms.ModelForm):
             'duration_minutes': 'Duração estimada',
         }
 
+        widgets = {
+            'access_price': forms.NumberInput(attrs={'min': '2', 'step': '0.01'}),
+        }
+
     def __init__(self, *args, **kwargs):
         self.artist = kwargs.pop('artist', None)
         super().__init__(*args, **kwargs)
@@ -85,6 +89,8 @@ class LiveStreamForm(forms.ModelForm):
             self.initial['scheduled_at'] = timezone.localtime(self.instance.scheduled_at).strftime('%Y-%m-%dT%H:%M')
         elif self.initial.get('event_type') in {LiveStream.RECORDED, LiveStream.REPLAY}:
             self.fields['create_upload_url'].initial = True
+        if not self.instance.pk and not self.is_bound and not self.initial.get('access_price'):
+            self.initial['access_price'] = '2.00'
         if self.instance and self.instance.pk:
             event_type = self.instance.event_type
             if event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:

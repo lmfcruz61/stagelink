@@ -436,6 +436,15 @@ class LiveStreamFormTests(TestCase):
 
         self.assertTrue(form.is_valid(), form.errors)
 
+    def test_new_live_form_defaults_to_minimum_ticket_price(self):
+        form = LiveStreamForm(
+            artist=self.artist,
+            initial={'event_type': LiveStream.LIVE},
+        )
+
+        self.assertEqual(form.initial['access_price'], '2.00')
+        self.assertIn('min="2"', str(form['access_price']))
+
     def test_live_below_minimum_price_is_rejected(self):
         scheduled_at = timezone.localtime(timezone.now() + timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M')
         form = LiveStreamForm(
