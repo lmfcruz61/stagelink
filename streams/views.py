@@ -1067,15 +1067,20 @@ def stream_create(request):
             live_stream = form.save(commit=False)
             live_stream.artist = artist
             if live_stream.event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:
+                live_stream.cloudflare_video_uid = ''
+                live_stream.cloudflare_upload_status = LiveStream.UPLOAD_NOT_REQUESTED
+                live_stream.save()
                 try:
                     created_live_input = ensure_artist_live_input(artist)
                 except CloudflareStreamError as error:
-                    messages.error(request, str(error))
-                    return redirect(f"{reverse('streams:dashboard')}?artist={artist.id}")
-                live_stream.cloudflare_live_input_uid = artist.cloudflare_live_input_uid
-                live_stream.cloudflare_video_uid = ''
-                live_stream.cloudflare_upload_status = LiveStream.UPLOAD_NOT_REQUESTED
-            live_stream.save()
+                    messages.warning(
+                        request,
+                        f'Live criada, mas os dados OBS ainda nao foram preparados: {error}',
+                    )
+                    return redirect('streams:stream_update', stream_id=live_stream.id)
+                sync_stream_live_input(live_stream)
+            else:
+                live_stream.save()
             if form.cleaned_data.get('create_upload_url') and live_stream.event_type in {LiveStream.RECORDED, LiveStream.REPLAY}:
                 try:
                     prepare_cloudflare_direct_upload(live_stream)

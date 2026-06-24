@@ -135,6 +135,7 @@ Ambiente:
 - [x] Live futura paga aparece na pagina publica mesmo inativa.
 - [x] Live abaixo de 2 EUR fica escondida ao publico.
 - [x] Criar live prepara ou reutiliza canal ao vivo do artista.
+- [x] Se a preparacao OBS falhar, a live fica gravada para preparar depois.
 - [x] Edicao de live mostra o canal StageHub ligado.
 - [x] Dados OBS aparecem na edicao da live quando disponiveis.
 - [x] Live sem dados OBS mostra botao `Preparar dados OBS`.

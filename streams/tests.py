@@ -18,7 +18,7 @@ from payments.models import PhotoGalleryPurchase, StreamTicketPurchase, Subscrip
 
 from .admin import PhotoGalleryAdmin
 from .forms import LiveStreamForm, PhotoGalleryForm, PhotoGalleryImageUploadForm
-from .cloudflare import create_direct_upload_for_stream
+from .cloudflare import CloudflareStreamError, create_direct_upload_for_stream
 from .models import LiveStream, MediaDeletionLog, PhotoGallery, PhotoGalleryImage, Tip
 
 
@@ -596,6 +596,38 @@ class LiveStreamFormTests(TestCase):
         self.assertEqual(self.artist.cloudflare_live_input_uid, 'live-input-prepared')
         self.assertEqual(stream.cloudflare_live_input_uid, 'live-input-prepared')
         self.assertEqual(stream.cloudflare_video_uid, '')
+
+    @patch('streams.views.create_live_input_for_artist')
+    def test_live_creation_is_kept_when_obs_setup_fails(self, create_live_input):
+        create_live_input.side_effect = CloudflareStreamError('Cloudflare indisponivel')
+        scheduled_at = timezone.localtime(timezone.now() + timedelta(minutes=30)).strftime('%Y-%m-%dT%H:%M')
+        self.user.set_password('pass12345')
+        self.user.save()
+        self.client.login(username='artist', password='pass12345')
+
+        response = self.client.post(reverse('streams:stream_create'), {
+            'artist': self.artist.id,
+            'title': 'Live guardada sem OBS',
+            'description': 'Mesmo com falha OBS, a live fica criada.',
+            'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            'cloudflare_stream_id': '',
+            'cloudflare_playback_url': '',
+            'youtube_video_id': '',
+            'event_type': LiveStream.LIVE,
+            'access_price': '2.00',
+            'scheduled_at': scheduled_at,
+            'duration_minutes': '',
+            'create_upload_url': '',
+        })
+
+        stream = LiveStream.objects.get(title='Live guardada sem OBS')
+        self.assertRedirects(response, reverse('streams:stream_update', args=[stream.id]))
+        self.assertEqual(stream.artist, self.artist)
+        self.assertEqual(stream.event_type, LiveStream.LIVE)
+        self.assertEqual(stream.access_price, Decimal('2.00'))
+        self.assertEqual(stream.cloudflare_upload_status, LiveStream.UPLOAD_NOT_REQUESTED)
+        self.assertEqual(stream.cloudflare_video_uid, '')
+        self.assertEqual(stream.cloudflare_live_input_uid, '')
 
     def test_recorded_cloudflare_video_rejects_duration_over_one_hour(self):
         scheduled_at = timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M')
