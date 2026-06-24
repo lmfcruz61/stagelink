@@ -124,7 +124,25 @@ Ambiente:
 - [x] Video com mais de 1 hora e recusado.
 - [ ] Falha de upload mostra mensagem clara.
 
-## 9. Stripe Connect do artista
+## 9. Lives e OBS
+
+- [x] Botao `Nova live` aparece para artista/gestor.
+- [x] Formulario de live abre.
+- [x] Formulario de live nao exige ID manual de video.
+- [x] Criar live prepara ou reutiliza canal ao vivo do artista.
+- [x] Dados OBS aparecem na edicao da live quando disponiveis.
+- [x] Configuracao OBS recomendada aparece:
+  - [x] 1280x720
+  - [x] 30 FPS
+  - [x] Bitrate 4000-6000 kbps
+  - [x] Keyframe 2 segundos
+  - [x] x264 veryfast
+- [x] Live agendada mantem contagem decrescente na sala.
+- [x] Live ativa mostra badge vermelho `Ao vivo`.
+- [ ] Teste real com OBS envia imagem/som para a sala.
+- [ ] Publico consegue entrar e assistir live real apos pagamento.
+
+## 10. Stripe Connect do artista
 
 - [x] Botao `Ligar Stripe` aparece quando conta nao esta ligada.
 - [ ] Botao abre fluxo Stripe.
@@ -134,7 +152,7 @@ Ambiente:
 - [x] Dashboard mostra cobrancas ativas quando Stripe permite.
 - [x] Dashboard mostra pagamentos ao banco ativos quando Stripe permite.
 
-## 10. Pagamentos do publico
+## 11. Pagamentos do publico
 
 - [x] Publico sem acesso ve bloqueio em video pago.
 - [x] Publico consegue iniciar compra de video.
@@ -147,7 +165,7 @@ Ambiente:
 - [x] Gorjeta funciona, se disponivel.
 - [x] Subscricao funciona, se o modo do artista permitir.
 
-## 11. Comissoes
+## 12. Comissoes
 
 - [x] Artista com comissao 20% calcula valores corretamente.
 - [x] Artista com comissao 10% calcula valores corretamente.
@@ -157,7 +175,7 @@ Ambiente:
 - [x] Dashboard mostra liquido estimado do artista.
 - [x] Pagamentos antigos nao sao alterados por mudanca futura de comissao.
 
-## 12. Modos de monetizacao
+## 13. Modos de monetizacao
 
 - [x] `Somente subscricao` nao mostra compra avulsa.
 - [x] `Subscricao e material pago exclusivo` exige subscricao para material pago.
@@ -165,7 +183,7 @@ Ambiente:
 - [ ] Alterar modo no admin reflete na pagina publica.
 - [x] Conteudos aparecem de forma coerente com o modo escolhido.
 
-## 13. Admin
+## 14. Admin
 
 - [x] Admin Django abre.
 - [ ] Admin consegue ver artistas.
@@ -180,7 +198,7 @@ Ambiente:
 - [x] Admin consegue apagar media quando necessario.
 - [x] Logs de eliminacao ficam registados.
 
-## 14. Contactos
+## 15. Contactos
 
 - [x] Pagina `/contacto` abre.
 - [x] Formulario exige nome.
@@ -194,7 +212,7 @@ Ambiente:
 - [x] Mensagem fica guardada na base de dados.
 - [x] Admin consegue ver a mensagem.
 
-## 15. Mobile
+## 16. Mobile
 
 - [ ] Homepage funciona em mobile.
 - [ ] Pagina do artista funciona em mobile.
@@ -204,7 +222,7 @@ Ambiente:
 - [ ] Checkout Stripe funciona em mobile.
 - [ ] Rodape fica legivel em mobile.
 
-## 16. Erros e estabilidade
+## 17. Erros e estabilidade
 
 - [ ] Site nao mostra erro 502.
 - [x] Site nao mostra erro 500.
@@ -213,7 +231,7 @@ Ambiente:
 - [x] `https://stagehub.pt/` responde 200 OK.
 - [x] Logs Fly nao mostram erros recentes.
 
-## 17. Resultado final
+## 18. Resultado final
 
 - [ ] Artista consegue completar pagina.
 - [ ] Artista consegue carregar fotos.

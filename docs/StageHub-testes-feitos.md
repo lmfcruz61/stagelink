@@ -7,7 +7,7 @@ Este ficheiro resume os testes ja executados por Codex e que justificam os check
 ## Resultado geral
 
 - `python manage.py check`: OK
-- `python manage.py test`: 80 testes OK
+- `python manage.py test`: 84 testes OK
 - Deploy Fly feito na versao 90
 - Producao validada internamente na maquina Fly com resposta HTTP 200 para `stagehub.pt`
 - Logs Fly sem erro 500 recente depois do deploy
@@ -99,6 +99,17 @@ Este ficheiro resume os testes ja executados por Codex e que justificam os check
 - Upload direto Cloudflare cria URL e UID.
 - Upload direto Cloudflare limita duracao maxima a 1 hora.
 - Embed Cloudflare normaliza varios formatos de URL/ID.
+
+### Lives e OBS
+
+- TC-LIVE-001: formulario de live StageHub aceita criacao sem ID manual de video.
+- TC-LIVE-002: criacao de live prepara/reutiliza canal ao vivo do artista e guarda dados OBS.
+- TC-LIVE-003: pagina de edicao de live mostra configuracao OBS recomendada.
+- TC-LIVE-004: recomendacoes OBS aparecem com 1280x720, 30 FPS, bitrate 4000-6000 kbps, keyframe 2 segundos e x264 veryfast.
+- TC-LIVE-005: pagina publica do artista mostra badge vermelho `Ao vivo` quando a live esta ativa.
+- TC-LIVE-006: sala da live mantem contagem decrescente antes da hora marcada.
+- TC-LIVE-007: ao terminar a contagem, a sala troca o estado visual para `Ao vivo`.
+- TC-LIVE-008: dashboard, homepage e pagina publica mantem botoes separados para `Novo video` e `Nova live`.
 
 ### Admin e media Cloudflare
 

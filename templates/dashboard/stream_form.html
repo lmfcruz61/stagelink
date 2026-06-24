@@ -2,20 +2,39 @@
 {% block title %}Evento - StageHub{% endblock %}
 {% block content %}
 <section class="mx-auto max-w-3xl">
-  <h1 class="mb-6 text-3xl font-semibold">{% if stream %}Editar video{% else %}Novo video{% endif %}</h1>
+  <h1 class="mb-6 text-3xl font-semibold">
+    {% if is_live_form %}
+      {% if stream %}Editar live{% else %}Nova live{% endif %}
+    {% else %}
+      {% if stream %}Editar video{% else %}Novo video{% endif %}
+    {% endif %}
+  </h1>
   <div class="mb-5 rounded border border-[#5230EF] bg-[#5230EF]/15 p-4 text-sm text-zinc-200">
-    Cria um video pago simples: preenche os dados, guarda, envia o ficheiro e publica quando estiver pronto. Define sempre um preco igual ou superior a 2 EUR.
+    {% if is_live_form %}
+      Cria uma live paga simples: preenche os dados, guarda, configura o OBS com os dados da StageHub e ativa quando estiver pronta. Define sempre um preco igual ou superior a 2 EUR.
+    {% else %}
+      Cria um video pago simples: preenche os dados, guarda, envia o ficheiro e publica quando estiver pronto. Define sempre um preco igual ou superior a 2 EUR.
+    {% endif %}
   </div>
 
   <details class="mb-5 rounded-xl border border-zinc-800 bg-zinc-900/90 p-5" open>
-    <summary class="cursor-pointer text-lg font-semibold text-zinc-100">Guia passo a passo para publicar um video</summary>
+    <summary class="cursor-pointer text-lg font-semibold text-zinc-100">{% if is_live_form %}Guia passo a passo para preparar uma live{% else %}Guia passo a passo para publicar um video{% endif %}</summary>
     <ol class="mt-4 grid gap-3 text-sm text-zinc-200 md:grid-cols-2">
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Preenche os dados.</strong><br>Adiciona titulo, descricao, capa horizontal, preco, data e duracao estimada.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>2. Mantem upload preparado.</strong><br>Para videos gravados, a StageHub prepara automaticamente a zona de envio.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Guarda.</strong><br>Depois de guardar, aparece a area Upload do video nesta pagina.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Envia o ficheiro.</strong><br>Escolhe o video no computador e clica Enviar video. O limite e 1 hora.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>5. Confirma o estado.</strong><br>Quando aparecer Upload recebido, o ficheiro ficou associado a este video.</li>
-      <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>6. Testa e publica.</strong><br>Abre a sala para testar e ativa o conteudo quando estiver pronto.</li>
+      {% if is_live_form %}
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Preenche os dados.</strong><br>Adiciona titulo, descricao, capa horizontal, preco, data e duracao estimada.</li>
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>2. Guarda.</strong><br>A StageHub prepara ou reutiliza o canal ao vivo do artista.</li>
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Configura o OBS.</strong><br>Copia o servidor e a chave de transmissao mostrados abaixo.</li>
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Testa.</strong><br>Faz um teste privado antes da hora marcada.</li>
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>5. Ativa.</strong><br>Quando estiver tudo pronto, ativa a live para o publico com acesso.</li>
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>6. Transmite.</strong><br>No OBS, clica Iniciar transmissao na hora combinada.</li>
+      {% else %}
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>1. Preenche os dados.</strong><br>Adiciona titulo, descricao, capa horizontal, preco, data e duracao estimada.</li>
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>2. Mantem upload preparado.</strong><br>Para videos gravados, a StageHub prepara automaticamente a zona de envio.</li>
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>3. Guarda.</strong><br>Depois de guardar, aparece a area Upload do video nesta pagina.</li>
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>4. Envia o ficheiro.</strong><br>Escolhe o video no computador e clica Enviar video. O limite e 1 hora.</li>
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>5. Confirma o estado.</strong><br>Quando aparecer Upload recebido, o ficheiro ficou associado a este video.</li>
+        <li class="rounded border border-zinc-800 bg-zinc-950 p-3"><strong>6. Testa e publica.</strong><br>Abre a sala para testar e ativa o conteudo quando estiver pronto.</li>
+      {% endif %}
     </ol>
   </details>
 
@@ -157,6 +176,41 @@
       {% endif %}
     </div>
   </form>
+  {% if stream and stream.event_type == stream.LIVE %}
+    <section class="mt-6 rounded-xl border border-[#2596BE] bg-[#2596BE]/12 p-5">
+      <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Configuracao OBS recomendada</h2>
+          <p class="mt-1 text-sm text-zinc-300">Usa estes dados no OBS para transmitir esta live. Mantem a chave privada.</p>
+        </div>
+        <span class="sl-chip border-[#2596BE] text-[#2596BE]">Live StageHub</span>
+      </div>
+      {% if stream.artist.cloudflare_rtmps_url and stream.artist.cloudflare_stream_key %}
+        <div class="mt-5 grid gap-3">
+          <div class="rounded border border-zinc-800 bg-zinc-950 p-3">
+            <p class="text-xs font-semibold uppercase text-zinc-500">Servidor</p>
+            <p class="mt-1 break-all font-mono text-sm text-zinc-100">{{ stream.artist.cloudflare_rtmps_url }}</p>
+          </div>
+          <div class="rounded border border-zinc-800 bg-zinc-950 p-3">
+            <p class="text-xs font-semibold uppercase text-zinc-500">Chave de transmissao</p>
+            <p class="mt-1 break-all font-mono text-sm text-zinc-100">{{ stream.artist.cloudflare_stream_key }}</p>
+          </div>
+        </div>
+      {% else %}
+        <p class="mt-4 rounded border border-amber-500/50 bg-amber-500/10 p-3 text-sm text-amber-100">Os dados OBS ainda nao estao disponiveis. Guarda novamente a live ou contacta o suporte StageHub.</p>
+      {% endif %}
+      <div class="mt-5 rounded border border-zinc-800 bg-zinc-950 p-4">
+        <h3 class="font-semibold">Definicoes recomendadas no OBS</h3>
+        <ul class="mt-3 grid gap-2 text-sm text-zinc-300 md:grid-cols-2">
+          <li><strong>Resolucao:</strong> 1280x720</li>
+          <li><strong>FPS:</strong> 30 FPS</li>
+          <li><strong>Bitrate:</strong> 4000-6000 kbps</li>
+          <li><strong>Keyframe:</strong> 2 segundos</li>
+          <li><strong>Encoder:</strong> x264 veryfast</li>
+        </ul>
+      </div>
+    </section>
+  {% endif %}
   {% if stream and stream.has_pending_direct_upload %}
     <section class="mt-6 rounded-xl border border-[#5230EF] bg-[#5230EF]/15 p-5">
       <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">

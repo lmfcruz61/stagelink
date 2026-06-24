@@ -399,6 +399,91 @@ class LiveStreamFormTests(TestCase):
 
         self.assertTrue(form.is_valid(), form.errors)
 
+    def test_live_cloudflare_does_not_require_manual_video_uid(self):
+        scheduled_at = timezone.localtime(timezone.now() + timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M')
+        form = LiveStreamForm(
+            data={
+                'title': 'Live nova',
+                'description': '',
+                'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+                'cloudflare_stream_id': '',
+                'cloudflare_playback_url': '',
+                'youtube_video_id': '',
+                'event_type': LiveStream.LIVE,
+                'access_price': '5.00',
+                'scheduled_at': scheduled_at,
+                'duration_minutes': '',
+                'create_upload_url': '',
+            },
+            artist=self.artist,
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+    @patch('streams.views.create_live_input_for_artist')
+    def test_dashboard_creates_live_and_prepares_obs_data(self, create_live_input):
+        create_live_input.return_value = {
+            'uid': 'live-input-new',
+            'rtmps_url': 'rtmps://live.cloudflare.com/live/',
+            'stream_key': 'secret-key',
+        }
+        self.user.set_password('pass12345')
+        self.user.save()
+        self.client.login(username='artist', password='pass12345')
+        scheduled_at = timezone.localtime(timezone.now() + timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M')
+
+        response = self.client.post(reverse('streams:stream_create'), {
+            'artist': self.artist.id,
+            'title': 'Live preparada',
+            'description': '',
+            'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            'cloudflare_stream_id': '',
+            'cloudflare_playback_url': '',
+            'youtube_video_id': '',
+            'event_type': LiveStream.LIVE,
+            'access_price': '5.00',
+            'scheduled_at': scheduled_at,
+            'duration_minutes': '',
+            'create_upload_url': '',
+        })
+
+        stream = LiveStream.objects.get(title='Live preparada')
+        self.assertRedirects(response, reverse('streams:stream_update', args=[stream.id]))
+        self.artist.refresh_from_db()
+        self.assertEqual(self.artist.cloudflare_live_input_uid, 'live-input-new')
+        self.assertEqual(self.artist.cloudflare_rtmps_url, 'rtmps://live.cloudflare.com/live/')
+        self.assertEqual(self.artist.cloudflare_stream_key, 'secret-key')
+        self.assertEqual(stream.cloudflare_live_input_uid, 'live-input-new')
+        self.assertEqual(stream.cloudflare_video_uid, '')
+
+    def test_live_edit_page_shows_obs_recommendations(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Live com OBS',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_live_input_uid='live-input-123',
+            event_type=LiveStream.LIVE,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.now() + timedelta(minutes=10),
+        )
+        self.artist.cloudflare_live_input_uid = 'live-input-123'
+        self.artist.cloudflare_rtmps_url = 'rtmps://live.cloudflare.com/live/'
+        self.artist.cloudflare_stream_key = 'secret-key'
+        self.artist.save(update_fields=[
+            'cloudflare_live_input_uid',
+            'cloudflare_rtmps_url',
+            'cloudflare_stream_key',
+        ])
+        self.user.set_password('pass12345')
+        self.user.save()
+        self.client.login(username='artist', password='pass12345')
+
+        response = self.client.get(reverse('streams:stream_update', args=[stream.id]))
+
+        self.assertContains(response, 'Configuracao OBS recomendada')
+        self.assertContains(response, '1280x720')
+        self.assertContains(response, '4000-6000 kbps')
+
     def test_recorded_cloudflare_video_rejects_duration_over_one_hour(self):
         scheduled_at = timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M')
         form = LiveStreamForm(
@@ -571,6 +656,14 @@ class LiveStreamAccessAndEmbedTests(TestCase):
         stream.is_active = True
 
         self.assertEqual(stream.display_status['code'], 'live')
+
+    def test_artist_page_marks_current_live_with_red_badge(self):
+        self.create_paid_stream()
+
+        response = self.client.get(reverse('streams:artist_detail', args=[self.artist.id]))
+
+        self.assertContains(response, 'Ao vivo')
+        self.assertContains(response, 'sl-live-badge')
 
     def test_paid_ticket_allows_entry_after_scheduled_time(self):
         stream = self.create_paid_stream()

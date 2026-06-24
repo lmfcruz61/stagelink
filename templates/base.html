@@ -133,6 +133,43 @@
       font-weight: 700;
     }
 
+    .sl-live-badge {
+      border: 1px solid rgba(248, 113, 113, 0.92);
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.98), rgba(127, 29, 29, 0.94));
+      box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.22), 0 0 28px rgba(239, 68, 68, 0.42);
+      color: rgb(255 255 255);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.38rem 0.8rem;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .sl-live-dot {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 999px;
+      background: rgb(254 202 202);
+      box-shadow: 0 0 0 rgba(254, 202, 202, 0.75);
+      animation: slLivePulse 1.35s ease-out infinite;
+    }
+
+    @keyframes slLivePulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(254, 202, 202, 0.8);
+      }
+      70% {
+        box-shadow: 0 0 0 8px rgba(254, 202, 202, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(254, 202, 202, 0);
+      }
+    }
+
     .sl-primary {
       border-radius: 999px;
       background: #5230EF;

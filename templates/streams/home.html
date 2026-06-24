@@ -10,7 +10,8 @@
     </div>
     <div class="flex flex-wrap gap-3">
       <a class="sl-secondary" href="{% url 'streams:dashboard' %}">Dashboard</a>
-      <a class="sl-primary" href="{% url 'streams:stream_create' %}?type=recorded">Novo video</a>
+      <a class="sl-secondary" href="{% url 'streams:stream_create' %}?type=recorded">Novo video</a>
+      <a class="sl-primary" href="{% url 'streams:stream_create' %}?type=live">Nova live</a>
     </div>
   </section>
 {% elif user.is_authenticated and user.fan_profile %}
@@ -92,7 +93,11 @@
             {% else %}
               <div class="flex h-full items-center justify-center px-5 text-center font-semibold">{{ stream.title }}</div>
             {% endif %}
-            <span class="absolute left-3 top-3 sl-chip">{{ stream.display_status.text }}</span>
+            {% if stream.display_status.code == 'live' %}
+              <span class="absolute left-3 top-3 sl-live-badge"><span class="sl-live-dot"></span>Ao vivo</span>
+            {% else %}
+              <span class="absolute left-3 top-3 sl-chip">{{ stream.display_status.text }}</span>
+            {% endif %}
           </div>
           <div class="p-5">
             <p class="text-sm text-[#2596BE]">{{ stream.artist.name }}</p>
@@ -271,7 +276,11 @@
               <div class="flex h-full w-full items-center justify-center px-4 text-center text-sm font-semibold text-zinc-300">{{ stream.title }}</div>
             {% endif %}
             <div class="absolute left-3 top-3 flex flex-wrap gap-2">
-              <span class="rounded border border-zinc-700 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-zinc-100">{{ stream.display_status.text }}</span>
+              {% if stream.display_status.code == 'live' %}
+                <span class="sl-live-badge"><span class="sl-live-dot"></span>Ao vivo</span>
+              {% else %}
+                <span class="rounded border border-zinc-700 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-zinc-100">{{ stream.display_status.text }}</span>
+              {% endif %}
               {% if stream.artist_id in favorite_artist_ids %}
                 <span class="rounded border border-amber-300 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-amber-100"><span class="favorite-star mr-1">&#9733;</span> Favorito</span>
               {% endif %}

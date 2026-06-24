@@ -68,6 +68,7 @@ class LiveStreamForm(forms.ModelForm):
             (LiveStream.VIDEO_PROVIDER_CLOUDFLARE, 'Video StageHub'),
         )
         self.fields['event_type'].choices = (
+            (LiveStream.LIVE, 'Live'),
             (LiveStream.RECORDED, 'Video gravado'),
             (LiveStream.REPLAY, 'Replay'),
         )
@@ -137,10 +138,11 @@ class LiveStreamForm(forms.ModelForm):
 
         if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE:
             accepts_direct_upload = event_type in {LiveStream.RECORDED, LiveStream.REPLAY} and create_upload_url
-            if not cloudflare_stream_id and not cloudflare_playback_url and not accepts_direct_upload:
+            accepts_live_setup = event_type in {LiveStream.LIVE, LiveStream.PREMIERE} and self.artist
+            if not cloudflare_stream_id and not cloudflare_playback_url and not accepts_direct_upload and not accepts_live_setup:
                 self.add_error(
                     'cloudflare_stream_id',
-                    'Indica o codigo de video StageHub ou prepara um upload direto.',
+                    'Indica o codigo de video StageHub, prepara um upload direto ou cria uma live StageHub.',
                 )
 
         access_price = cleaned_data.get('access_price')

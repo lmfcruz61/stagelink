@@ -33,7 +33,7 @@
   <div class="sl-card p-6">
     <h2 class="mb-5 text-xl font-semibold">Conteudo principal</h2>
     <div class="mb-5 rounded border border-[#5230EF] bg-[#5230EF]/15 p-4 text-sm text-zinc-200">
-      <strong>Conteudo simples:</strong> o artista prepara a pagina, cria galerias e envia videos gravados diretamente pela StageHub. Nao precisa de ferramentas tecnicas externas.
+      <strong>Conteudo simples:</strong> o artista prepara a pagina, cria galerias, envia videos gravados e pode agendar lives quando precisar.
     </div>
     <div class="mb-5 rounded border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-200">
       <h3 class="font-semibold">Modo de monetizacao atual</h3>
@@ -70,6 +70,36 @@
         <a class="sl-primary whitespace-nowrap" href="{% url 'payments:stripe_connect_start' artist.id %}">
           {% if artist.stripe_connect_ready %}Abrir painel Stripe{% elif artist.stripe_account_id %}Continuar validacao Stripe{% else %}Ligar Stripe{% endif %}
         </a>
+      </div>
+    </div>
+    <div class="mb-5 rounded border border-red-500/50 bg-red-950/20 p-4 text-sm text-zinc-200">
+      <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h3 class="font-semibold text-red-100">Lives e OBS</h3>
+          <p class="mt-2 text-zinc-300">Para transmitir ao vivo, usa estes dados no OBS. Mantem a chave privada.</p>
+          {% if artist.cloudflare_live_input_uid %}
+            <div class="mt-3 space-y-2">
+              <p>Servidor: <span class="font-mono text-zinc-100">{{ artist.cloudflare_rtmps_url }}</span></p>
+              <p>Chave de transmissao: <span class="font-mono text-zinc-100">{{ artist.cloudflare_stream_key }}</span></p>
+            </div>
+          {% else %}
+            <p class="mt-3 text-zinc-400">Este artista ainda nao tem dados OBS preparados.</p>
+          {% endif %}
+        </div>
+        {% if not artist.cloudflare_live_input_uid %}
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_cloudflare_live_input">
+            <button class="sl-primary whitespace-nowrap">Preparar dados OBS</button>
+          </form>
+        {% endif %}
+      </div>
+      <div class="mt-4 grid gap-2 text-xs text-zinc-300 sm:grid-cols-2 lg:grid-cols-3">
+        <span class="rounded border border-red-500/30 bg-zinc-950/70 px-3 py-2">Resolucao: 1280x720</span>
+        <span class="rounded border border-red-500/30 bg-zinc-950/70 px-3 py-2">FPS: 30</span>
+        <span class="rounded border border-red-500/30 bg-zinc-950/70 px-3 py-2">Bitrate: 4000-6000 kbps</span>
+        <span class="rounded border border-red-500/30 bg-zinc-950/70 px-3 py-2">Keyframe: 2 segundos</span>
+        <span class="rounded border border-red-500/30 bg-zinc-950/70 px-3 py-2">Encoder: x264 veryfast</span>
       </div>
     </div>
     <form method="post" enctype="multipart/form-data" class="space-y-4">

@@ -53,7 +53,8 @@
         {% endif %}
         {% if can_manage_current_artist %}
           <a class="sl-secondary bg-zinc-950/80" href="{% url 'streams:artist_profile_edit' %}?artist={{ artist.id }}">Editar pagina</a>
-          <a class="sl-primary" href="{% url 'streams:stream_create' %}?artist={{ artist.id }}&type=recorded">Novo video</a>
+          <a class="sl-secondary bg-zinc-950/80" href="{% url 'streams:stream_create' %}?artist={{ artist.id }}&type=recorded">Novo video</a>
+          <a class="sl-primary" href="{% url 'streams:stream_create' %}?artist={{ artist.id }}&type=live">Nova live</a>
         {% endif %}
       </div>
     </div>
@@ -73,7 +74,11 @@
           <img src="{{ featured_stream.cover_image.url }}" alt="{{ featured_stream.title }}" class="aspect-video w-full object-cover">
         {% endif %}
         <div class="p-5">
-          <p class="sl-chip border-[#5230EF] text-[#2596BE]">{{ featured_stream.display_status.text }}</p>
+          {% if featured_stream.display_status.code == 'live' %}
+            <p class="sl-live-badge"><span class="sl-live-dot"></span>Ao vivo</p>
+          {% else %}
+            <p class="sl-chip border-[#5230EF] text-[#2596BE]">{{ featured_stream.display_status.text }}</p>
+          {% endif %}
           <h2 class="mt-2 text-2xl font-semibold">{{ featured_stream.title }}</h2>
           <p class="mt-2 text-zinc-400">{{ featured_stream.scheduled_at|date:"d/m/Y H:i" }} &middot; {{ featured_stream.access_price }} EUR</p>
           <div class="mt-5 flex flex-wrap gap-3">
@@ -168,6 +173,9 @@
 <section class="mb-10">
   <div class="mb-4 flex items-center justify-between">
     <h2 class="text-2xl font-semibold">Eventos agendados</h2>
+    {% if can_manage_current_artist %}
+      <a class="sl-secondary px-3 py-2 text-sm" href="{% url 'streams:stream_create' %}?artist={{ artist.id }}&type=live">Nova live</a>
+    {% endif %}
   </div>
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for stream in upcoming_streams %}
@@ -178,7 +186,11 @@
           {% else %}
             <div class="flex h-full w-full items-center justify-center px-4 text-center font-semibold">{{ stream.title }}</div>
           {% endif %}
-          <span class="absolute left-3 top-3 rounded border border-zinc-700 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-zinc-100">{{ stream.display_status.text }}</span>
+          {% if stream.display_status.code == 'live' %}
+            <span class="absolute left-3 top-3 sl-live-badge"><span class="sl-live-dot"></span>Ao vivo</span>
+          {% else %}
+            <span class="absolute left-3 top-3 rounded border border-zinc-700 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-zinc-100">{{ stream.display_status.text }}</span>
+          {% endif %}
         </div>
         <div class="px-1 py-3">
           <h3 class="font-semibold">{{ stream.title }}</h3>
@@ -252,7 +264,11 @@
           {% else %}
             <div class="flex h-full w-full items-center justify-center px-4 text-center font-semibold">{{ stream.title }}</div>
           {% endif %}
-          <span class="absolute left-3 top-3 rounded border border-zinc-700 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-zinc-100">{{ stream.display_status.text }}</span>
+          {% if stream.display_status.code == 'live' %}
+            <span class="absolute left-3 top-3 sl-live-badge"><span class="sl-live-dot"></span>Ao vivo</span>
+          {% else %}
+            <span class="absolute left-3 top-3 rounded border border-zinc-700 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-zinc-100">{{ stream.display_status.text }}</span>
+          {% endif %}
         </div>
         <div class="px-1 py-3">
           <h3 class="font-semibold">{{ stream.title }}</h3>
@@ -325,7 +341,11 @@
           {% else %}
             <div class="flex h-full w-full items-center justify-center px-4 text-center font-semibold">{{ stream.title }}</div>
           {% endif %}
-          <span class="absolute left-3 top-3 rounded border border-zinc-700 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-zinc-100">{{ stream.display_status.text }}</span>
+          {% if stream.display_status.code == 'live' %}
+            <span class="absolute left-3 top-3 sl-live-badge"><span class="sl-live-dot"></span>Ao vivo</span>
+          {% else %}
+            <span class="absolute left-3 top-3 rounded border border-zinc-700 bg-zinc-950/85 px-2 py-1 text-xs font-semibold text-zinc-100">{{ stream.display_status.text }}</span>
+          {% endif %}
         </div>
         <div class="px-1 py-3">
           <h3 class="font-semibold">{{ stream.title }}</h3>
