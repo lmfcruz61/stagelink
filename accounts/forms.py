@@ -21,6 +21,12 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = ('username', 'email', 'display_name', 'role', 'password1', 'password2')
 
+    def clean_email(self):
+        email = self.cleaned_data['email'].strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('Este email ja esta associado a uma conta. Usa esse login para gerir varios artistas.')
+        return email
+
     @transaction.atomic
     def save(self, commit=True):
         user = super().save(commit=False)

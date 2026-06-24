@@ -1,5 +1,39 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
+
+from .forms import SignUpForm
+
+
+class SignUpFormTests(TestCase):
+    def test_signup_rejects_existing_email_case_insensitive(self):
+        User.objects.create_user(username='luis', email='luis@example.com')
+
+        form = SignUpForm(data={
+            'username': 'siulc',
+            'email': 'LUIS@example.com',
+            'display_name': 'SIULC',
+            'role': 'musician',
+            'password1': 'StrongPass123!',
+            'password2': 'StrongPass123!',
+        })
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('email', form.errors)
+
+    def test_signup_normalizes_new_email_to_lowercase(self):
+        form = SignUpForm(data={
+            'username': 'newartist',
+            'email': 'ARTISTA@EXAMPLE.COM',
+            'display_name': 'Novo Artista',
+            'role': 'musician',
+            'password1': 'StrongPass123!',
+            'password2': 'StrongPass123!',
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+        user = form.save()
+        self.assertEqual(user.email, 'artista@example.com')
 
 
 class PasswordResetPageTests(TestCase):
