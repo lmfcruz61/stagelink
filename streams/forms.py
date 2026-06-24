@@ -143,7 +143,7 @@ class LiveStreamForm(forms.ModelForm):
 
         access_price = cleaned_data.get('access_price')
         if access_price is not None:
-            if access_price < 2:
+            if access_price < LiveStream.MIN_PRICE:
                 self.add_error(
                     'access_price',
                     'O preco minimo de bilhete na StageHub e 2 EUR.',

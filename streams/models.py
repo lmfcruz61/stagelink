@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class LiveStream(models.Model):
+    MIN_PRICE = Decimal('2.00')
     VIDEO_PROVIDER_CLOUDFLARE = 'cloudflare_stream'
     VIDEO_PROVIDER_CLOUDFLARE_WEBRTC = 'cloudflare_webrtc'
     VIDEO_PROVIDER_YOUTUBE = 'youtube'
@@ -58,7 +59,7 @@ class LiveStream(models.Model):
     uploaded_at = models.DateTimeField(blank=True, null=True)
     youtube_video_id = models.CharField(max_length=200, blank=True)
     event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default=LIVE)
-    access_price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    access_price = models.DecimalField(max_digits=8, decimal_places=2, default=MIN_PRICE)
     scheduled_at = models.DateTimeField()
     duration_minutes = models.PositiveIntegerField(
         blank=True,

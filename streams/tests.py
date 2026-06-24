@@ -778,6 +778,38 @@ class LiveStreamAccessAndEmbedTests(TestCase):
         self.assertContains(response, 'Ao vivo')
         self.assertContains(response, 'sl-live-badge')
 
+    def test_artist_page_shows_scheduled_inactive_paid_live(self):
+        LiveStream.objects.create(
+            artist=self.artist,
+            title='Live futura paga',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_live_input_uid='live-input-future',
+            event_type=LiveStream.LIVE,
+            access_price=LiveStream.MIN_PRICE,
+            scheduled_at=timezone.now() + timedelta(hours=2),
+            is_active=False,
+        )
+
+        response = self.client.get(reverse('streams:artist_detail', args=[self.artist.id]))
+
+        self.assertContains(response, 'Live futura paga')
+
+    def test_artist_page_hides_live_below_minimum_price_from_public(self):
+        LiveStream.objects.create(
+            artist=self.artist,
+            title='Live barata escondida',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_live_input_uid='live-input-cheap',
+            event_type=LiveStream.LIVE,
+            access_price=Decimal('1.00'),
+            scheduled_at=timezone.now() + timedelta(hours=2),
+            is_active=False,
+        )
+
+        response = self.client.get(reverse('streams:artist_detail', args=[self.artist.id]))
+
+        self.assertNotContains(response, 'Live barata escondida')
+
     def test_paid_ticket_allows_entry_after_scheduled_time(self):
         stream = self.create_paid_stream()
         StreamTicketPurchase.objects.create(

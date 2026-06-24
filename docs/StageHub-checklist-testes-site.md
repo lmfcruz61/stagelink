@@ -131,6 +131,9 @@ Ambiente:
 - [x] Formulario de live nao exige ID manual de video.
 - [x] Nova live abre com preco inicial de 2 EUR.
 - [x] Preco minimo de 2 EUR e aplicado a lives novas e antigas.
+- [x] Eventos/lives existentes abaixo de 2 EUR sao corrigidos para 2 EUR por migracao.
+- [x] Live futura paga aparece na pagina publica mesmo inativa.
+- [x] Live abaixo de 2 EUR fica escondida ao publico.
 - [x] Criar live prepara ou reutiliza canal ao vivo do artista.
 - [x] Edicao de live mostra o canal StageHub ligado.
 - [x] Dados OBS aparecem na edicao da live quando disponiveis.

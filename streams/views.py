@@ -100,7 +100,7 @@ def home(request):
             return redirect('streams:home')
         messages.warning(request, 'Nao foi possivel subscrever a newsletter. Confirma os dados abaixo.')
 
-    visible_streams_filter = (Q(is_active=True) | Q(scheduled_at__gte=now)) & Q(access_price__gt=0)
+    visible_streams_filter = (Q(is_active=True) | Q(scheduled_at__gte=now)) & Q(access_price__gte=LiveStream.MIN_PRICE)
     purchased_stream_ids = set()
     purchased_gallery_ids = set()
     if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
@@ -296,7 +296,10 @@ def artist_detail(request, artist_id):
     streams = artist.streams.all()
     photo_galleries = artist.photo_galleries.all()
     if not can_manage_current_artist:
-        streams = streams.filter(Q(is_active=True) | Q(scheduled_at__gte=now), access_price__gt=0)
+        streams = streams.filter(
+            Q(is_active=True) | Q(scheduled_at__gte=now),
+            access_price__gte=LiveStream.MIN_PRICE,
+        )
         photo_galleries = photo_galleries.filter(
             is_active=True,
             moderation_status=PhotoGallery.APPROVED,
