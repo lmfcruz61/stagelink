@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 from urllib.parse import parse_qs, urlparse
 
 from .models import LiveStream, PhotoGallery
@@ -81,6 +82,7 @@ class LiveStreamForm(forms.ModelForm):
             self.initial['event_type'] = LiveStream.RECORDED
         if self.instance and self.instance.pk:
             self.fields['create_upload_url'].initial = self.instance.has_pending_direct_upload
+            self.initial['scheduled_at'] = timezone.localtime(self.instance.scheduled_at).strftime('%Y-%m-%dT%H:%M')
         elif self.initial.get('event_type') in {LiveStream.RECORDED, LiveStream.REPLAY}:
             self.fields['create_upload_url'].initial = True
         if self.instance and self.instance.pk:

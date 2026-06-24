@@ -45,12 +45,19 @@
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p class="text-sm text-zinc-400">Estado atual</p>
-          <p class="text-lg font-semibold">{% if stream.is_active %}Stream ativo{% else %}Stream inativo{% endif %}</p>
+          <p class="text-lg font-semibold">
+            {% if stream.event_type == stream.LIVE %}
+              {% if stream.is_active %}Live ativa{% else %}Live inativa{% endif %}
+            {% else %}
+              {% if stream.is_active %}Conteudo ativo{% else %}Conteudo inativo{% endif %}
+            {% endif %}
+          </p>
+          <p class="mt-1 text-sm text-zinc-400">Data marcada: {{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
         </div>
         {% if stream.is_active %}
-          <button class="rounded-full border border-red-600 bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-500" type="submit">&#9209; Desativar stream</button>
+          <button class="rounded-full border border-red-600 bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-500" type="submit">{% if stream.event_type == stream.LIVE %}Desativar live{% else %}Desativar conteudo{% endif %}</button>
         {% else %}
-          <button class="rounded-full border border-[#10B981] bg-[#10B981] px-5 py-3 font-semibold text-zinc-950 hover:bg-emerald-300" type="submit">&#9654; Ativar stream</button>
+          <button class="rounded-full border border-[#10B981] bg-[#10B981] px-5 py-3 font-semibold text-zinc-950 hover:bg-emerald-300" type="submit">{% if stream.event_type == stream.LIVE %}Ativar live{% else %}Ativar conteudo{% endif %}</button>
         {% endif %}
       </div>
     </form>
@@ -197,7 +204,14 @@
           </div>
         </div>
       {% else %}
-        <p class="mt-4 rounded border border-amber-500/50 bg-amber-500/10 p-3 text-sm text-amber-100">Os dados OBS ainda nao estao disponiveis. Guarda novamente a live ou contacta o suporte StageHub.</p>
+        <div class="mt-4 rounded border border-amber-500/50 bg-amber-500/10 p-4 text-sm text-amber-100">
+          <p>Os dados OBS ainda nao estao disponiveis para esta live.</p>
+          <form method="post" class="mt-3">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="prepare_obs">
+            <button class="sl-primary">Preparar dados OBS</button>
+          </form>
+        </div>
       {% endif %}
       <div class="mt-5 rounded border border-zinc-800 bg-zinc-950 p-4">
         <h3 class="font-semibold">Definicoes recomendadas no OBS</h3>

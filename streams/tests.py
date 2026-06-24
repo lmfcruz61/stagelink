@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 import json
 from unittest.mock import patch
@@ -345,6 +345,22 @@ class LiveStreamFormTests(TestCase):
 
         self.assertIn('T', str(form['scheduled_at']))
 
+    def test_datetime_local_value_uses_current_timezone_on_edit(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Live com data',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_live_input_uid='live-input-123',
+            event_type=LiveStream.LIVE,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.make_aware(datetime(2026, 6, 24, 20, 30)),
+        )
+
+        with timezone.override('Europe/Lisbon'):
+            form = LiveStreamForm(instance=stream, artist=self.artist)
+
+        self.assertIn('2026-06-24T20:30', str(form['scheduled_at']))
+
     def test_title_only_edit_does_not_fail_on_legacy_video_rules(self):
         stream = LiveStream.objects.create(
             artist=self.artist,
@@ -481,8 +497,40 @@ class LiveStreamFormTests(TestCase):
         response = self.client.get(reverse('streams:stream_update', args=[stream.id]))
 
         self.assertContains(response, 'Configuracao OBS recomendada')
+        self.assertContains(response, 'Ativar live')
+        self.assertContains(response, 'Live inativa')
         self.assertContains(response, '1280x720')
         self.assertContains(response, '4000-6000 kbps')
+
+    @patch('streams.views.create_live_input_for_artist')
+    def test_live_edit_page_can_prepare_missing_obs_data(self, create_live_input):
+        create_live_input.return_value = {
+            'uid': 'live-input-prepared',
+            'rtmps_url': 'rtmps://live.cloudflare.com/live/',
+            'stream_key': 'secret-key',
+        }
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Live sem OBS',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            event_type=LiveStream.LIVE,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.now() + timedelta(minutes=10),
+        )
+        self.user.set_password('pass12345')
+        self.user.save()
+        self.client.login(username='artist', password='pass12345')
+
+        response = self.client.post(reverse('streams:stream_update', args=[stream.id]), {
+            'action': 'prepare_obs',
+        })
+
+        self.assertRedirects(response, reverse('streams:stream_update', args=[stream.id]))
+        self.artist.refresh_from_db()
+        stream.refresh_from_db()
+        self.assertEqual(self.artist.cloudflare_live_input_uid, 'live-input-prepared')
+        self.assertEqual(stream.cloudflare_live_input_uid, 'live-input-prepared')
+        self.assertEqual(stream.cloudflare_video_uid, '')
 
     def test_recorded_cloudflare_video_rejects_duration_over_one_hour(self):
         scheduled_at = timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M')

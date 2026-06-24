@@ -131,6 +131,7 @@ Ambiente:
 - [x] Formulario de live nao exige ID manual de video.
 - [x] Criar live prepara ou reutiliza canal ao vivo do artista.
 - [x] Dados OBS aparecem na edicao da live quando disponiveis.
+- [x] Live sem dados OBS mostra botao `Preparar dados OBS`.
 - [x] Configuracao OBS recomendada aparece:
   - [x] 1280x720
   - [x] 30 FPS
@@ -139,6 +140,8 @@ Ambiente:
   - [x] x264 veryfast
 - [x] Live agendada mantem contagem decrescente na sala.
 - [x] Live ativa mostra badge vermelho `Ao vivo`.
+- [x] Botao `Ativar live` aparece na edicao da live gravada.
+- [x] Data/hora da live aparece em formato local na edicao.
 - [ ] Teste real com OBS envia imagem/som para a sala.
 - [ ] Publico consegue entrar e assistir live real apos pagamento.
 

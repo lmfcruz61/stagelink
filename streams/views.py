@@ -457,6 +457,24 @@ def ensure_artist_live_input(artist):
     return True
 
 
+def sync_stream_live_input(stream):
+    if stream.event_type not in {LiveStream.LIVE, LiveStream.PREMIERE}:
+        return False
+    if not stream.artist.cloudflare_live_input_uid:
+        return False
+    if stream.cloudflare_live_input_uid == stream.artist.cloudflare_live_input_uid and not stream.cloudflare_video_uid:
+        return False
+    stream.cloudflare_live_input_uid = stream.artist.cloudflare_live_input_uid
+    stream.cloudflare_video_uid = ''
+    stream.cloudflare_upload_status = LiveStream.UPLOAD_NOT_REQUESTED
+    stream.save(update_fields=[
+        'cloudflare_live_input_uid',
+        'cloudflare_video_uid',
+        'cloudflare_upload_status',
+    ])
+    return True
+
+
 def prepare_cloudflare_direct_upload(stream):
     upload = create_direct_upload_for_stream(stream)
     stream.cloudflare_video_uid = upload['uid']
@@ -1107,6 +1125,20 @@ def stream_update(request, stream_id):
         return redirect('streams:dashboard')
 
     if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'prepare_obs':
+            try:
+                created_live_input = ensure_artist_live_input(stream.artist)
+                sync_stream_live_input(stream)
+            except CloudflareStreamError as error:
+                messages.error(request, str(error))
+                return redirect('streams:stream_update', stream_id=stream.id)
+            if created_live_input:
+                messages.success(request, 'Dados OBS preparados para esta live.')
+            else:
+                messages.success(request, 'Live ligada aos dados OBS do artista.')
+            return redirect('streams:stream_update', stream_id=stream.id)
+
         form = LiveStreamForm(request.POST, request.FILES, instance=stream, artist=stream.artist)
         if form.is_valid():
             updated_stream = form.save()
@@ -1116,14 +1148,7 @@ def stream_update(request, stream_id):
                 except CloudflareStreamError as error:
                     messages.error(request, str(error))
                     return redirect('streams:stream_update', stream_id=updated_stream.id)
-                updated_stream.cloudflare_live_input_uid = updated_stream.artist.cloudflare_live_input_uid
-                updated_stream.cloudflare_video_uid = ''
-                updated_stream.cloudflare_upload_status = LiveStream.UPLOAD_NOT_REQUESTED
-                updated_stream.save(update_fields=[
-                    'cloudflare_live_input_uid',
-                    'cloudflare_video_uid',
-                    'cloudflare_upload_status',
-                ])
+                sync_stream_live_input(updated_stream)
                 if created_live_input:
                     messages.success(request, 'Live atualizada e dados OBS preparados.')
                 else:
@@ -1145,6 +1170,7 @@ def stream_update(request, stream_id):
             return redirect(f"{reverse('streams:dashboard')}?artist={stream.artist_id}")
         messages.error(request, 'Nao foi possivel atualizar o evento. Confirma os campos assinalados.')
     else:
+        sync_stream_live_input(stream)
         form = LiveStreamForm(instance=stream, artist=stream.artist)
     return render(request, 'dashboard/stream_form.html', {
         'form': form,

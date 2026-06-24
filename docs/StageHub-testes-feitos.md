@@ -7,7 +7,7 @@ Este ficheiro resume os testes ja executados por Codex e que justificam os check
 ## Resultado geral
 
 - `python manage.py check`: OK
-- `python manage.py test`: 84 testes OK
+- `python manage.py test`: 86 testes OK
 - Deploy Fly feito na versao 90
 - Producao validada internamente na maquina Fly com resposta HTTP 200 para `stagehub.pt`
 - Logs Fly sem erro 500 recente depois do deploy
@@ -110,6 +110,8 @@ Este ficheiro resume os testes ja executados por Codex e que justificam os check
 - TC-LIVE-006: sala da live mantem contagem decrescente antes da hora marcada.
 - TC-LIVE-007: ao terminar a contagem, a sala troca o estado visual para `Ao vivo`.
 - TC-LIVE-008: dashboard, homepage e pagina publica mantem botoes separados para `Novo video` e `Nova live`.
+- TC-LIVE-009: live antiga/sem dados OBS permite preparar dados diretamente na edicao.
+- TC-LIVE-010: edicao de live mostra data/hora em formato local e botao claro `Ativar live`.
 
 ### Admin e media Cloudflare
 
