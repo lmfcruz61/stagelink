@@ -116,12 +116,27 @@
       </label>
     </div>
 
-    <label>
-      <span>{{ form.cloudflare_stream_id.label }}</span>
-      {{ form.cloudflare_stream_id }}
-      <span id="cloudflare-stream-help" class="mt-1 block text-sm text-zinc-500">{{ form.cloudflare_stream_id.help_text }}</span>
-      {% for error in form.cloudflare_stream_id.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
-    </label>
+    {% if is_live_form %}
+      <div class="rounded border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-300">
+        <p class="font-semibold text-zinc-100">Canal StageHub ao vivo</p>
+        {% if stream and stream.cloudflare_live_input_uid %}
+          <p class="mt-1">Ligado: <span class="font-mono text-zinc-100">{{ stream.cloudflare_live_input_uid }}</span></p>
+        {% elif stream and stream.artist.cloudflare_live_input_uid %}
+          <p class="mt-1">Canal do artista preparado: <span class="font-mono text-zinc-100">{{ stream.artist.cloudflare_live_input_uid }}</span></p>
+        {% else %}
+          <p class="mt-1 text-zinc-400">O canal sera preparado quando guardares a live ou clicares em Preparar dados OBS.</p>
+        {% endif %}
+        <input type="hidden" name="{{ form.cloudflare_stream_id.name }}" value="{{ form.cloudflare_stream_id.value|default_if_none:'' }}">
+        {% for error in form.cloudflare_stream_id.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </div>
+    {% else %}
+      <label>
+        <span>{{ form.cloudflare_stream_id.label }}</span>
+        {{ form.cloudflare_stream_id }}
+        <span id="cloudflare-stream-help" class="mt-1 block text-sm text-zinc-500">{{ form.cloudflare_stream_id.help_text }}</span>
+        {% for error in form.cloudflare_stream_id.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </label>
+    {% endif %}
 
     <label id="direct-upload-field" class="flex items-start gap-3 rounded border border-zinc-800 bg-zinc-950 p-3">
       {{ form.create_upload_url }}

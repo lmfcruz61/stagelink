@@ -129,7 +129,9 @@ Ambiente:
 - [x] Botao `Nova live` aparece para artista/gestor.
 - [x] Formulario de live abre.
 - [x] Formulario de live nao exige ID manual de video.
+- [x] Preco minimo de 2 EUR e aplicado a lives novas e antigas.
 - [x] Criar live prepara ou reutiliza canal ao vivo do artista.
+- [x] Edicao de live mostra o canal StageHub ligado.
 - [x] Dados OBS aparecem na edicao da live quando disponiveis.
 - [x] Live sem dados OBS mostra botao `Preparar dados OBS`.
 - [x] Configuracao OBS recomendada aparece:

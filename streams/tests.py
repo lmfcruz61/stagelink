@@ -368,7 +368,7 @@ class LiveStreamFormTests(TestCase):
             video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
             cloudflare_live_input_uid='live-input-123',
             event_type=LiveStream.LIVE,
-            access_price=Decimal('0.00'),
+            access_price=Decimal('2.00'),
             scheduled_at=timezone.now() + timedelta(days=1),
         )
         scheduled_at = timezone.localtime(stream.scheduled_at).strftime('%Y-%m-%dT%H:%M')
@@ -436,6 +436,60 @@ class LiveStreamFormTests(TestCase):
 
         self.assertTrue(form.is_valid(), form.errors)
 
+    def test_live_below_minimum_price_is_rejected(self):
+        scheduled_at = timezone.localtime(timezone.now() + timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M')
+        form = LiveStreamForm(
+            data={
+                'title': 'Live barata',
+                'description': '',
+                'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+                'cloudflare_stream_id': '',
+                'cloudflare_playback_url': '',
+                'youtube_video_id': '',
+                'event_type': LiveStream.LIVE,
+                'access_price': '1.99',
+                'scheduled_at': scheduled_at,
+                'duration_minutes': '',
+                'create_upload_url': '',
+            },
+            artist=self.artist,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('access_price', form.errors)
+
+    def test_legacy_live_below_minimum_price_is_rejected_on_simple_edit(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Live antiga',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_live_input_uid='live-input-123',
+            event_type=LiveStream.LIVE,
+            access_price=Decimal('0.00'),
+            scheduled_at=timezone.now() + timedelta(days=1),
+        )
+        scheduled_at = timezone.localtime(stream.scheduled_at).strftime('%Y-%m-%dT%H:%M')
+
+        form = LiveStreamForm(
+            data={
+                'title': 'Live antiga editada',
+                'description': stream.description,
+                'video_provider': stream.video_provider,
+                'cloudflare_stream_id': stream.cloudflare_live_input_uid,
+                'cloudflare_playback_url': stream.cloudflare_playback_url,
+                'youtube_video_id': stream.youtube_video_id,
+                'event_type': stream.event_type,
+                'access_price': str(stream.access_price),
+                'scheduled_at': scheduled_at,
+                'duration_minutes': '',
+            },
+            instance=stream,
+            artist=self.artist,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('access_price', form.errors)
+
     @patch('streams.views.create_live_input_for_artist')
     def test_dashboard_creates_live_and_prepares_obs_data(self, create_live_input):
         create_live_input.return_value = {
@@ -499,6 +553,8 @@ class LiveStreamFormTests(TestCase):
         self.assertContains(response, 'Configuracao OBS recomendada')
         self.assertContains(response, 'Ativar live')
         self.assertContains(response, 'Live inativa')
+        self.assertContains(response, 'Canal StageHub ao vivo')
+        self.assertContains(response, 'live-input-123')
         self.assertContains(response, '1280x720')
         self.assertContains(response, '4000-6000 kbps')
 

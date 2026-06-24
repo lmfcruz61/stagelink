@@ -135,18 +135,6 @@ class LiveStreamForm(forms.ModelForm):
             cloudflare_stream_id = self.artist.cloudflare_live_input_uid
             cleaned_data['cloudflare_stream_id'] = cloudflare_stream_id
 
-        if not self.should_validate_video_rules():
-            return cleaned_data
-
-        if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE:
-            accepts_direct_upload = event_type in {LiveStream.RECORDED, LiveStream.REPLAY} and create_upload_url
-            accepts_live_setup = event_type in {LiveStream.LIVE, LiveStream.PREMIERE} and self.artist
-            if not cloudflare_stream_id and not cloudflare_playback_url and not accepts_direct_upload and not accepts_live_setup:
-                self.add_error(
-                    'cloudflare_stream_id',
-                    'Indica o codigo de video StageHub, prepara um upload direto ou cria uma live StageHub.',
-                )
-
         access_price = cleaned_data.get('access_price')
         if access_price is not None:
             if access_price < 2:
@@ -158,6 +146,18 @@ class LiveStreamForm(forms.ModelForm):
                 self.add_error(
                     'video_provider',
                     'Eventos pagos devem usar video StageHub.',
+                )
+
+        if not self.should_validate_video_rules():
+            return cleaned_data
+
+        if provider == LiveStream.VIDEO_PROVIDER_CLOUDFLARE:
+            accepts_direct_upload = event_type in {LiveStream.RECORDED, LiveStream.REPLAY} and create_upload_url
+            accepts_live_setup = event_type in {LiveStream.LIVE, LiveStream.PREMIERE} and self.artist
+            if not cloudflare_stream_id and not cloudflare_playback_url and not accepts_direct_upload and not accepts_live_setup:
+                self.add_error(
+                    'cloudflare_stream_id',
+                    'Indica o codigo de video StageHub, prepara um upload direto ou cria uma live StageHub.',
                 )
 
         if provider == LiveStream.VIDEO_PROVIDER_YOUTUBE:

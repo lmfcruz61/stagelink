@@ -7,7 +7,7 @@ Este ficheiro resume os testes ja executados por Codex e que justificam os check
 ## Resultado geral
 
 - `python manage.py check`: OK
-- `python manage.py test`: 86 testes OK
+- `python manage.py test`: 88 testes OK
 - Deploy Fly feito na versao 90
 - Producao validada internamente na maquina Fly com resposta HTTP 200 para `stagehub.pt`
 - Logs Fly sem erro 500 recente depois do deploy
@@ -112,6 +112,8 @@ Este ficheiro resume os testes ja executados por Codex e que justificam os check
 - TC-LIVE-008: dashboard, homepage e pagina publica mantem botoes separados para `Novo video` e `Nova live`.
 - TC-LIVE-009: live antiga/sem dados OBS permite preparar dados diretamente na edicao.
 - TC-LIVE-010: edicao de live mostra data/hora em formato local e botao claro `Ativar live`.
+- TC-LIVE-011: lives novas e antigas nao podem ficar com preco abaixo de 2 EUR.
+- TC-LIVE-012: edicao de live mostra o canal StageHub ao vivo ligado ao artista.
 
 ### Admin e media Cloudflare
 
