@@ -130,6 +130,8 @@
   const postStartCode = '{{ stream.post_start_display_status.code|escapejs }}';
   const videoProvider = '{{ stream.video_provider|escapejs }}';
   const cloudflareEmbedUrl = '{{ stream.cloudflare_embed_url|escapejs }}';
+  const streamEventType = '{{ stream.event_type|escapejs }}';
+  const cloudflareUploadStatus = '{{ stream.cloudflare_upload_status|escapejs }}';
   const youtubeVideoId = '{{ stream.youtube_embed_id|escapejs }}';
   let youtubeApiReady = false;
   let player = null;
@@ -179,6 +181,10 @@
   }
 
   function buildCloudflarePlayer() {
+    if (streamEventType === 'recorded' && cloudflareUploadStatus !== 'uploaded') {
+      showVideoStatus('Este video ainda nao foi enviado. O artista precisa concluir o upload antes de testar a sala.', false);
+      return;
+    }
     if (!cloudflareEmbedUrl) {
       showVideoStatus('Este evento ainda nao tem video configurado.');
       return;

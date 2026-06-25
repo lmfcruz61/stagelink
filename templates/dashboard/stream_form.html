@@ -130,12 +130,22 @@
         {% for error in form.cloudflare_stream_id.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
       </div>
     {% else %}
-      <label>
-        <span>{{ form.cloudflare_stream_id.label }}</span>
-        {{ form.cloudflare_stream_id }}
-        <span id="cloudflare-stream-help" class="mt-1 block text-sm text-zinc-500">{{ form.cloudflare_stream_id.help_text }}</span>
-        {% for error in form.cloudflare_stream_id.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
-      </label>
+      {% if user.is_staff or user.is_superuser %}
+        <label>
+          <span>{{ form.cloudflare_stream_id.label }}</span>
+          {{ form.cloudflare_stream_id }}
+          <span id="cloudflare-stream-help" class="mt-1 block text-sm text-zinc-500">{{ form.cloudflare_stream_id.help_text }}</span>
+          {% for error in form.cloudflare_stream_id.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+        </label>
+      {% else %}
+        <input type="hidden" name="{{ form.cloudflare_stream_id.name }}" value="{{ form.cloudflare_stream_id.value|default_if_none:'' }}">
+        {% if stream and stream.cloudflare_video_uid %}
+          <div class="rounded border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-300">
+            <p class="font-semibold text-zinc-100">Video StageHub preparado</p>
+            <p class="mt-1">O espaco do video ja foi criado. Envia o ficheiro na area de upload abaixo.</p>
+          </div>
+        {% endif %}
+      {% endif %}
     {% endif %}
 
     <label id="direct-upload-field" class="flex items-start gap-3 rounded border border-zinc-800 bg-zinc-950 p-3">
@@ -266,6 +276,11 @@
         <p id="upload-feedback" class="text-sm text-zinc-300"></p>
         <button id="recorded-video-upload-button" type="button" class="sl-primary justify-self-start">Enviar video</button>
       </div>
+      <form method="post" class="mt-4">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="renew_upload">
+        <button class="sl-secondary" type="submit">Preparar novo link de upload</button>
+      </form>
     </section>
   {% elif stream and stream.cloudflare_upload_status == stream.UPLOAD_UPLOADED %}
     <section class="mt-6 rounded-xl border border-[#10B981] bg-[#10B981]/15 p-5">

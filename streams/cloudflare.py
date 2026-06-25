@@ -103,7 +103,7 @@ def create_direct_upload_for_stream(stream):
     return {
         'uid': result.get('uid', ''),
         'upload_url': result.get('uploadURL', ''),
-        'expires': result.get('expires', ''),
+        'expires': result.get('expires') or result.get('uploadExpiry', ''),
     }
 
 

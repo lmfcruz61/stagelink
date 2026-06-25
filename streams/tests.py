@@ -922,6 +922,55 @@ class LiveStreamAccessAndEmbedTests(TestCase):
 
         self.assertTrue(stream.has_pending_direct_upload)
 
+    def test_room_explains_recorded_video_pending_upload(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Video pendente na sala',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_video_uid='video-pending-123',
+            cloudflare_upload_url='https://upload.videodelivery.net/tus/abc',
+            cloudflare_upload_status=LiveStream.UPLOAD_PENDING,
+            event_type=LiveStream.RECORDED,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.now() - timedelta(minutes=5),
+            is_active=True,
+        )
+        StreamTicketPurchase.objects.create(
+            fan=self.fan,
+            stream=stream,
+            stripe_session_id='cs_test_pending_room',
+            paid=True,
+        )
+        self.client.force_login(self.fan_user)
+
+        response = self.client.get(reverse('streams:room', args=[stream.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "const cloudflareUploadStatus = 'pending'")
+        self.assertContains(response, 'Este video ainda nao foi enviado')
+
+    @patch('streams.views.prepare_cloudflare_direct_upload')
+    def test_artist_can_renew_recorded_video_upload_link(self, prepare_upload):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Video com link expirado',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_video_uid='video-expired-123',
+            cloudflare_upload_url='https://upload.videodelivery.net/tus/old',
+            cloudflare_upload_status=LiveStream.UPLOAD_PENDING,
+            event_type=LiveStream.RECORDED,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.now(),
+        )
+        self.client.force_login(self.artist_user)
+
+        response = self.client.post(reverse('streams:stream_update', args=[stream.id]), {
+            'action': 'renew_upload',
+        })
+
+        self.assertRedirects(response, reverse('streams:stream_update', args=[stream.id]))
+        prepare_upload.assert_called_once_with(stream)
+
 
 class ArtistProfilePhotoUploadTests(TestCase):
     def setUp(self):

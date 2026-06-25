@@ -1149,6 +1149,17 @@ def stream_update(request, stream_id):
                 messages.success(request, 'Live ligada aos dados OBS do artista.')
             return redirect('streams:stream_update', stream_id=stream.id)
 
+        if action == 'renew_upload':
+            if not stream.is_recorded_video:
+                messages.error(request, 'Este evento nao e um video gravado.')
+                return redirect('streams:stream_update', stream_id=stream.id)
+            try:
+                prepare_cloudflare_direct_upload(stream)
+                messages.success(request, 'Novo link de upload preparado. Envia agora o ficheiro de video.')
+            except CloudflareStreamError as error:
+                messages.error(request, str(error))
+            return redirect('streams:stream_update', stream_id=stream.id)
+
         form = LiveStreamForm(request.POST, request.FILES, instance=stream, artist=stream.artist)
         if form.is_valid():
             updated_stream = form.save()

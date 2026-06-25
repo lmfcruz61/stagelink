@@ -122,7 +122,9 @@ Ambiente:
 - [ ] Video pode ser testado em `Ver sala`.
 - [ ] Video pode ser ativado.
 - [x] Video com mais de 1 hora e recusado.
-- [ ] Falha de upload mostra mensagem clara.
+- [x] Video pendente de upload mostra mensagem clara na sala.
+- [x] Link de upload pode ser renovado quando necessario.
+- [ ] Falha real de upload mostra mensagem clara.
 
 ## 9. Lives e OBS
 
