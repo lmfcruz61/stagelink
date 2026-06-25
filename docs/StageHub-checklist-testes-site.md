@@ -149,7 +149,11 @@ Ambiente:
 - [x] Live ativa mostra badge vermelho `Ao vivo`.
 - [x] Botao `Ativar live` aparece na edicao da live gravada.
 - [x] Data/hora da live aparece em formato local na edicao.
-- [ ] Teste real com OBS envia imagem/som para a sala.
+- [x] Token Cloudflare Stream em producao permite gerar dados OBS.
+- [x] Dados OBS reais foram gerados para o artista SIULC.
+- [x] Teste real com OBS envia imagem para a sala.
+- [x] Delay real observado fica perto de 10 segundos.
+- [x] Teste real com OBS envia som para a sala.
 - [ ] Publico consegue entrar e assistir live real apos pagamento.
 
 ## 10. Stripe Connect do artista

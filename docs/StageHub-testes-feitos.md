@@ -1,6 +1,6 @@
 # StageHub - Testes feitos
 
-Data: 2026-06-24
+Data: 2026-06-25
 
 Este ficheiro resume os testes ja executados por Codex e que justificam os checks marcados no ficheiro `StageHub-checklist-testes-site.md`.
 
@@ -119,6 +119,10 @@ Este ficheiro resume os testes ja executados por Codex e que justificam os check
 - TC-LIVE-015: live futura paga aparece na pagina publica do artista mesmo estando inativa.
 - TC-LIVE-016: live abaixo de 2 EUR nao aparece ao publico.
 - TC-LIVE-017: falha ao preparar dados OBS/Cloudflare nao apaga nem impede a gravacao da live.
+- TC-LIVE-018: token Cloudflare Stream em producao permite criar canal live/OBS.
+- TC-LIVE-019: dados OBS reais foram gerados para o artista SIULC.
+- TC-LIVE-020: teste real OBS enviou imagem para a sala StageHub, com delay aproximado de 10 segundos.
+- TC-LIVE-021: teste real OBS enviou som para a sala StageHub.
 
 ### Admin e media Cloudflare
 
@@ -139,6 +143,14 @@ Este ficheiro resume os testes ja executados por Codex e que justificam os check
   - ainda nao tem `charges_enabled` nem `payouts_enabled`;
   - Stripe pede dados pessoais/contacto/morada.
 - SIULC foi verificado como ativo na Stripe live.
+- Cloudflare Stream foi corrigido em producao:
+  - `CLOUDFLARE_API_TOKEN` atualizado;
+  - canal live/OBS criado para SIULC;
+  - RTMPS e chave de transmissao ficaram disponiveis no artista.
+- Live real testada com OBS:
+  - imagem chegou a sala;
+  - som chegou a sala;
+  - delay observado perto de 10 segundos;
 - Emails duplicados existentes foram apenas consultados, sem apagar nem alterar contas:
   - `SIULC`
   - `Stage_Team`
