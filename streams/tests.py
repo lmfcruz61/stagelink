@@ -971,6 +971,26 @@ class LiveStreamAccessAndEmbedTests(TestCase):
         self.assertRedirects(response, reverse('streams:stream_update', args=[stream.id]))
         prepare_upload.assert_called_once_with(stream)
 
+    def test_recorded_video_upload_uses_cloudflare_direct_upload_url(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Video com upload direto',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_video_uid='video-upload-123',
+            cloudflare_upload_url='https://upload.cloudflarestream.com/video-upload-123',
+            cloudflare_upload_status=LiveStream.UPLOAD_PENDING,
+            event_type=LiveStream.RECORDED,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.now(),
+        )
+        self.client.force_login(self.artist_user)
+
+        response = self.client.get(reverse('streams:stream_update', args=[stream.id]))
+
+        self.assertContains(response, 'uploadUrl:')
+        self.assertContains(response, 'https://upload.cloudflarestream.com/video')
+        self.assertNotContains(response, 'endpoint:')
+
 
 class ArtistProfilePhotoUploadTests(TestCase):
     def setUp(self):

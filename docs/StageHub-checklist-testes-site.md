@@ -124,6 +124,7 @@ Ambiente:
 - [x] Video com mais de 1 hora e recusado.
 - [x] Video pendente de upload mostra mensagem clara na sala.
 - [x] Link de upload pode ser renovado quando necessario.
+- [x] Upload direto Cloudflare usa o URL direto correto no Tus.
 - [ ] Falha real de upload mostra mensagem clara.
 
 ## 9. Lives e OBS

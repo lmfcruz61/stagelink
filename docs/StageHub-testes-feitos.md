@@ -7,7 +7,7 @@ Este ficheiro resume os testes ja executados por Codex e que justificam os check
 ## Resultado geral
 
 - `python manage.py check`: OK
-- `python manage.py test`: 94 testes OK
+- `python manage.py test`: 95 testes OK
 - Deploy Fly feito na versao 90
 - Producao validada internamente na maquina Fly com resposta HTTP 200 para `stagehub.pt`
 - Logs Fly sem erro 500 recente depois do deploy
@@ -101,6 +101,7 @@ Este ficheiro resume os testes ja executados por Codex e que justificam os check
 - Embed Cloudflare normaliza varios formatos de URL/ID.
 - Sala de video gravado pendente mostra mensagem clara em vez de parecer erro do player.
 - Artista consegue preparar novo link de upload para video gravado pendente.
+- Upload direto Cloudflare usa `uploadUrl` no Tus, evitando erro 400 ao criar upload sobre um URL ja criado.
 
 ### Lives e OBS
 
