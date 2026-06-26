@@ -401,13 +401,10 @@
       setUploadFeedback('A enviar...');
 
       const upload = new tus.Upload(file, {
-        uploadUrl: '{{ stream.cloudflare_upload_url|escapejs }}',
+        endpoint: '{{ stream.cloudflare_upload_url|escapejs }}',
         chunkSize: 50 * 1024 * 1024,
         retryDelays: [0, 1000, 3000, 5000],
-        metadata: {
-          filename: file.name,
-          filetype: file.type
-        },
+        storeFingerprintForResuming: false,
         onError: function(error) {
           uploadButton.disabled = false;
           uploadState.textContent = 'Erro no upload';

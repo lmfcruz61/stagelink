@@ -101,7 +101,7 @@ Este ficheiro resume os testes ja executados por Codex e que justificam os check
 - Embed Cloudflare normaliza varios formatos de URL/ID.
 - Sala de video gravado pendente mostra mensagem clara em vez de parecer erro do player.
 - Artista consegue preparar novo link de upload para video gravado pendente.
-- Upload direto Cloudflare usa `uploadUrl` no Tus, evitando erro 400 ao criar upload sobre um URL ja criado.
+- Upload direto Cloudflare usa o endpoint Tus da Cloudflare sem metadata e sem retoma local, evitando erros 400 no inicio do upload.
 
 ### Lives e OBS
 
