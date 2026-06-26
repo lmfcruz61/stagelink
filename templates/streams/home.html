@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
-{% block title %}StageHub{% endblock %}
+{% block title %}StageHub – Centro de Artistas e Eventos{% endblock %}
+{% block meta %}
+  {% include 'partials/og_tags.html' with og=og %}
+{% endblock %}
 {% block content %}
 {% if user.is_authenticated and user.artist_profile %}
   <section class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">

@@ -46,6 +46,39 @@ class LegalPageTests(TestCase):
         self.assertContains(response, reverse('streams:contact'))
         self.assertContains(response, 'Gerir cookies')
 
+    @override_settings(ALLOWED_HOSTS=['stagehub.pt'])
+    def test_homepage_has_institutional_social_metadata(self):
+        artist_user = User.objects.create_user(username='artist_meta')
+        Artist.objects.create(
+            user=artist_user,
+            name='Artista Meta',
+            bio='Biografia do artista que nao deve aparecer nos metadados da homepage.',
+            headline='Frase do artista',
+        )
+
+        response = self.client.get(reverse('streams:home'), secure=True, HTTP_HOST='stagehub.pt')
+
+        expected_title = 'StageHub – Centro de Artistas e Eventos'
+        expected_description = (
+            'Crie. Partilhe. Atue. Ensine. Inspire. O StageHub reúne artistas, formadores e criadores '
+            'numa única plataforma para realizar eventos ao vivo, workshops, espetáculos, aulas, conteúdos '
+            'exclusivos e construir comunidades verdadeiras. Descubra novos talentos, apoie os seus artistas '
+            'favoritos e viva experiências únicas, interativas e memoráveis.'
+        )
+        head_html = response.content.decode().split('</head>', 1)[0]
+        self.assertIn(f'<title>{expected_title}</title>', head_html)
+        self.assertIn(f'<meta name="description" content="{expected_description}">', head_html)
+        self.assertIn(f'<meta property="og:title" content="{expected_title}">', head_html)
+        self.assertIn(f'<meta property="og:description" content="{expected_description}">', head_html)
+        self.assertIn('<meta property="og:url" content="https://stagehub.pt/">', head_html)
+        self.assertIn('<meta property="og:type" content="website">', head_html)
+        self.assertIn('<meta name="twitter:card" content="summary_large_image">', head_html)
+        self.assertIn(f'<meta name="twitter:title" content="{expected_title}">', head_html)
+        self.assertIn(f'<meta name="twitter:description" content="{expected_description}">', head_html)
+        self.assertIn('<meta property="og:image" content="https://stagehub.pt/static/img/stagehub-og-placeholder.svg">', head_html)
+        self.assertIn('<meta name="twitter:image" content="https://stagehub.pt/static/img/stagehub-og-placeholder.svg">', head_html)
+        self.assertNotIn('Biografia do artista que nao deve aparecer nos metadados da homepage.', head_html)
+
 
 @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
 class ContactPageTests(TestCase):

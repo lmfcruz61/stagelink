@@ -34,6 +34,15 @@ from .forms import PhotoGalleryForm, PhotoGalleryImageUploadForm
 from .models import LiveStream, PhotoGallery, PhotoGalleryImage
 
 
+STAGEHUB_HOME_TITLE = 'StageHub – Centro de Artistas e Eventos'
+STAGEHUB_HOME_DESCRIPTION = (
+    'Crie. Partilhe. Atue. Ensine. Inspire. O StageHub reúne artistas, formadores e criadores '
+    'numa única plataforma para realizar eventos ao vivo, workshops, espetáculos, aulas, conteúdos '
+    'exclusivos e construir comunidades verdadeiras. Descubra novos talentos, apoie os seus artistas '
+    'favoritos e viva experi\u00eancias \u00fanicas, interativas e memor\u00e1veis.'
+)
+
+
 def absolute_static(request, path):
     return request.build_absolute_uri(static(path))
 
@@ -84,6 +93,16 @@ def artist_og_context(request, artist, url=None):
         'title': f'{artist.name} | StageHub',
         'type': 'profile',
         'url': artist_url,
+    }
+
+
+def home_og_context(request):
+    return {
+        'description': STAGEHUB_HOME_DESCRIPTION,
+        'image': absolute_static(request, 'img/stagehub-og-placeholder.svg'),
+        'title': STAGEHUB_HOME_TITLE,
+        'type': 'website',
+        'url': request.build_absolute_uri(reverse('streams:home')),
     }
 
 
@@ -213,6 +232,7 @@ def home(request):
         'favorite_artists': favorite_artists,
         'favorite_artist_ids': favorite_artist_ids,
         'newsletter_form': newsletter_form,
+        'og': home_og_context(request),
         'public_photo_galleries': public_photo_galleries,
         'purchased_stream_ids': purchased_stream_ids,
         'purchased_gallery_ids': purchased_gallery_ids,
