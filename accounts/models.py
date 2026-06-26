@@ -264,6 +264,55 @@ class ContactMessage(models.Model):
         return f'{self.get_contact_type_display()} - {self.subject}'
 
 
+class ActivityLog(models.Model):
+    ACTION_REQUEST = 'request'
+    ACTION_LOGIN = 'login'
+    ACTION_LOGOUT = 'logout'
+    ACTION_ADMIN = 'admin'
+    ACTION_PAYMENT = 'payment'
+    ACTION_UPLOAD = 'upload'
+    ACTION_ERROR = 'error'
+    ACTION_CHOICES = (
+        (ACTION_REQUEST, 'Pedido'),
+        (ACTION_LOGIN, 'Login'),
+        (ACTION_LOGOUT, 'Logout'),
+        (ACTION_ADMIN, 'Admin'),
+        (ACTION_PAYMENT, 'Pagamento'),
+        (ACTION_UPLOAD, 'Upload'),
+        (ACTION_ERROR, 'Erro'),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='activity_logs', blank=True, null=True)
+    username = models.CharField(max_length=150, blank=True)
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES, default=ACTION_REQUEST)
+    method = models.CharField(max_length=10)
+    path = models.CharField(max_length=500)
+    query_string = models.CharField(max_length=500, blank=True)
+    status_code = models.PositiveSmallIntegerField(blank=True, null=True)
+    duration_ms = models.PositiveIntegerField(blank=True, null=True)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    user_agent = models.CharField(max_length=255, blank=True)
+    referrer = models.CharField(max_length=500, blank=True)
+    view_name = models.CharField(max_length=180, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Atividade do site'
+        verbose_name_plural = 'Atividade do site'
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['action', '-created_at']),
+            models.Index(fields=['status_code', '-created_at']),
+            models.Index(fields=['user', '-created_at']),
+            models.Index(fields=['path']),
+        ]
+
+    def __str__(self):
+        user_label = self.username or 'anonimo'
+        return f'{self.created_at:%Y-%m-%d %H:%M} - {user_label} - {self.path}'
+
+
 class SiteAppearance(models.Model):
     name = models.CharField(max_length=80, default='StageHub')
     logo = models.ImageField(

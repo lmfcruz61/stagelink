@@ -3,6 +3,15 @@
 
 {% block content %}
   {% stagehub_pending_approvals as pending %}
+  <div style="margin-bottom: 20px; padding: 15px; border-radius: 4px; border: 1px solid #14b8a6; background: #042f2e; color: #f0fdfa;">
+    <h2 style="margin: 0 0 8px;">Atividade do site</h2>
+    <p style="margin: 0 0 12px;">
+      Consulta entradas, saidas, paginas visitadas, erros, uploads, pagamentos e movimentos no painel admin.
+    </p>
+    <a href="{% url 'admin:accounts_activitylog_changelist' %}" style="color: #99f6e4; font-weight: 700;">
+      Abrir logs de atividade
+    </a>
+  </div>
   <div style="margin-bottom: 20px; padding: 15px; border-radius: 4px; border: 1px solid #2563eb; background: #0f172a; color: #eff6ff;">
     <h2 style="margin: 0 0 8px;">Media Cloudflare</h2>
     <p style="margin: 0 0 12px;">

@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .forms import SignUpForm
+from .models import ActivityLog
 
 
 class SignUpFormTests(TestCase):
@@ -49,3 +50,57 @@ class PasswordResetPageTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Recuperar password')
         self.assertContains(response, 'link seguro')
+
+
+@override_settings(ACTIVITY_LOG_ENABLED=True)
+class ActivityLogMiddlewareTests(TestCase):
+    def test_request_creates_activity_log_without_request_body(self):
+        user = User.objects.create_user(username='fanlog', password='pass12345')
+        self.client.login(username='fanlog', password='pass12345')
+
+        response = self.client.get(
+            reverse('streams:home'),
+            HTTP_USER_AGENT='StageHub Test Browser',
+            HTTP_REFERER='https://example.com/origem',
+            HTTP_X_FORWARDED_FOR='203.0.113.55, 10.0.0.1',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        log = ActivityLog.objects.filter(path=reverse('streams:home')).latest('created_at')
+        self.assertEqual(log.user, user)
+        self.assertEqual(log.username, 'fanlog')
+        self.assertEqual(log.action, ActivityLog.ACTION_REQUEST)
+        self.assertEqual(log.method, 'GET')
+        self.assertEqual(log.status_code, 200)
+        self.assertEqual(log.ip_address, '203.0.113.55')
+        self.assertEqual(log.user_agent, 'StageHub Test Browser')
+        self.assertEqual(log.referrer, 'https://example.com/origem')
+
+    def test_media_paths_are_not_logged(self):
+        response = self.client.get('/media/teste.jpg')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(ActivityLog.objects.filter(path='/media/teste.jpg').exists())
+
+    def test_admin_can_list_activity_logs(self):
+        User.objects.create_superuser(username='adminlog', email='admin@example.com', password='pass12345')
+        activity_log = ActivityLog.objects.create(
+            username='visitante',
+            action=ActivityLog.ACTION_REQUEST,
+            method='GET',
+            path='/',
+            status_code=200,
+            ip_address='203.0.113.80',
+        )
+        self.client.login(username='adminlog', password='pass12345')
+
+        response = self.client.get(reverse('admin:accounts_activitylog_changelist'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'visitante')
+        self.assertContains(response, '203.0.113.80')
+
+        detail_response = self.client.get(reverse('admin:accounts_activitylog_change', args=[activity_log.pk]))
+
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertContains(detail_response, '203.0.113.80')

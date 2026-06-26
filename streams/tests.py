@@ -1180,6 +1180,23 @@ class PhotoGalleryAccessTests(TestCase):
         self.assertContains(response, 'Aprovacoes pendentes')
         self.assertContains(response, 'Abrir galerias pendentes')
 
+    def test_submit_gallery_for_review_redirects_to_artist_dashboard(self):
+        gallery = self.create_gallery(
+            is_active=False,
+            moderation_status=PhotoGallery.DRAFT,
+        )
+        PhotoGalleryImage.objects.create(gallery=gallery, image='private/foto-secreta.jpg')
+        self.client.force_login(self.artist_user)
+
+        response = self.client.post(f'/dashboard/galerias/{gallery.id}/editar/', {
+            'action': 'submit_review',
+        })
+        gallery.refresh_from_db()
+
+        self.assertRedirects(response, f'/dashboard/?artist={self.artist.id}')
+        self.assertEqual(gallery.moderation_status, PhotoGallery.PENDING)
+        self.assertFalse(gallery.is_active)
+
     def test_approved_gallery_edit_page_does_not_show_submit_review_button(self):
         gallery = self.create_gallery()
         self.client.force_login(self.artist_user)

@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'accounts.middleware.ActivityLogMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -75,7 +76,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'stagelink.wsgi.application'
 ASGI_APPLICATION = 'stagelink.asgi.application'
 
-DATABASE_URL = config('DATABASE_URL', default='')
+DATABASE_URL = str(config('DATABASE_URL', default=''))
 if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require='sslmode=require' in DATABASE_URL)
@@ -88,7 +89,7 @@ else:
         }
     }
 
-REDIS_URL = config('REDIS_URL', default='')
+REDIS_URL = str(config('REDIS_URL', default=''))
 if REDIS_URL:
     CHANNEL_LAYERS = {
         'default': {
@@ -183,6 +184,7 @@ STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='')
 STRIPE_MONTHLY_PRICE_EUR = config('STRIPE_MONTHLY_PRICE_EUR', default='7.00')
 STAGEHUB_COMMISSION_PERCENT = config('STAGEHUB_COMMISSION_PERCENT', default='20.00')
 FACEBOOK_PIXEL_ID = config('FACEBOOK_PIXEL_ID', default='')
+ACTIVITY_LOG_ENABLED = env_bool('ACTIVITY_LOG_ENABLED', default=True)
 
 CLOUDFLARE_ACCOUNT_ID = config('CLOUDFLARE_ACCOUNT_ID', default='')
 CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN = config('CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN', default='')

@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.http import HttpResponse
 
 from .models import (
+    ActivityLog,
     Artist,
     ArtistPhoto,
     ContactMessage,
@@ -14,6 +15,48 @@ from .models import (
 )
 
 admin.site.register(Profile)
+
+
+@admin.register(ActivityLog)
+class ActivityLogAdmin(admin.ModelAdmin):
+    list_display = (
+        'created_at',
+        'action',
+        'username',
+        'method',
+        'path',
+        'status_code',
+        'duration_ms',
+        'ip_address',
+    )
+    list_filter = ('action', 'method', 'status_code', 'created_at')
+    search_fields = ('username', 'path', 'query_string', 'ip_address', 'user_agent', 'referrer', 'view_name')
+    readonly_fields = (
+        'user',
+        'username',
+        'action',
+        'method',
+        'path',
+        'query_string',
+        'status_code',
+        'duration_ms',
+        'ip_address',
+        'user_agent',
+        'referrer',
+        'view_name',
+        'created_at',
+    )
+    date_hierarchy = 'created_at'
+    ordering = ('-created_at',)
+    list_per_page = 50
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(Artist)
 class ArtistAdmin(admin.ModelAdmin):
     list_display = (

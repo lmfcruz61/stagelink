@@ -992,6 +992,7 @@ def photo_gallery_update(request, gallery_id):
                 gallery.rejection_reason = ''
                 gallery.save(update_fields=['moderation_status', 'is_active', 'rejection_reason'])
                 messages.success(request, 'Galeria enviada para validacao StageHub.')
+                return redirect(f"{reverse('streams:dashboard')}?artist={gallery.artist_id}")
             return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
     else:
         form = PhotoGalleryForm(instance=gallery)
