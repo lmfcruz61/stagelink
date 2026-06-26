@@ -47,11 +47,13 @@ class ArtistProfileForm(forms.ModelForm):
     photo = forms.ImageField(
         label='Foto principal',
         required=False,
+        widget=forms.FileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}),
         help_text='Recomendado: imagem quadrada, pelo menos 800x800 px, em JPG ou PNG.',
     )
     hero_image = forms.ImageField(
         label='Imagem de capa da pagina',
         required=False,
+        widget=forms.FileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}),
         help_text='Recomendado: imagem horizontal 16:9, pelo menos 1600x900 px.',
     )
 
@@ -115,6 +117,7 @@ class OrganizationForm(forms.ModelForm):
         }
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
+            'logo': forms.FileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}),
         }
 
 
@@ -133,6 +136,7 @@ class FanProfileForm(forms.ModelForm):
     photo = forms.ImageField(
         label='Foto de perfil',
         required=False,
+        widget=forms.FileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}),
         help_text='Recomendado: imagem quadrada, pelo menos 400x400 px, em JPG ou PNG.',
     )
 

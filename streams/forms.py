@@ -9,6 +9,7 @@ class LiveStreamForm(forms.ModelForm):
     cover_image = forms.ImageField(
         label='Foto de capa do evento',
         required=False,
+        widget=forms.FileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}),
         help_text='Recomendado: imagem horizontal 16:9, pelo menos 1280x720 px, em JPG ou PNG.',
     )
     scheduled_at = forms.DateTimeField(
@@ -275,6 +276,7 @@ class PhotoGalleryForm(forms.ModelForm):
         }
         widgets = {
             'description': forms.Textarea(attrs={'rows': 5}),
+            'public_cover': forms.FileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}),
         }
 
     def clean_access_price(self):

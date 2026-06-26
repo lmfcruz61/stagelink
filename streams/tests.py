@@ -394,6 +394,41 @@ class LiveStreamFormTests(TestCase):
         updated = form.save()
         self.assertEqual(updated.title, 'Nome novo')
 
+    def test_stream_edit_without_new_cover_keeps_existing_cover(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Video com capa',
+            description='Descricao antiga',
+            cover_image='streams/covers/capa-existente.jpg',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_video_uid='video-stagehub-123',
+            event_type=LiveStream.RECORDED,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.now() + timedelta(days=1),
+        )
+        scheduled_at = timezone.localtime(stream.scheduled_at).strftime('%Y-%m-%dT%H:%M')
+        self.user.set_password('pass12345')
+        self.user.save()
+        self.client.login(username='artist', password='pass12345')
+
+        response = self.client.post(reverse('streams:stream_update', args=[stream.id]), {
+            'title': 'Video com capa editado',
+            'description': stream.description,
+            'video_provider': stream.video_provider,
+            'cloudflare_stream_id': stream.cloudflare_video_uid,
+            'cloudflare_playback_url': stream.cloudflare_playback_url,
+            'youtube_video_id': stream.youtube_video_id,
+            'event_type': stream.event_type,
+            'access_price': '5.00',
+            'scheduled_at': scheduled_at,
+            'duration_minutes': '',
+            'create_upload_url': '',
+        })
+        stream.refresh_from_db()
+
+        self.assertRedirects(response, f"{reverse('streams:dashboard')}?artist={self.artist.id}")
+        self.assertEqual(stream.cover_image.name, 'streams/covers/capa-existente.jpg')
+
     def test_recorded_cloudflare_direct_upload_does_not_require_video_uid(self):
         scheduled_at = timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M')
         form = LiveStreamForm(
@@ -566,6 +601,26 @@ class LiveStreamFormTests(TestCase):
         self.assertContains(response, 'live-input-123')
         self.assertContains(response, '1280x720')
         self.assertContains(response, '4000-6000 kbps')
+
+    def test_stream_edit_page_does_not_offer_accidental_cover_clear(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Video com capa',
+            cover_image='streams/covers/capa-existente.jpg',
+            video_provider=LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            cloudflare_video_uid='video-stagehub-123',
+            event_type=LiveStream.RECORDED,
+            access_price=Decimal('5.00'),
+            scheduled_at=timezone.now() + timedelta(days=1),
+        )
+        self.user.set_password('pass12345')
+        self.user.save()
+        self.client.login(username='artist', password='pass12345')
+
+        response = self.client.get(reverse('streams:stream_update', args=[stream.id]))
+
+        self.assertContains(response, 'Capa atual')
+        self.assertNotContains(response, 'Limpar')
 
     @patch('streams.views.create_live_input_for_artist')
     def test_live_edit_page_can_prepare_missing_obs_data(self, create_live_input):
@@ -1048,6 +1103,42 @@ class ArtistProfilePhotoUploadTests(TestCase):
         self.assertContains(response, '5 MB por foto')
         self.assertContains(response, '30 MB no total')
 
+    def test_artist_profile_edit_without_new_images_keeps_existing_images(self):
+        self.artist.photo = 'artists/foto-existente.jpg'
+        self.artist.hero_image = 'artists/heroes/capa-existente.jpg'
+        self.artist.save(update_fields=['photo', 'hero_image'])
+        self.client.force_login(self.artist_user)
+
+        response = self.client.post(f"{reverse('streams:artist_profile_edit')}?artist={self.artist.id}", {
+            'action': 'save_profile',
+            'name': 'Artista Perfil Editado',
+            'headline': '',
+            'monetization_mode': self.artist.monetization_mode,
+            'location': '',
+            'bio': '',
+            'contact_email': '',
+            'contact_phone': '',
+            'youtube_link': '',
+            'instagram_link': '',
+            'spotify_link': '',
+            'website_link': '',
+        })
+        self.artist.refresh_from_db()
+
+        self.assertRedirects(response, f"{reverse('streams:artist_profile_edit')}?artist={self.artist.id}")
+        self.assertEqual(self.artist.photo.name, 'artists/foto-existente.jpg')
+        self.assertEqual(self.artist.hero_image.name, 'artists/heroes/capa-existente.jpg')
+
+    def test_artist_profile_page_does_not_offer_accidental_image_clear(self):
+        self.artist.photo = 'artists/foto-existente.jpg'
+        self.artist.hero_image = 'artists/heroes/capa-existente.jpg'
+        self.artist.save(update_fields=['photo', 'hero_image'])
+        self.client.force_login(self.artist_user)
+
+        response = self.client.get(f"{reverse('streams:artist_profile_edit')}?artist={self.artist.id}")
+
+        self.assertNotContains(response, 'Limpar')
+
 
 class PhotoGalleryAccessTests(TestCase):
     def setUp(self):
@@ -1222,6 +1313,31 @@ class PhotoGalleryAccessTests(TestCase):
         self.assertRedirects(response, f'/dashboard/galerias/{gallery.id}/editar/')
         self.assertEqual(gallery.moderation_status, PhotoGallery.DRAFT)
         self.assertFalse(gallery.is_active)
+
+    def test_gallery_edit_without_new_cover_keeps_existing_cover(self):
+        gallery = self.create_gallery(public_cover='photo_galleries/covers/capa-existente.jpg')
+        self.client.force_login(self.artist_user)
+
+        response = self.client.post(f'/dashboard/galerias/{gallery.id}/editar/', {
+            'action': 'save_gallery',
+            'title': 'Galeria renomeada',
+            'description': gallery.description,
+            'access_price': '5.00',
+            'is_active': 'on',
+        })
+        gallery.refresh_from_db()
+
+        self.assertRedirects(response, f'/dashboard/galerias/{gallery.id}/editar/')
+        self.assertEqual(gallery.public_cover.name, 'photo_galleries/covers/capa-existente.jpg')
+
+    def test_gallery_edit_page_does_not_offer_accidental_cover_clear(self):
+        gallery = self.create_gallery(public_cover='photo_galleries/covers/capa-existente.jpg')
+        self.client.force_login(self.artist_user)
+
+        response = self.client.get(f'/dashboard/galerias/{gallery.id}/editar/')
+
+        self.assertContains(response, 'Capa publica')
+        self.assertNotContains(response, 'Limpar')
 
     def test_deleting_gallery_removes_it_from_public_pages(self):
         gallery = self.create_gallery(title='Galeria para apagar')
