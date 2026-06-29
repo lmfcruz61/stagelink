@@ -814,6 +814,53 @@ class LiveStreamAccessAndEmbedTests(TestCase):
             is_active=True,
         )
 
+    @patch('streams.views.list_stream_live_input_videos')
+    def test_artist_can_publish_closest_ready_live_recording_as_replay(self, list_videos):
+        stream = self.create_paid_stream()
+        closest_created = (stream.scheduled_at + timedelta(minutes=5)).isoformat()
+        list_videos.return_value = [
+            {
+                'uid': 'older-recording',
+                'created': (stream.scheduled_at - timedelta(days=2)).isoformat(),
+                'status': {'state': 'ready'},
+            },
+            {
+                'uid': 'matching-recording',
+                'created': closest_created,
+                'status': {'state': 'ready'},
+            },
+        ]
+        self.client.force_login(self.artist_user)
+
+        response = self.client.post(reverse('streams:stream_publish_replay', args=[stream.id]))
+
+        self.assertRedirects(response, reverse('streams:stream_update', args=[stream.id]))
+        stream.refresh_from_db()
+        self.assertEqual(stream.event_type, LiveStream.REPLAY)
+        self.assertEqual(stream.cloudflare_video_uid, 'matching-recording')
+        self.assertEqual(stream.cloudflare_live_input_uid, '')
+        self.assertTrue(stream.is_active)
+        self.assertEqual(stream.title, 'Live paga')
+        self.assertEqual(stream.access_price, Decimal('10.00'))
+        self.assertContains(self.client.get(reverse('streams:home')), 'Live paga')
+
+    @patch('streams.views.list_stream_live_input_videos')
+    def test_replay_waits_until_cloudflare_recording_is_ready(self, list_videos):
+        stream = self.create_paid_stream()
+        list_videos.return_value = [{
+            'uid': 'processing-recording',
+            'created': stream.scheduled_at.isoformat(),
+            'status': {'state': 'inprogress'},
+        }]
+        self.client.force_login(self.artist_user)
+
+        self.client.post(reverse('streams:stream_publish_replay', args=[stream.id]))
+
+        stream.refresh_from_db()
+        self.assertEqual(stream.event_type, LiveStream.LIVE)
+        self.assertEqual(stream.cloudflare_video_uid, '')
+        self.assertTrue(stream.is_active)
+
     @override_settings(CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN='customer-test.cloudflarestream.com')
     def test_cloudflare_embed_url_does_not_duplicate_full_host(self):
         stream = self.create_paid_stream()

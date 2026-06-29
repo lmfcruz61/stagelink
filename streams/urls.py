@@ -24,6 +24,7 @@ urlpatterns = [
     path('dashboard/streams/novo/', views.stream_create, name='stream_create'),
     path('dashboard/streams/<int:stream_id>/editar/', views.stream_update, name='stream_update'),
     path('dashboard/streams/<int:stream_id>/alternar-ativo/', views.stream_toggle_active, name='stream_toggle_active'),
+    path('dashboard/streams/<int:stream_id>/publicar-replay/', views.stream_publish_replay, name='stream_publish_replay'),
     path('dashboard/streams/<int:stream_id>/upload-concluido/', views.stream_mark_upload_complete, name='stream_mark_upload_complete'),
     path('dashboard/streams/<int:stream_id>/apagar/', views.stream_delete, name='stream_delete'),
     path('dashboard/galerias/nova/', views.photo_gallery_create, name='photo_gallery_create'),

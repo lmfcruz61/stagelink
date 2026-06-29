@@ -28,7 +28,12 @@ from accounts.models import Artist, ArtistPhoto, Organization, OrganizationMembe
 from payments.models import PhotoGalleryPurchase, StreamTicketPurchase, Subscription
 from payments.pricing import ticket_checkout_pricing
 
-from .cloudflare import CloudflareStreamError, create_direct_upload_for_stream, create_live_input_for_artist
+from .cloudflare import (
+    CloudflareStreamError,
+    create_direct_upload_for_stream,
+    create_live_input_for_artist,
+    list_stream_live_input_videos,
+)
 from .forms import LiveStreamForm
 from .forms import PhotoGalleryForm, PhotoGalleryImageUploadForm
 from .models import LiveStream, PhotoGallery, PhotoGalleryImage
@@ -1234,6 +1239,81 @@ def stream_toggle_active(request, stream_id):
             messages.success(request, 'Stream ativado.')
         else:
             messages.success(request, 'Stream desativado.')
+    return redirect('streams:stream_update', stream_id=stream.id)
+
+
+@login_required
+@require_POST
+def stream_publish_replay(request, stream_id):
+    stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
+    if not can_manage_artist(request.user, stream.artist):
+        messages.error(request, 'Nao tens permissao para gerir este evento.')
+        return redirect('streams:dashboard')
+    if stream.event_type not in {LiveStream.LIVE, LiveStream.PREMIERE}:
+        messages.warning(request, 'Este evento ja nao e uma live.')
+        return redirect('streams:stream_update', stream_id=stream.id)
+    if not stream.cloudflare_live_input_uid:
+        messages.error(request, 'Esta live nao tem um canal Cloudflare associado.')
+        return redirect('streams:stream_update', stream_id=stream.id)
+
+    try:
+        videos = list_stream_live_input_videos(stream.cloudflare_live_input_uid)
+    except CloudflareStreamError as error:
+        messages.error(request, str(error))
+        return redirect('streams:stream_update', stream_id=stream.id)
+
+    assigned_video_uids = set(
+        LiveStream.objects.exclude(pk=stream.pk)
+        .exclude(cloudflare_video_uid='')
+        .values_list('cloudflare_video_uid', flat=True),
+    )
+    recordings = [
+        video for video in videos
+        if video.get('uid')
+        and video.get('uid') not in assigned_video_uids
+        and (video.get('status') or {}).get('state') == 'ready'
+    ]
+
+    def recording_distance(video):
+        created_at = parse_datetime(video.get('created') or '')
+        if not created_at:
+            return float('inf')
+        if timezone.is_naive(created_at):
+            created_at = timezone.make_aware(created_at, timezone=datetime_timezone.utc)
+        return abs((created_at - stream.scheduled_at).total_seconds())
+
+    recording = min(recordings, key=recording_distance) if recordings else None
+    if not recording:
+        messages.warning(
+            request,
+            'A gravacao ainda esta a ser processada pela Cloudflare. Aguarda um pouco e tenta novamente.',
+        )
+        return redirect('streams:stream_update', stream_id=stream.id)
+
+    stream.event_type = LiveStream.REPLAY
+    stream.cloudflare_video_uid = recording['uid']
+    stream.cloudflare_live_input_uid = ''
+    stream.cloudflare_playback_url = ''
+    stream.cloudflare_upload_url = ''
+    stream.cloudflare_upload_expires_at = None
+    stream.cloudflare_upload_status = LiveStream.UPLOAD_UPLOADED
+    stream.uploaded_at = timezone.now()
+    stream.is_active = True
+    stream.save(update_fields=[
+        'event_type',
+        'cloudflare_video_uid',
+        'cloudflare_live_input_uid',
+        'cloudflare_playback_url',
+        'cloudflare_upload_url',
+        'cloudflare_upload_expires_at',
+        'cloudflare_upload_status',
+        'uploaded_at',
+        'is_active',
+    ])
+    messages.success(
+        request,
+        'Replay publicado. O video ja esta disponivel na pagina inicial e na pagina do artista.',
+    )
     return redirect('streams:stream_update', stream_id=stream.id)
 
 

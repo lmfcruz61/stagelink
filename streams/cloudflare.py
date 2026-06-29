@@ -167,6 +167,18 @@ def get_stream_live_input(live_input_uid):
     return data.get('result') or {}
 
 
+def list_stream_live_input_videos(live_input_uid):
+    data = cloudflare_stream_request(
+        f'/stream/live_inputs/{live_input_uid}/videos',
+        method='GET',
+    )
+    if not data.get('success'):
+        raise CloudflareStreamError(
+            f'Cloudflare nao devolveu as gravacoes desta live: {data.get("errors")}',
+        )
+    return data.get('result') or []
+
+
 def delete_stream_live_input(live_input_uid):
     data = cloudflare_stream_request(f'/stream/live_inputs/{live_input_uid}', method='DELETE')
     if not data.get('success', True):
