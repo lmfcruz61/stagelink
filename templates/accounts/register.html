@@ -9,40 +9,47 @@
     <div class="mt-6 grid gap-3">
       <div class="sl-card p-4 text-sm text-zinc-300">
         <p class="font-semibold text-zinc-100">Artista</p>
-        <p class="mt-1">Cria a tua pagina e escolhe depois como queres monetizar:</p>
+        <p class="mt-1">Cria a tua página e escolhe como queres monetizar:</p>
+        <p class="mt-2 text-xs text-zinc-500">Passa o rato ou toca numa opção para veres a descrição.</p>
         <ul class="mt-3 space-y-2 text-zinc-400">
-          <li class="group relative">
-            <button type="button" class="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-zinc-800 focus:bg-zinc-800 focus:outline-none" aria-describedby="subscription-only-description">
-              <span aria-hidden="true">•</span>
-              <span>Subscricoes</span>
-              <span class="ml-auto text-xs text-zinc-500" aria-hidden="true">ⓘ</span>
-            </button>
-            <span id="subscription-only-description" role="tooltip" class="pointer-events-none absolute left-2 top-full z-10 mt-1 hidden w-[min(300px,calc(100vw-5rem))] rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-xs leading-relaxed text-zinc-300 shadow-xl group-hover:block group-focus-within:block">
-              O publico paga uma subscricao mensal para aceder aos conteudos incluidos pelo artista. A compra individual fica desativada.
-            </span>
+          <li>
+            <details class="group relative">
+              <summary class="flex w-full cursor-pointer list-none items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-left transition hover:border-zinc-700 hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#2596BE]/70 [&::-webkit-details-marker]:hidden">
+                <span aria-hidden="true">•</span>
+                <span>Subscrições</span>
+                <span class="ml-auto flex h-5 w-5 items-center justify-center rounded-full border border-zinc-600 text-xs text-zinc-300" aria-hidden="true">i</span>
+              </summary>
+              <p class="mt-1 rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-xs leading-relaxed text-zinc-300 shadow-xl md:absolute md:left-2 md:top-full md:z-20 md:hidden md:w-80 md:group-hover:block md:group-open:block">
+                O público paga uma subscrição mensal para aceder aos conteúdos incluídos pelo artista. A compra individual fica desativada.
+              </p>
+            </details>
           </li>
-          <li class="group relative">
-            <button type="button" class="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-zinc-800 focus:bg-zinc-800 focus:outline-none" aria-describedby="subscription-paid-description">
-              <span aria-hidden="true">•</span>
-              <span>Subscricoes + conteudo pago</span>
-              <span class="ml-auto text-xs text-zinc-500" aria-hidden="true">ⓘ</span>
-            </button>
-            <span id="subscription-paid-description" role="tooltip" class="pointer-events-none absolute left-2 top-full z-10 mt-1 hidden w-[min(300px,calc(100vw-5rem))] rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-xs leading-relaxed text-zinc-300 shadow-xl group-hover:block group-focus-within:block">
-              O publico precisa de uma subscricao ativa e pode depois comprar conteudos pagos exclusivos separadamente.
-            </span>
+          <li>
+            <details class="group relative">
+              <summary class="flex w-full cursor-pointer list-none items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-left transition hover:border-zinc-700 hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#2596BE]/70 [&::-webkit-details-marker]:hidden">
+                <span aria-hidden="true">•</span>
+                <span>Subscrições + conteúdo pago</span>
+                <span class="ml-auto flex h-5 w-5 items-center justify-center rounded-full border border-zinc-600 text-xs text-zinc-300" aria-hidden="true">i</span>
+              </summary>
+              <p class="mt-1 rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-xs leading-relaxed text-zinc-300 shadow-xl md:absolute md:left-2 md:top-full md:z-20 md:hidden md:w-80 md:group-hover:block md:group-open:block">
+                O público paga uma subscrição mensal e pode também comprar conteúdos ou eventos pagos separadamente.
+              </p>
+            </details>
           </li>
-          <li class="group relative">
-            <button type="button" class="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-zinc-800 focus:bg-zinc-800 focus:outline-none" aria-describedby="paid-only-description">
-              <span aria-hidden="true">•</span>
-              <span>Somente conteudo pago</span>
-              <span class="ml-auto text-xs text-zinc-500" aria-hidden="true">ⓘ</span>
-            </button>
-            <span id="paid-only-description" role="tooltip" class="pointer-events-none absolute left-2 top-full z-10 mt-1 hidden w-[min(300px,calc(100vw-5rem))] rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-xs leading-relaxed text-zinc-300 shadow-xl group-hover:block group-focus-within:block">
-              Nao existe subscricao mensal. O publico compra individualmente os conteudos e eventos que quiser.
-            </span>
+          <li>
+            <details class="group relative">
+              <summary class="flex w-full cursor-pointer list-none items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-left transition hover:border-zinc-700 hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#2596BE]/70 [&::-webkit-details-marker]:hidden">
+                <span aria-hidden="true">•</span>
+                <span>Somente conteúdo pago</span>
+                <span class="ml-auto flex h-5 w-5 items-center justify-center rounded-full border border-zinc-600 text-xs text-zinc-300" aria-hidden="true">i</span>
+              </summary>
+              <p class="mt-1 rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-xs leading-relaxed text-zinc-300 shadow-xl md:absolute md:left-2 md:top-full md:z-20 md:hidden md:w-80 md:group-hover:block md:group-open:block">
+                Não existe subscrição mensal. O público compra individualmente os conteúdos e eventos que quiser.
+              </p>
+            </details>
           </li>
         </ul>
-        <p class="mt-3 text-xs text-zinc-500">Podes alterar esta opcao mais tarde no painel do artista.</p>
+        <p class="mt-3 text-xs text-zinc-500">Podes alterar esta opção mais tarde no painel do artista.</p>
       </div>
       <div class="sl-card p-4 text-sm text-zinc-300">
         <p class="font-semibold text-zinc-100">Publico</p>

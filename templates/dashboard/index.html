@@ -132,19 +132,21 @@
     </div>
   </div>
 
-  {% if not artist.stripe_connect_ready %}
-    <div class="mt-5 rounded border border-zinc-800 bg-zinc-950/70 p-4">
-      <p class="font-semibold">Checklist para ativar pagamentos</p>
+    {% if not artist.stripe_connect_ready %}
+      <div class="mt-5 rounded border border-zinc-800 bg-zinc-950/70 p-4">
+        <p class="font-semibold">Checklist para ativar pagamentos</p>
       <ol class="mt-3 grid gap-2 text-sm text-zinc-300 md:grid-cols-2">
         <li>{% if artist.stripe_account_id %}<span class="text-emerald-200">OK</span>{% else %}<span class="text-amber-100">1.</span>{% endif %} Criar/ligar conta Stripe.</li>
         <li>{% if artist.stripe_details_submitted %}<span class="text-emerald-200">OK</span>{% else %}<span class="text-amber-100">2.</span>{% endif %} Submeter dados pedidos pela Stripe.</li>
         <li>{% if artist.stripe_charges_enabled %}<span class="text-emerald-200">OK</span>{% else %}<span class="text-amber-100">3.</span>{% endif %} Ativar cobrancas.</li>
         <li>{% if artist.stripe_payouts_enabled %}<span class="text-emerald-200">OK</span>{% else %}<span class="text-amber-100">4.</span>{% endif %} Ativar pagamentos para a conta bancaria.</li>
-      </ol>
-    </div>
-  {% endif %}
+        </ol>
+      </div>
+    {% endif %}
 
-  <div class="mt-5 grid gap-4 md:grid-cols-3">
+    {% include 'dashboard/_stripe_help.html' %}
+
+    <div class="mt-5 grid gap-4 md:grid-cols-3">
     <div class="rounded border border-zinc-800 bg-zinc-950/70 p-4">
       <p class="text-sm text-zinc-400">Receita bruta registada</p>
       <p class="mt-2 text-3xl font-semibold">{{ payment_summary.total_gross }} EUR</p>
