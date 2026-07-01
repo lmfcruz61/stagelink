@@ -1,5 +1,7 @@
 from decimal import Decimal
 from decimal import InvalidOperation
+from datetime import datetime
+from datetime import timezone as datetime_timezone
 from datetime import timedelta
 from urllib.parse import urlencode
 
@@ -14,6 +16,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 from accounts.models import Artist, Fan, OrganizationMember
 from streams.models import LiveStream, PhotoGallery, Tip
@@ -340,6 +343,7 @@ def _complete_checkout_session(session):
                 'commission_percent': Decimal(metadata.get('commission_percent') or '0'),
                 'status': Subscription.ACTIVE,
                 'tier': metadata.get('tier', Subscription.SUBSCRIBER),
+                'cancel_at_period_end': False,
                 # Valor inicial conservador; eventos invoice/subscription podem refiná-lo.
                 'current_period_end': timezone.now() + timedelta(days=31),
             },
@@ -406,6 +410,60 @@ def subscribe_artist(request, artist_id):
         },
     )
     return redirect(session.url)
+
+
+@login_required
+@require_POST
+def cancel_subscription(request, subscription_id):
+    fan = getattr(request.user, 'fan_profile', None)
+    if fan is None:
+        messages.error(request, 'Só contas de público podem gerir subscrições.')
+        return redirect('accounts:profile')
+
+    subscription = get_object_or_404(
+        Subscription.objects.select_related('artist'),
+        pk=subscription_id,
+        fan=fan,
+    )
+    if subscription.status != Subscription.ACTIVE or not subscription.is_current:
+        messages.info(request, 'Esta subscrição já não está ativa.')
+        return redirect('accounts:profile')
+    if subscription.cancel_at_period_end:
+        messages.info(request, 'A anulação desta subscrição já está agendada.')
+        return redirect('accounts:profile')
+    if not subscription.stripe_subscription_id:
+        messages.error(request, 'Não foi possível identificar esta subscrição na Stripe. Contacta o suporte.')
+        return redirect('accounts:profile')
+    if not settings.STRIPE_SECRET_KEY:
+        messages.error(request, 'A Stripe não está configurada. Tenta novamente mais tarde.')
+        return redirect('accounts:profile')
+
+    try:
+        stripe_subscription = stripe.Subscription.modify(
+            subscription.stripe_subscription_id,
+            cancel_at_period_end=True,
+        )
+    except stripe.error.StripeError:
+        messages.error(request, 'Não foi possível anular a subscrição na Stripe. Tenta novamente.')
+        return redirect('accounts:profile')
+
+    subscription.cancel_at_period_end = bool(stripe_subscription.get('cancel_at_period_end', True))
+    update_fields = ['cancel_at_period_end']
+    period_end = stripe_subscription.get('current_period_end')
+    if period_end:
+        subscription.current_period_end = datetime.fromtimestamp(
+            period_end,
+            tz=datetime_timezone.utc,
+        )
+        update_fields.append('current_period_end')
+    subscription.save(update_fields=update_fields)
+
+    messages.success(
+        request,
+        f'Subscrição de {subscription.artist.name} anulada. '
+        f'Manténs o acesso até {timezone.localtime(subscription.current_period_end):%d/%m/%Y}.',
+    )
+    return redirect('accounts:profile')
 
 
 @login_required

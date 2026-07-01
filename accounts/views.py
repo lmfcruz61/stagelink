@@ -59,4 +59,8 @@ def profile(request):
         'artist': artist,
         'fan': fan,
         'fan_form': fan_form,
+        'subscriptions': (
+            fan.subscriptions.select_related('artist').order_by('-created_at')
+            if fan else []
+        ),
     })

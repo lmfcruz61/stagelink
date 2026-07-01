@@ -55,5 +55,47 @@
       <p class="mt-2 text-zinc-400">Esta conta ainda nao tem perfil associado.</p>
     {% endif %}
   </div>
+
+  {% if fan %}
+    <section class="mt-8">
+      <div class="mb-4">
+        <p class="text-sm text-[#2596BE]">Pagamentos</p>
+        <h2 class="text-2xl font-semibold">As minhas subscrições</h2>
+      </div>
+      <div class="space-y-4">
+        {% for subscription in subscriptions %}
+          <article class="sl-card p-5">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="text-lg font-semibold">{{ subscription.artist.name }}</p>
+                <p class="mt-1 text-sm text-zinc-400">
+                  {{ subscription.get_tier_display }} · {{ subscription.get_status_display }}
+                </p>
+                {% if subscription.cancel_at_period_end %}
+                  <p class="mt-2 text-sm text-amber-200">
+                    Anulação agendada. Manténs o acesso até {{ subscription.current_period_end|date:"d/m/Y" }}.
+                  </p>
+                {% elif subscription.is_current %}
+                  <p class="mt-2 text-sm text-zinc-400">
+                    Próxima renovação: {{ subscription.current_period_end|date:"d/m/Y" }}.
+                  </p>
+                {% endif %}
+              </div>
+              {% if subscription.is_current and not subscription.cancel_at_period_end %}
+                <form method="post" action="{% url 'payments:cancel_subscription' subscription.id %}" onsubmit="return confirm('Queres mesmo anular esta subscrição? Manterás o acesso até ao fim do período já pago.');">
+                  {% csrf_token %}
+                  <button type="submit" class="rounded-lg border border-red-500/60 px-4 py-2 text-sm font-semibold text-red-200 hover:bg-red-500/10">
+                    Anular subscrição
+                  </button>
+                </form>
+              {% endif %}
+            </div>
+          </article>
+        {% empty %}
+          <div class="sl-card p-5 text-zinc-400">Ainda não tens subscrições.</div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
 </section>
 {% endblock %}

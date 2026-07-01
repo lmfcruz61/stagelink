@@ -396,3 +396,74 @@ class StripeConnectWebhookTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.artist.refresh_from_db()
         self.assertFalse(self.artist.stripe_connect_ready)
+
+
+class SubscriptionCancellationTests(TestCase):
+    def setUp(self):
+        self.artist_user = User.objects.create_user(username='cancel_artist')
+        self.artist = Artist.objects.create(user=self.artist_user, name='Artista Cancelamento')
+        self.fan_user = User.objects.create_user(username='cancel_fan')
+        self.fan = Fan.objects.create(user=self.fan_user, display_name='Publico Cancelamento')
+        self.subscription = Subscription.objects.create(
+            fan=self.fan,
+            artist=self.artist,
+            stripe_subscription_id='sub_test_cancel',
+            status=Subscription.ACTIVE,
+            current_period_end=timezone.now() + timedelta(days=20),
+        )
+
+    @override_settings(STRIPE_SECRET_KEY='sk_test_xxx')
+    @patch('payments.views.stripe.Subscription.modify')
+    def test_fan_can_schedule_subscription_cancellation(self, modify):
+        stripe_period_end = int((timezone.now() + timedelta(days=15)).timestamp())
+        modify.return_value = {
+            'cancel_at_period_end': True,
+            'current_period_end': stripe_period_end,
+        }
+        self.client.force_login(self.fan_user)
+
+        response = self.client.post(
+            reverse('payments:cancel_subscription', args=[self.subscription.id]),
+        )
+
+        self.assertRedirects(response, reverse('accounts:profile'))
+        modify.assert_called_once_with(
+            'sub_test_cancel',
+            cancel_at_period_end=True,
+        )
+        self.subscription.refresh_from_db()
+        self.assertTrue(self.subscription.cancel_at_period_end)
+        self.assertTrue(self.subscription.is_current)
+
+    def test_cancellation_only_accepts_post(self):
+        self.client.force_login(self.fan_user)
+
+        response = self.client.get(
+            reverse('payments:cancel_subscription', args=[self.subscription.id]),
+        )
+
+        self.assertEqual(response.status_code, 405)
+
+    @override_settings(STRIPE_SECRET_KEY='sk_test_xxx')
+    @patch('payments.views.stripe.Subscription.modify')
+    def test_another_fan_cannot_cancel_subscription(self, modify):
+        other_user = User.objects.create_user(username='other_fan')
+        Fan.objects.create(user=other_user, display_name='Outro Publico')
+        self.client.force_login(other_user)
+
+        response = self.client.post(
+            reverse('payments:cancel_subscription', args=[self.subscription.id]),
+        )
+
+        self.assertEqual(response.status_code, 404)
+        modify.assert_not_called()
+        self.subscription.refresh_from_db()
+        self.assertFalse(self.subscription.cancel_at_period_end)
+
+    def test_profile_shows_cancel_button_for_current_subscription(self):
+        self.client.force_login(self.fan_user)
+
+        response = self.client.get(reverse('accounts:profile'))
+
+        self.assertContains(response, 'As minhas subscrições')
+        self.assertContains(response, 'Anular subscrição')
