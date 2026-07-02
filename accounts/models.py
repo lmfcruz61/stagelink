@@ -85,6 +85,10 @@ class Artist(models.Model):
     bio = models.TextField(blank=True)
     contact_email = models.EmailField(blank=True)
     contact_phone = models.CharField(max_length=40, blank=True)
+    is_institutional = models.BooleanField(
+        default=False,
+        help_text='Permite ao artista disponibilizar conteúdos gratuitos individualmente.',
+    )
     photo = models.ImageField(upload_to='artists/', blank=True, null=True)
     hero_image = models.ImageField(upload_to='artists/heroes/', blank=True, null=True)
     youtube_link = models.URLField(blank=True)

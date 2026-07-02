@@ -357,12 +357,13 @@ class LiveStreamAdmin(admin.ModelAdmin):
         'artist',
         'video_provider',
         'event_type',
+        'access_type',
         'cloudflare_upload_status',
         'scheduled_at',
         'access_price',
         'is_active',
     )
-    list_filter = ('video_provider', 'event_type', 'cloudflare_upload_status', 'is_active', 'scheduled_at')
+    list_filter = ('access_type', 'video_provider', 'event_type', 'cloudflare_upload_status', 'is_active', 'scheduled_at')
     search_fields = ('title', 'artist__name', 'cloudflare_video_uid', 'cloudflare_live_input_uid', 'youtube_video_id')
 
 
@@ -395,6 +396,7 @@ class PhotoGalleryAdmin(admin.ModelAdmin):
     list_display = (
         'title',
         'artist',
+        'access_type',
         'access_price',
         'image_total',
         'moderation_status',
@@ -402,7 +404,7 @@ class PhotoGalleryAdmin(admin.ModelAdmin):
         'is_active',
         'created_at',
     )
-    list_filter = ('moderation_status', 'is_sensitive', 'is_active', 'created_at')
+    list_filter = ('access_type', 'moderation_status', 'is_sensitive', 'is_active', 'created_at')
     search_fields = ('title', 'artist__name', 'description')
     readonly_fields = ('created_at', 'updated_at', 'reviewed_at')
     inlines = (PhotoGalleryImageInline,)

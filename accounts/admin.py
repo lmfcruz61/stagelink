@@ -62,6 +62,7 @@ class ArtistAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'user',
+        'is_institutional',
         'monetization_mode',
         'commission_rate',
         'cloudflare_live_input_uid',
@@ -69,7 +70,7 @@ class ArtistAdmin(admin.ModelAdmin):
         'stripe_charges_enabled',
         'stripe_payouts_enabled',
     )
-    list_filter = ('monetization_mode', 'stripe_charges_enabled', 'stripe_payouts_enabled')
+    list_filter = ('is_institutional', 'monetization_mode', 'stripe_charges_enabled', 'stripe_payouts_enabled')
     search_fields = ('name', 'user__username', 'cloudflare_live_input_uid', 'stripe_account_id')
     readonly_fields = ('cloudflare_rtmps_url', 'cloudflare_stream_key')
 

@@ -1,5 +1,6 @@
 from django import forms
 from django.utils import timezone
+from decimal import Decimal
 from urllib.parse import parse_qs, urlparse
 
 from .models import LiveStream, PhotoGallery
@@ -50,6 +51,7 @@ class LiveStreamForm(forms.ModelForm):
             'cloudflare_playback_url',
             'youtube_video_id',
             'event_type',
+            'access_type',
             'access_price',
             'scheduled_at',
             'duration_minutes',
@@ -59,6 +61,7 @@ class LiveStreamForm(forms.ModelForm):
             'description': 'Descricao publica',
             'video_provider': 'Plataforma de video',
             'event_type': 'Tipo de conteudo',
+            'access_type': 'Tipo de acesso',
             'access_price': 'Preco do bilhete',
             'duration_minutes': 'Duração estimada',
         }
@@ -69,7 +72,23 @@ class LiveStreamForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.artist = kwargs.pop('artist', None)
+        self.allow_free_access = kwargs.pop('allow_free_access', False)
         super().__init__(*args, **kwargs)
+        self.fields['access_type'].required = False
+        can_choose_access_type = bool(
+            self.allow_free_access
+            or (self.artist and self.artist.is_institutional)
+        )
+        if not can_choose_access_type:
+            allowed_type = (
+                LiveStream.ACCESS_SUBSCRIBERS
+                if self.artist and self.artist.subscription_includes_content
+                else LiveStream.ACCESS_PAID
+            )
+            self.fields['access_type'].choices = tuple(
+                choice for choice in LiveStream.ACCESS_TYPE_CHOICES
+                if choice[0] == allowed_type
+            )
         self.fields['video_provider'].choices = (
             (LiveStream.VIDEO_PROVIDER_CLOUDFLARE, 'Video StageHub'),
         )
@@ -104,6 +123,7 @@ class LiveStreamForm(forms.ModelForm):
             return True
         video_fields = {
             'access_price',
+            'access_type',
             'cloudflare_playback_url',
             'cloudflare_stream_id',
             'create_upload_url',
@@ -143,7 +163,23 @@ class LiveStreamForm(forms.ModelForm):
             cleaned_data['cloudflare_stream_id'] = cloudflare_stream_id
 
         access_price = cleaned_data.get('access_price')
-        if access_price is not None:
+        access_type = (
+            cleaned_data.get('access_type')
+            or getattr(self.instance, 'access_type', None)
+            or LiveStream.ACCESS_PAID
+        )
+        cleaned_data['access_type'] = access_type
+        if access_type == LiveStream.ACCESS_FREE:
+            if not (
+                self.allow_free_access
+                or (self.artist and self.artist.is_institutional)
+            ):
+                self.add_error(
+                    'access_type',
+                    'Apenas artistas institucionais podem disponibilizar conteúdo gratuito.',
+                )
+            cleaned_data['access_price'] = Decimal('0.00')
+        elif access_type == LiveStream.ACCESS_PAID and access_price is not None:
             if access_price < LiveStream.MIN_PRICE:
                 self.add_error(
                     'access_price',
@@ -258,6 +294,7 @@ class PhotoGalleryForm(forms.ModelForm):
             'title',
             'description',
             'public_cover',
+            'access_type',
             'access_price',
             'is_sensitive',
             'is_active',
@@ -266,6 +303,7 @@ class PhotoGalleryForm(forms.ModelForm):
             'title': 'Titulo',
             'description': 'Descricao publica',
             'public_cover': 'Capa publica discreta',
+            'access_type': 'Tipo de acesso',
             'access_price': 'Preco de acesso',
             'is_sensitive': 'Conteudo sensivel/adulto',
             'is_active': 'Ativa',
@@ -279,11 +317,55 @@ class PhotoGalleryForm(forms.ModelForm):
             'public_cover': forms.FileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}),
         }
 
-    def clean_access_price(self):
-        value = self.cleaned_data['access_price']
-        if value < PhotoGallery.MIN_PRICE:
-            raise forms.ValidationError('O preco minimo de acesso a galerias na StageHub e 2 EUR.')
-        return value
+    def __init__(self, *args, **kwargs):
+        self.artist = kwargs.pop('artist', None)
+        self.allow_free_access = kwargs.pop('allow_free_access', False)
+        super().__init__(*args, **kwargs)
+        self.fields['access_type'].required = False
+        can_choose_access_type = bool(
+            self.allow_free_access
+            or (self.artist and self.artist.is_institutional)
+        )
+        if not can_choose_access_type:
+            allowed_type = (
+                PhotoGallery.ACCESS_SUBSCRIBERS
+                if self.artist and self.artist.subscription_includes_content
+                else PhotoGallery.ACCESS_PAID
+            )
+            self.fields['access_type'].choices = tuple(
+                choice for choice in PhotoGallery.ACCESS_TYPE_CHOICES
+                if choice[0] == allowed_type
+            )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        access_type = (
+            cleaned_data.get('access_type')
+            or getattr(self.instance, 'access_type', None)
+            or PhotoGallery.ACCESS_PAID
+        )
+        cleaned_data['access_type'] = access_type
+        access_price = cleaned_data.get('access_price')
+        if access_type == PhotoGallery.ACCESS_FREE:
+            if not (
+                self.allow_free_access
+                or (self.artist and self.artist.is_institutional)
+            ):
+                self.add_error(
+                    'access_type',
+                    'Apenas artistas institucionais podem disponibilizar conteúdo gratuito.',
+                )
+            cleaned_data['access_price'] = Decimal('0.00')
+        elif (
+            access_type == PhotoGallery.ACCESS_PAID
+            and access_price is not None
+            and access_price < PhotoGallery.MIN_PRICE
+        ):
+            self.add_error(
+                'access_price',
+                'O preco minimo de acesso a galerias na StageHub e 2 EUR.',
+            )
+        return cleaned_data
 
     def clean_public_cover(self):
         cover = self.cleaned_data.get('public_cover')

@@ -1616,3 +1616,128 @@ class CloudflareDirectUploadTests(TestCase):
         request = mock_urlopen.call_args.args[0]
         payload = json.loads(request.data.decode('utf-8'))
         self.assertEqual(payload['maxDurationSeconds'], 3600)
+
+
+class InstitutionalFreeContentTests(TestCase):
+    def setUp(self):
+        self.artist_user = User.objects.create_user(username='institutional_artist')
+        self.artist = Artist.objects.create(
+            user=self.artist_user,
+            name='Artista Institucional',
+        )
+        self.fan_user = User.objects.create_user(username='institutional_fan')
+        self.fan = Fan.objects.create(user=self.fan_user, display_name='Publico Institucional')
+
+    def stream_form_data(self, access_type, access_price='2.00'):
+        return {
+            'title': 'Conteudo institucional',
+            'description': '',
+            'video_provider': LiveStream.VIDEO_PROVIDER_CLOUDFLARE,
+            'cloudflare_stream_id': '',
+            'cloudflare_playback_url': '',
+            'youtube_video_id': '',
+            'event_type': LiveStream.RECORDED,
+            'access_type': access_type,
+            'access_price': access_price,
+            'scheduled_at': timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M'),
+            'duration_minutes': '30',
+            'create_upload_url': 'on',
+        }
+
+    def test_normal_artist_cannot_create_free_content(self):
+        form = LiveStreamForm(
+            data=self.stream_form_data(LiveStream.ACCESS_FREE, '0.00'),
+            artist=self.artist,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('access_type', form.errors)
+
+    def test_institutional_artist_can_create_free_content(self):
+        self.artist.is_institutional = True
+        self.artist.save(update_fields=['is_institutional'])
+        form = LiveStreamForm(
+            data=self.stream_form_data(LiveStream.ACCESS_FREE, '0.00'),
+            artist=self.artist,
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data['access_price'], Decimal('0.00'))
+
+    def test_authenticated_fan_can_access_free_content(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Video gratuito',
+            event_type=LiveStream.RECORDED,
+            access_type=LiveStream.ACCESS_FREE,
+            access_price=Decimal('0.00'),
+            scheduled_at=timezone.now(),
+            is_active=True,
+        )
+
+        decision = stream.access_decision(self.fan_user)
+
+        self.assertTrue(decision['allowed'])
+        self.assertEqual(decision['reason'], 'free_content')
+
+    def test_subscribers_content_requires_active_subscription(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Video de subscritores',
+            event_type=LiveStream.RECORDED,
+            access_type=LiveStream.ACCESS_SUBSCRIBERS,
+            scheduled_at=timezone.now(),
+            is_active=True,
+        )
+        self.assertFalse(stream.access_decision(self.fan_user)['allowed'])
+        Subscription.objects.create(
+            fan=self.fan,
+            artist=self.artist,
+            status=Subscription.ACTIVE,
+            current_period_end=timezone.now() + timedelta(days=20),
+        )
+
+        self.assertTrue(stream.access_decision(self.fan_user)['allowed'])
+
+    def test_existing_content_defaults_to_paid_behavior(self):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Conteudo antigo',
+            event_type=LiveStream.RECORDED,
+            access_price=LiveStream.MIN_PRICE,
+            scheduled_at=timezone.now(),
+            is_active=True,
+        )
+
+        self.assertEqual(stream.access_type, LiveStream.ACCESS_PAID)
+        self.assertFalse(stream.access_decision(self.fan_user)['allowed'])
+
+    def test_home_marks_free_content_without_showing_price(self):
+        LiveStream.objects.create(
+            artist=self.artist,
+            title='Conteudo gratuito na home',
+            event_type=LiveStream.RECORDED,
+            access_type=LiveStream.ACCESS_FREE,
+            access_price=Decimal('0.00'),
+            scheduled_at=timezone.now(),
+            is_active=True,
+        )
+
+        response = self.client.get(reverse('streams:home'))
+
+        self.assertContains(response, 'Conteudo gratuito na home')
+        self.assertContains(response, 'Gratuito')
+
+    def test_authenticated_fan_can_access_free_gallery(self):
+        gallery = PhotoGallery.objects.create(
+            artist=self.artist,
+            title='Galeria gratuita',
+            public_cover='photo_galleries/covers/free.jpg',
+            access_type=PhotoGallery.ACCESS_FREE,
+            access_price=Decimal('0.00'),
+            is_active=True,
+            moderation_status=PhotoGallery.APPROVED,
+        )
+
+        self.assertTrue(gallery.is_publicly_available)
+        self.assertTrue(gallery.user_has_access(self.fan_user))

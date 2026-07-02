@@ -66,7 +66,12 @@ def _event_public_url(request, stream):
 
 def _event_og_context(request, stream, url=None):
     event_url = url or _event_public_url(request, stream)
-    price = f'{stream.access_price} EUR'
+    if stream.is_free:
+        price = 'Gratuito'
+    elif stream.is_subscribers_only:
+        price = 'Apenas subscritores'
+    else:
+        price = f'{stream.access_price} EUR'
     description = (
         f'{stream.artist.name} apresenta {stream.title} em '
         f'{timezone.localtime(stream.scheduled_at).strftime("%d/%m/%Y %H:%M")}. '
@@ -469,6 +474,13 @@ def cancel_subscription(request, subscription_id):
 @login_required
 def buy_ticket(request, stream_id):
     stream = get_object_or_404(LiveStream, pk=stream_id)
+    if stream.is_free:
+        return redirect('streams:room', stream_id=stream.id)
+    if stream.is_subscribers_only:
+        if stream.active_subscription_for_user(request.user):
+            return redirect('streams:room', stream_id=stream.id)
+        messages.error(request, 'Este conteúdo está disponível apenas para subscritores ativos.')
+        return redirect('streams:artist_detail', artist_id=stream.artist_id)
     if not stream.artist.allows_paid_content:
         messages.error(request, 'Este artista disponibiliza conteudo atraves de subscricao, sem compra avulsa.')
         return redirect('streams:event_detail', stream_id=stream.id)
@@ -571,6 +583,22 @@ def buy_ticket(request, stream_id):
 @login_required
 def buy_photo_gallery(request, gallery_id):
     gallery = get_object_or_404(PhotoGallery.objects.select_related('artist'), pk=gallery_id)
+    if gallery.is_free:
+        return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
+    if gallery.is_subscribers_only:
+        fan = getattr(request.user, 'fan_profile', None)
+        has_subscription = bool(
+            fan and Subscription.objects.filter(
+                fan=fan,
+                artist=gallery.artist,
+                status=Subscription.ACTIVE,
+                current_period_end__gte=timezone.now(),
+            ).exists()
+        )
+        if has_subscription:
+            return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
+        messages.error(request, 'Esta galeria está disponível apenas para subscritores ativos.')
+        return redirect('streams:artist_detail', artist_id=gallery.artist_id)
     if not gallery.artist.allows_paid_content:
         messages.error(request, 'Este artista disponibiliza galerias atraves de subscricao, sem compra avulsa.')
         return redirect('streams:photo_gallery_detail', gallery_id=gallery.id)
@@ -660,6 +688,9 @@ def buy_photo_gallery(request, gallery_id):
 @login_required
 def create_tip(request, stream_id):
     stream = get_object_or_404(LiveStream.objects.select_related('artist'), pk=stream_id)
+    if stream.is_free:
+        messages.error(request, 'Este conteúdo gratuito não está disponível para pagamentos.')
+        return redirect('streams:room', stream_id=stream.id)
     if stream.artist.paid_content_requires_subscription and not stream.active_subscription_for_user(request.user):
         messages.error(request, 'As gorjetas neste artista estao disponiveis apenas para subscritores ativos.')
         return redirect('streams:room', stream_id=stream.id)

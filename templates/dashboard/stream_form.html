@@ -170,8 +170,13 @@
       </span>
     </label>
 
-    <div class="grid gap-4 md:grid-cols-3">
+    <div class="grid gap-4 md:grid-cols-4">
       <label>
+        <span>{{ form.access_type.label }}</span>
+        {{ form.access_type }}
+        {% for error in form.access_type.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
+      </label>
+      <label id="access-price-field">
         <span>{{ form.access_price.label }}</span>
         {{ form.access_price }}
         {% for error in form.access_price.errors %}<span class="mt-1 block text-sm text-red-300">{{ error }}</span>{% endfor %}
@@ -325,7 +330,9 @@
 
 <script>
   const eventTypeInput = document.querySelector('#id_event_type');
+  const accessTypeInput = document.querySelector('#id_access_type');
   const accessPriceInput = document.querySelector('#id_access_price');
+  const accessPriceField = document.querySelector('#access-price-field');
   const directUploadField = document.querySelector('#direct-upload-field');
   const cloudflareHelp = document.querySelector('#cloudflare-stream-help');
   const videoHelp = 'Normalmente fica preenchido automaticamente quando preparas o upload. Usa apenas se o suporte StageHub indicar um codigo.';
@@ -344,9 +351,13 @@
   function updateVideoFields() {
     updateCloudflareHelp();
     updateDirectUploadVisibility();
+    if (accessPriceField) {
+      accessPriceField.classList.toggle('hidden', accessTypeInput?.value !== 'paid');
+    }
   }
 
   eventTypeInput?.addEventListener('change', updateVideoFields);
+  accessTypeInput?.addEventListener('change', updateVideoFields);
   accessPriceInput?.addEventListener('input', updateVideoFields);
   updateVideoFields();
 </script>

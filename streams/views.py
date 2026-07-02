@@ -64,7 +64,12 @@ def event_public_url(request, stream):
 
 def event_og_context(request, stream, url=None):
     event_url = url or event_public_url(request, stream)
-    price = f'{stream.access_price} EUR'
+    if stream.is_free:
+        price = 'Gratuito'
+    elif stream.is_subscribers_only:
+        price = 'Apenas subscritores'
+    else:
+        price = f'{stream.access_price} EUR'
     description = (
         f'{stream.artist.name} apresenta {stream.title} em '
         f'{timezone.localtime(stream.scheduled_at).strftime("%d/%m/%Y %H:%M")}. '
@@ -124,7 +129,11 @@ def home(request):
             return redirect('streams:home')
         messages.warning(request, 'Nao foi possivel subscrever a newsletter. Confirma os dados abaixo.')
 
-    visible_streams_filter = (Q(is_active=True) | Q(scheduled_at__gte=now)) & Q(access_price__gte=LiveStream.MIN_PRICE)
+    valid_stream_access = (
+        Q(access_type__in=(LiveStream.ACCESS_FREE, LiveStream.ACCESS_SUBSCRIBERS))
+        | Q(access_type=LiveStream.ACCESS_PAID, access_price__gte=LiveStream.MIN_PRICE)
+    )
+    visible_streams_filter = (Q(is_active=True) | Q(scheduled_at__gte=now)) & valid_stream_access
     purchased_stream_ids = set()
     purchased_gallery_ids = set()
     if request.user.is_authenticated and hasattr(request.user, 'fan_profile'):
@@ -162,7 +171,10 @@ def home(request):
         (
             Q(is_active=True)
             & Q(moderation_status=PhotoGallery.APPROVED)
-            & Q(access_price__gte=PhotoGallery.MIN_PRICE)
+            & (
+                Q(access_type__in=(PhotoGallery.ACCESS_FREE, PhotoGallery.ACCESS_SUBSCRIBERS))
+                | Q(access_type=PhotoGallery.ACCESS_PAID, access_price__gte=PhotoGallery.MIN_PRICE)
+            )
         ) | Q(id__in=purchased_gallery_ids),
     ).select_related('artist')
 
@@ -323,12 +335,16 @@ def artist_detail(request, artist_id):
     if not can_manage_current_artist:
         streams = streams.filter(
             Q(is_active=True) | Q(scheduled_at__gte=now),
-            access_price__gte=LiveStream.MIN_PRICE,
+        ).filter(
+            Q(access_type__in=(LiveStream.ACCESS_FREE, LiveStream.ACCESS_SUBSCRIBERS))
+            | Q(access_type=LiveStream.ACCESS_PAID, access_price__gte=LiveStream.MIN_PRICE),
         )
         photo_galleries = photo_galleries.filter(
             is_active=True,
             moderation_status=PhotoGallery.APPROVED,
-            access_price__gte=PhotoGallery.MIN_PRICE,
+        ).filter(
+            Q(access_type__in=(PhotoGallery.ACCESS_FREE, PhotoGallery.ACCESS_SUBSCRIBERS))
+            | Q(access_type=PhotoGallery.ACCESS_PAID, access_price__gte=PhotoGallery.MIN_PRICE),
         )
     upcoming_streams = streams.filter(scheduled_at__gte=now).order_by('scheduled_at')
     video_library_streams = streams.filter(
@@ -389,6 +405,7 @@ def stream_detail(request, stream_id):
     can_buy_ticket = (
         request.user.is_authenticated
         and hasattr(request.user, 'fan_profile')
+        and stream.is_paid
         and stream.artist.allows_paid_content
         and (not stream.artist.paid_content_requires_subscription or has_active_subscription)
     )
@@ -908,6 +925,7 @@ def photo_gallery_detail(request, gallery_id):
     can_buy_gallery = (
         request.user.is_authenticated
         and hasattr(request.user, 'fan_profile')
+        and gallery.is_paid
         and gallery.artist.allows_paid_content
         and (not gallery.artist.paid_content_requires_subscription or has_active_subscription)
     )
@@ -935,7 +953,12 @@ def photo_gallery_create(request):
 
     if request.method == 'POST':
         artist = selected_artist or get_object_or_404(artists, pk=request.POST.get('artist'))
-        form = PhotoGalleryForm(request.POST, request.FILES)
+        form = PhotoGalleryForm(
+            request.POST,
+            request.FILES,
+            artist=artist,
+            allow_free_access=request.user.is_staff or request.user.is_superuser,
+        )
         if form.is_valid():
             gallery = form.save(commit=False)
             gallery.artist = artist
@@ -945,7 +968,11 @@ def photo_gallery_create(request):
             return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
         messages.error(request, 'Nao foi possivel criar a galeria. Confirma os campos assinalados.')
     else:
-        form = PhotoGalleryForm(initial={'access_price': PhotoGallery.MIN_PRICE})
+        form = PhotoGalleryForm(
+            artist=selected_artist,
+            allow_free_access=request.user.is_staff or request.user.is_superuser,
+            initial={'access_price': PhotoGallery.MIN_PRICE},
+        )
 
     return render(request, 'dashboard/photo_gallery_form.html', {
         'artists': artists,
@@ -971,7 +998,13 @@ def photo_gallery_update(request, gallery_id):
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'save_gallery':
-            form = PhotoGalleryForm(request.POST, request.FILES, instance=gallery)
+            form = PhotoGalleryForm(
+                request.POST,
+                request.FILES,
+                instance=gallery,
+                artist=gallery.artist,
+                allow_free_access=request.user.is_staff or request.user.is_superuser,
+            )
             image_form = PhotoGalleryImageUploadForm(gallery=gallery)
             if form.is_valid():
                 gallery = form.save(commit=False)
@@ -990,7 +1023,11 @@ def photo_gallery_update(request, gallery_id):
                 return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
             messages.error(request, 'Nao foi possivel guardar a galeria.')
         elif action == 'add_images':
-            form = PhotoGalleryForm(instance=gallery)
+            form = PhotoGalleryForm(
+                instance=gallery,
+                artist=gallery.artist,
+                allow_free_access=request.user.is_staff or request.user.is_superuser,
+            )
             image_form = PhotoGalleryImageUploadForm(request.POST, request.FILES, gallery=gallery)
             if image_form.is_valid():
                 start_position = gallery.images.count()
@@ -1009,7 +1046,7 @@ def photo_gallery_update(request, gallery_id):
         elif action == 'submit_review':
             if not gallery.images.exists():
                 messages.error(request, 'Adiciona pelo menos uma foto antes de enviar para validacao.')
-            elif gallery.access_price < PhotoGallery.MIN_PRICE:
+            elif gallery.is_paid and gallery.access_price < PhotoGallery.MIN_PRICE:
                 messages.error(request, 'O preco minimo de acesso a galerias na StageHub e 2 EUR.')
             else:
                 gallery.moderation_status = PhotoGallery.PENDING
@@ -1020,7 +1057,11 @@ def photo_gallery_update(request, gallery_id):
                 return redirect(f"{reverse('streams:dashboard')}?artist={gallery.artist_id}")
             return redirect('streams:photo_gallery_update', gallery_id=gallery.id)
     else:
-        form = PhotoGalleryForm(instance=gallery)
+        form = PhotoGalleryForm(
+            instance=gallery,
+            artist=gallery.artist,
+            allow_free_access=request.user.is_staff or request.user.is_superuser,
+        )
         image_form = PhotoGalleryImageUploadForm(gallery=gallery)
 
     return render(request, 'dashboard/photo_gallery_form.html', {
@@ -1088,7 +1129,12 @@ def stream_create(request):
 
     if request.method == 'POST':
         artist = selected_artist or get_object_or_404(artists, pk=request.POST.get('artist'))
-        form = LiveStreamForm(request.POST, request.FILES, artist=artist)
+        form = LiveStreamForm(
+            request.POST,
+            request.FILES,
+            artist=artist,
+            allow_free_access=request.user.is_staff or request.user.is_superuser,
+        )
         if form.is_valid():
             live_stream = form.save(commit=False)
             live_stream.artist = artist
@@ -1142,7 +1188,11 @@ def stream_create(request):
                 'scheduled_at': timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M'),
                 'create_upload_url': True,
             }
-        form = LiveStreamForm(artist=selected_artist, initial=initial)
+        form = LiveStreamForm(
+            artist=selected_artist,
+            allow_free_access=request.user.is_staff or request.user.is_superuser,
+            initial=initial,
+        )
 
     current_event_type = form.data.get('event_type') or form.initial.get('event_type')
     return render(request, 'dashboard/stream_form.html', {
@@ -1186,7 +1236,13 @@ def stream_update(request, stream_id):
                 messages.error(request, str(error))
             return redirect('streams:stream_update', stream_id=stream.id)
 
-        form = LiveStreamForm(request.POST, request.FILES, instance=stream, artist=stream.artist)
+        form = LiveStreamForm(
+            request.POST,
+            request.FILES,
+            instance=stream,
+            artist=stream.artist,
+            allow_free_access=request.user.is_staff or request.user.is_superuser,
+        )
         if form.is_valid():
             updated_stream = form.save()
             if updated_stream.event_type in {LiveStream.LIVE, LiveStream.PREMIERE}:
@@ -1218,7 +1274,11 @@ def stream_update(request, stream_id):
         messages.error(request, 'Nao foi possivel atualizar o evento. Confirma os campos assinalados.')
     else:
         sync_stream_live_input(stream)
-        form = LiveStreamForm(instance=stream, artist=stream.artist)
+        form = LiveStreamForm(
+            instance=stream,
+            artist=stream.artist,
+            allow_free_access=request.user.is_staff or request.user.is_superuser,
+        )
     return render(request, 'dashboard/stream_form.html', {
         'form': form,
         'stream': stream,

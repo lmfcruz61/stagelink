@@ -467,3 +467,59 @@ class SubscriptionCancellationTests(TestCase):
 
         self.assertContains(response, 'As minhas subscrições')
         self.assertContains(response, 'Anular subscrição')
+
+
+class FreeContentCheckoutProtectionTests(TestCase):
+    def setUp(self):
+        self.artist_user = User.objects.create_user(username='free_artist')
+        self.artist = Artist.objects.create(
+            user=self.artist_user,
+            name='Artista Gratuito',
+            is_institutional=True,
+        )
+        self.fan_user = User.objects.create_user(username='free_fan')
+        self.fan = Fan.objects.create(user=self.fan_user, display_name='Publico Gratuito')
+        self.client.force_login(self.fan_user)
+
+    @override_settings(STRIPE_SECRET_KEY='sk_test_xxx')
+    @patch('payments.views.stripe.checkout.Session.create')
+    @patch('payments.views.stripe.Account.retrieve')
+    def test_free_stream_never_starts_stripe_checkout(self, retrieve, session_create):
+        stream = LiveStream.objects.create(
+            artist=self.artist,
+            title='Evento gratuito',
+            event_type=LiveStream.RECORDED,
+            access_type=LiveStream.ACCESS_FREE,
+            access_price=Decimal('0.00'),
+            scheduled_at=timezone.now(),
+            is_active=True,
+        )
+
+        response = self.client.get(reverse('payments:buy_ticket', args=[stream.id]))
+
+        self.assertRedirects(response, reverse('streams:room', args=[stream.id]))
+        retrieve.assert_not_called()
+        session_create.assert_not_called()
+
+    @override_settings(STRIPE_SECRET_KEY='sk_test_xxx')
+    @patch('payments.views.stripe.checkout.Session.create')
+    @patch('payments.views.stripe.Account.retrieve')
+    def test_free_gallery_never_starts_stripe_checkout(self, retrieve, session_create):
+        gallery = PhotoGallery.objects.create(
+            artist=self.artist,
+            title='Galeria gratuita',
+            public_cover='photo_galleries/covers/free-checkout.jpg',
+            access_type=PhotoGallery.ACCESS_FREE,
+            access_price=Decimal('0.00'),
+            is_active=True,
+            moderation_status=PhotoGallery.APPROVED,
+        )
+
+        response = self.client.get(reverse('payments:buy_photo_gallery', args=[gallery.id]))
+
+        self.assertRedirects(
+            response,
+            reverse('streams:photo_gallery_detail', args=[gallery.id]),
+        )
+        retrieve.assert_not_called()
+        session_create.assert_not_called()

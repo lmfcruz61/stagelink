@@ -13,7 +13,11 @@
     <p class="text-sm text-[#2596BE]">{{ stream.artist.name }}</p>
     <h1 class="mt-2 text-3xl font-semibold">{{ stream.title }}</h1>
     <p class="mt-3 text-zinc-300">
-      {% if stream.artist.subscription_includes_content %}
+      {% if stream.is_free %}
+        {% trans "Este conteúdo é gratuito. Inicia sessão para aceder." %}
+      {% elif stream.is_subscribers_only %}
+        {% trans "Este conteúdo está disponível apenas para subscritores ativos." %}
+      {% elif stream.artist.subscription_includes_content %}
         {% trans "Esta sala esta incluida na subscricao ativa deste artista." %}
       {% elif stream.artist.paid_content_requires_subscription %}
         {% trans "Este conteudo pago e exclusivo para subscritores ativos deste artista." %}
@@ -22,10 +26,12 @@
       {% endif %}
     </p>
     <div class="mt-6 grid gap-3">
-      {% if stream.artist.allows_paid_content %}
+      {% if stream.is_free %}
+        <a class="sl-primary w-full" href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}">{% trans "Entrar para ver" %}</a>
+      {% elif stream.is_paid and stream.artist.allows_paid_content %}
         <a class="sl-primary w-full" href="{% url 'payments:buy_ticket' stream.id %}">{% trans "Comprar acesso" %}</a>
       {% endif %}
-      {% if stream.artist.allows_subscriptions %}
+      {% if stream.is_subscribers_only or stream.artist.allows_subscriptions %}
         <a class="sl-secondary w-full" href="{% url 'streams:artist_detail' stream.artist.id %}#subscricoes">{% trans "Ver planos de subscricao" %}</a>
       {% endif %}
     </div>

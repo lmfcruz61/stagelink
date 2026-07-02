@@ -75,6 +75,9 @@
 <section class="mb-8 rounded-xl border border-[#5230EF]/60 bg-[#5230EF]/10 p-5">
   <p class="text-sm font-semibold text-[#2596BE]">Modo de monetizacao</p>
   <h2 class="mt-1 text-2xl font-semibold">{{ artist.get_monetization_mode_display }}</h2>
+  {% if artist.is_institutional %}
+    <p class="mt-2 text-sm font-semibold text-[#10B981]">Artista institucional: pode disponibilizar conteúdos gratuitos individualmente.</p>
+  {% endif %}
   {% if artist.subscription_includes_content %}
     <p class="mt-2 text-sm text-zinc-300">Os conteudos deste artista devem ser apresentados como incluidos na subscricao. A compra avulsa fica desativada.</p>
   {% elif artist.paid_content_requires_subscription %}
@@ -212,7 +215,10 @@
               <div class="min-w-0">
                 <a class="font-semibold hover:text-[#2596BE]" href="{% url 'streams:stream_update' stream.id %}">{{ stream.title }}</a>
                 <p class="mt-1 text-sm text-zinc-400">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</p>
-                <p class="mt-1 text-sm text-zinc-400">{{ stream.access_price }} EUR &middot; {% if stream.is_active %}ativo{% else %}inativo{% endif %}</p>
+                <p class="mt-1 text-sm text-zinc-400">
+                  {{ stream.get_access_type_display }}{% if stream.is_paid %} · {{ stream.access_price }} EUR{% endif %}
+                  &middot; {% if stream.is_active %}ativo{% else %}inativo{% endif %}
+                </p>
                 {% if stream.display_status.code == 'live' %}
                   <p class="mt-2"><span class="sl-live-badge"><span class="sl-live-dot"></span>Ao vivo</span></p>
                 {% else %}
@@ -251,7 +257,10 @@
               </a>
               <div class="min-w-0">
                 <a class="font-semibold hover:text-[#2596BE]" href="{% url 'streams:photo_gallery_update' gallery.id %}">{{ gallery.title }}</a>
-                <p class="mt-1 text-sm text-zinc-400">{{ gallery.access_price }} EUR &middot; {{ gallery.image_count }} fotos &middot; {% if gallery.is_active %}ativa{% else %}inativa{% endif %}</p>
+                <p class="mt-1 text-sm text-zinc-400">
+                  {{ gallery.get_access_type_display }}{% if gallery.is_paid %} · {{ gallery.access_price }} EUR{% endif %}
+                  &middot; {{ gallery.image_count }} fotos &middot; {% if gallery.is_active %}ativa{% else %}inativa{% endif %}
+                </p>
                 <p class="mt-1 text-xs text-zinc-500">Validacao: {{ gallery.get_moderation_status_display }}</p>
                 {% if gallery.is_sensitive %}<p class="mt-1 text-xs text-amber-200">Conteudo sensivel/adulto</p>{% endif %}
               </div>

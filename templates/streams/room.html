@@ -59,10 +59,17 @@
           {% endif %}
           <span class="sl-chip"><span id="viewer-count">0</span> a ver</span>
           <span class="sl-chip">{{ stream.scheduled_at|date:"d/m/Y H:i" }}</span>
-          <span class="sl-chip">{{ stream.access_price }} EUR</span>
+          {% if stream.is_free %}
+            <span class="sl-chip border-emerald-500 text-emerald-200">Gratuito</span>
+          {% elif stream.is_subscribers_only %}
+            <span class="sl-chip border-[#2596BE] text-[#2596BE]">Subscritores</span>
+          {% else %}
+            <span class="sl-chip">{{ stream.access_price }} EUR</span>
+          {% endif %}
         </div>
       </div>
 
+      {% if stream.is_paid %}
       <form method="post" action="{% url 'payments:create_tip' stream.id %}" class="sl-card w-full p-3 lg:w-[360px]">
         {% csrf_token %}
         <p class="mb-3 text-sm font-semibold text-zinc-200">Enviar gorjeta</p>
@@ -72,6 +79,7 @@
         </div>
         <button class="sl-primary mt-3 w-full">{% trans "Gorjeta" %}</button>
       </form>
+      {% endif %}
     </div>
 
     {% if stream.cover_image %}

@@ -14,6 +14,14 @@ logger = logging.getLogger(__name__)
 
 class LiveStream(models.Model):
     MIN_PRICE = Decimal('2.00')
+    ACCESS_PAID = 'paid'
+    ACCESS_FREE = 'free'
+    ACCESS_SUBSCRIBERS = 'subscribers'
+    ACCESS_TYPE_CHOICES = (
+        (ACCESS_PAID, 'Pago'),
+        (ACCESS_FREE, 'Gratuito'),
+        (ACCESS_SUBSCRIBERS, 'Apenas subscritores'),
+    )
     VIDEO_PROVIDER_CLOUDFLARE = 'cloudflare_stream'
     VIDEO_PROVIDER_CLOUDFLARE_WEBRTC = 'cloudflare_webrtc'
     VIDEO_PROVIDER_YOUTUBE = 'youtube'
@@ -59,6 +67,11 @@ class LiveStream(models.Model):
     uploaded_at = models.DateTimeField(blank=True, null=True)
     youtube_video_id = models.CharField(max_length=200, blank=True)
     event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default=LIVE)
+    access_type = models.CharField(
+        max_length=20,
+        choices=ACCESS_TYPE_CHOICES,
+        default=ACCESS_PAID,
+    )
     access_price = models.DecimalField(max_digits=8, decimal_places=2, default=MIN_PRICE)
     scheduled_at = models.DateTimeField()
     duration_minutes = models.PositiveIntegerField(
@@ -85,6 +98,18 @@ class LiveStream(models.Model):
     @property
     def has_paid_tickets(self):
         return self.ticket_purchases.filter(paid=True).exists()
+
+    @property
+    def is_free(self):
+        return self.access_type == self.ACCESS_FREE
+
+    @property
+    def is_subscribers_only(self):
+        return self.access_type == self.ACCESS_SUBSCRIBERS
+
+    @property
+    def is_paid(self):
+        return self.access_type == self.ACCESS_PAID
 
     @property
     def visual_state(self):
@@ -312,12 +337,18 @@ class LiveStream(models.Model):
             ).exists():
                 return {**base, 'allowed': True, 'reason': 'organization_manager'}
 
-        if self.access_price <= 0:
-            return {**base, 'allowed': False, 'reason': 'free_events_disabled'}
+        active_subscription = self.active_subscription_for_user(user)
+        if self.is_free:
+            return {**base, 'allowed': True, 'reason': 'free_content'}
+        if self.is_subscribers_only:
+            if active_subscription:
+                return {**base, 'allowed': True, 'reason': 'subscribers_only_content'}
+            return {**base, 'allowed': False, 'reason': 'subscription_required'}
+        if self.access_price < self.MIN_PRICE:
+            return {**base, 'allowed': False, 'reason': 'invalid_paid_price'}
 
         from payments.models import StreamTicketPurchase
 
-        active_subscription = self.active_subscription_for_user(user)
         has_required_subscription = bool(active_subscription) if self.artist.paid_content_requires_subscription else True
 
         has_paid_ticket = StreamTicketPurchase.objects.filter(
@@ -379,11 +410,20 @@ class PhotoGallery(models.Model):
     )
     MIN_PRICE = Decimal('2.00')
     MAX_IMAGES = 30
+    ACCESS_PAID = LiveStream.ACCESS_PAID
+    ACCESS_FREE = LiveStream.ACCESS_FREE
+    ACCESS_SUBSCRIBERS = LiveStream.ACCESS_SUBSCRIBERS
+    ACCESS_TYPE_CHOICES = LiveStream.ACCESS_TYPE_CHOICES
 
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='photo_galleries')
     title = models.CharField(max_length=180)
     description = models.TextField(blank=True)
     public_cover = models.ImageField(upload_to='photo_galleries/covers/')
+    access_type = models.CharField(
+        max_length=20,
+        choices=ACCESS_TYPE_CHOICES,
+        default=ACCESS_PAID,
+    )
     access_price = models.DecimalField(max_digits=8, decimal_places=2, default=MIN_PRICE)
     is_active = models.BooleanField(default=False)
     is_sensitive = models.BooleanField(default=False)
@@ -409,7 +449,10 @@ class PhotoGallery(models.Model):
 
     @property
     def is_publicly_available(self):
-        return self.is_active and self.moderation_status == self.APPROVED and self.access_price >= self.MIN_PRICE
+        valid_access = self.access_type in {self.ACCESS_FREE, self.ACCESS_SUBSCRIBERS}
+        if self.access_type == self.ACCESS_PAID:
+            valid_access = self.access_price >= self.MIN_PRICE
+        return self.is_active and self.moderation_status == self.APPROVED and valid_access
 
     @property
     def has_paid_purchases(self):
@@ -418,6 +461,18 @@ class PhotoGallery(models.Model):
     @property
     def image_count(self):
         return self.images.count()
+
+    @property
+    def is_free(self):
+        return self.access_type == self.ACCESS_FREE
+
+    @property
+    def is_subscribers_only(self):
+        return self.access_type == self.ACCESS_SUBSCRIBERS
+
+    @property
+    def is_paid(self):
+        return self.access_type == self.ACCESS_PAID
 
     def user_has_access(self, user):
         if not user.is_authenticated:
@@ -429,6 +484,8 @@ class PhotoGallery(models.Model):
         if self.artist.organization_id:
             if self.artist.organization.members.filter(user=user, role__in=OrganizationMember.EDIT_ROLES).exists():
                 return True
+        if self.is_free:
+            return True
         fan = getattr(user, 'fan_profile', None)
         if not fan:
             return False
@@ -440,6 +497,8 @@ class PhotoGallery(models.Model):
             status=Subscription.ACTIVE,
             current_period_end__gte=timezone.now(),
         ).exists()
+        if self.is_subscribers_only:
+            return active_subscription
         if active_subscription and self.artist.subscription_includes_content:
             return True
         if self.artist.paid_content_requires_subscription and not active_subscription:

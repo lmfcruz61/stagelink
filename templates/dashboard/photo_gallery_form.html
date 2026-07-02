@@ -98,7 +98,10 @@
       {% if gallery %}
         <div class="sl-card p-5">
           <h2 class="text-xl font-semibold">Resumo</h2>
-          <p class="mt-3 text-sm text-zinc-400">Preco: <span class="text-zinc-100">{{ gallery.access_price }} EUR</span></p>
+          <p class="mt-3 text-sm text-zinc-400">Acesso: <span class="text-zinc-100">{{ gallery.get_access_type_display }}</span></p>
+          {% if gallery.is_paid %}
+            <p class="mt-1 text-sm text-zinc-400">Preco: <span class="text-zinc-100">{{ gallery.access_price }} EUR</span></p>
+          {% endif %}
           <p class="mt-1 text-sm text-zinc-400">Fotos: <span class="text-zinc-100">{{ gallery.image_count }}</span></p>
           <p class="mt-1 text-sm text-zinc-400">Publicacao: <span class="text-zinc-100">{% if gallery.is_active %}ativa{% else %}inativa{% endif %}</span></p>
           {% if gallery.is_sensitive %}<p class="mt-3 rounded border border-amber-500/50 bg-amber-500/10 p-3 text-sm text-amber-100">Marcada como conteudo sensivel/adulto.</p>{% endif %}
@@ -222,4 +225,16 @@
     })();
   </script>
 {% endif %}
+<script>
+  (function () {
+    const accessType = document.querySelector('#id_access_type');
+    const accessPrice = document.querySelector('#id_access_price');
+    const accessPriceRow = accessPrice?.closest('p');
+    function updateAccessPrice() {
+      accessPriceRow?.classList.toggle('hidden', accessType?.value !== 'paid');
+    }
+    accessType?.addEventListener('change', updateAccessPrice);
+    updateAccessPrice();
+  })();
+</script>
 {% endblock %}
